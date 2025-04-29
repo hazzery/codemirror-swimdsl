@@ -1,25 +1,27 @@
 import { parser } from "./syntax.grammar"
 import { LRLanguage, LanguageSupport, indentNodeProp, foldNodeProp, foldInside, delimitedIndent } from "@codemirror/language"
-import { styleTags, tags as t } from "@lezer/highlight"
+import { styleTags, tags } from "@lezer/highlight"
+
+let parserWithMetadata = parser.configure({
+  props: [
+    indentNodeProp.add({
+      Application: delimitedIndent({ closing: ")", align: false })
+    }),
+    foldNodeProp.add({
+      Application: foldInside
+    }),
+    styleTags({
+      Identifier: tags.variableName,
+      Boolean: tags.bool,
+      String: tags.string,
+      LineComment: tags.lineComment,
+      "( )": tags.paren
+    })
+  ]
+})
 
 export const SwimdslLanguage = LRLanguage.define({
-  parser: parser.configure({
-    props: [
-      indentNodeProp.add({
-        Application: delimitedIndent({ closing: ")", align: false })
-      }),
-      foldNodeProp.add({
-        Application: foldInside
-      }),
-      styleTags({
-        Identifier: t.variableName,
-        Boolean: t.bool,
-        String: t.string,
-        LineComment: t.lineComment,
-        "( )": t.paren
-      })
-    ]
-  }),
+  parser: parserWithMetadata,
   languageData: {
     commentTokens: { line: ";" }
   }
