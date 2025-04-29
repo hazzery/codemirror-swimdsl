@@ -21,6 +21,7 @@ let parserWithMetadata = parser.configure({
 })
 
 export const SwimdslLanguage = LRLanguage.define({
+  name: "swimdsl",
   parser: parserWithMetadata,
   languageData: {
     commentTokens: { line: ";" }
