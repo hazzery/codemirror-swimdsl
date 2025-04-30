@@ -1,7 +1,7 @@
-import { parser } from "./syntax.grammar"
-import { LRLanguage, LanguageSupport, indentNodeProp, foldNodeProp, foldInside, delimitedIndent } from "@codemirror/language"
-import { styleTags, tags } from "@lezer/highlight"
-import { LRParser } from "@lezer/lr"
+import { LRLanguage, LanguageSupport, delimitedIndent, foldInside, foldNodeProp, indentNodeProp } from "@codemirror/language";
+import { styleTags, tags } from "@lezer/highlight";
+import { LRParser } from "@lezer/lr";
+import { parser } from "./syntax.grammar";
 
 let parserWithMetadata: LRParser = parser.configure({
   props: [
@@ -19,7 +19,7 @@ let parserWithMetadata: LRParser = parser.configure({
       "( )": tags.paren
     })
   ]
-})
+});
 
 export const swimdslLanguage: LRLanguage = LRLanguage.define({
   name: "swimdsl",
@@ -27,8 +27,8 @@ export const swimdslLanguage: LRLanguage = LRLanguage.define({
   languageData: {
     commentTokens: { line: ";" }
   },
-})
+});
 
 export function swimdsl(): LanguageSupport {
-  return new LanguageSupport(swimdslLanguage)
+  return new LanguageSupport(swimdslLanguage);
 }
