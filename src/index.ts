@@ -1,8 +1,9 @@
 import { parser } from "./syntax.grammar"
 import { LRLanguage, LanguageSupport, indentNodeProp, foldNodeProp, foldInside, delimitedIndent } from "@codemirror/language"
 import { styleTags, tags } from "@lezer/highlight"
+import { LRParser } from "@lezer/lr"
 
-let parserWithMetadata = parser.configure({
+let parserWithMetadata: LRParser = parser.configure({
   props: [
     indentNodeProp.add({
       Application: delimitedIndent({ closing: ")", align: false })
@@ -20,14 +21,14 @@ let parserWithMetadata = parser.configure({
   ]
 })
 
-export const SwimdslLanguage = LRLanguage.define({
+export const swimdslLanguage: LRLanguage = LRLanguage.define({
   name: "swimdsl",
   parser: parserWithMetadata,
   languageData: {
     commentTokens: { line: ";" }
-  }
+  },
 })
 
-export function swimdsl() {
-  return new LanguageSupport(SwimdslLanguage)
+export function swimdsl(): LanguageSupport {
+  return new LanguageSupport(swimdslLanguage)
 }

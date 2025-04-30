@@ -1,4 +1,4 @@
-import { SwimdslLanguage } from "../dist/index.js"
+import { swimdslLanguage } from "../dist/index.js"
 import { fileTests } from "@lezer/generator/dist/test"
 
 import * as fs from "fs"
