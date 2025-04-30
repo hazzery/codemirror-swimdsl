@@ -6,6 +6,10 @@
     "test": "mocha test/test.js",
     "prepare": "rollup -c"
   },
+  "author": {
+    "name": "Harrison Parkes",
+    "email": "git@hparkes.com"
+  },
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -27,5 +31,9 @@
     "rollup-plugin-dts": "^6.2.1",
     "rollup-plugin-ts": "^3.0.2",
     "typescript": "^5.8.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hazzery/codemirror-swimdsl"
   }
 }
