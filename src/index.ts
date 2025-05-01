@@ -14,11 +14,12 @@ let parserWithMetadata: LRParser = parser.configure({
       Application: foldInside
     }),
     styleTags({
+      Stroke: tags.className,
+      Time: tags.integer,
+      Percentage: tags.integer,
+      Number: tags.integer,
       Identifier: tags.variableName,
-      Boolean: tags.bool,
-      String: tags.string,
-      LineComment: tags.lineComment,
-      "( )": tags.paren
+      Stroke: tags.className,
     })
   ]
 });

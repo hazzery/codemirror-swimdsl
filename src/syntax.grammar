@@ -1,26 +1,87 @@
-@top Program { expression* }
+@top StatementList { Statement+ }
 
-@skip { space | LineComment }
+Statement {
+  Set
+  | RestInstruction
+  | PaceDefinition
+  | Comment
+}
 
-expression {
-  Identifier |
-  String |
-  Boolean |
-  Application { "(" expression* ")" }
+Set {
+  Instruction | RepeatedInstruction
+}
+
+Instruction {
+  SingleInstruction | BlockInstruction
+}
+
+BlockInstruction {
+  "{" Statement+ "}"
+}
+
+RepeatedInstruction {
+    Number "x" Instruction
+}
+
+SingleInstruction {
+    Distance Stroke Pace?
+}
+
+RestInstruction {
+    Duration "rest"
+}
+
+Distance {
+    Number
+}
+
+Stroke {
+    "Freestyle"
+  | "Backstroke"
+  | "Butterfly"
+  | "Breaststroke"
+}
+
+PaceDefinition {
+    "Pace" Identifier "=" Percentage
+}
+
+Pace {
+    "@" ( FixedTime 
+        | PerceivedRate
+        | VariableRate )
+}
+
+FixedTime {
+    Duration
+}
+
+Duration {
+    Number ":" Number    // minutes:seconds
+}
+
+Percentage {
+    Number "%"         // e.g., 60% or 5%
+}
+
+PerceivedRate {
+    (Percentage | PaceAlias)
+}
+
+VariableRate {
+     PerceivedRate "->" PerceivedRate  // can model increasing or decreasing rate
+}
+
+PaceAlias {
+    Identifier        // a named pace, e.g., easy or hard
 }
 
 @tokens {
-  Identifier { $[a-zA-Z_\-0-9]+ }
-
-  String { '"' (!["\\] | "\\" _)* '"' }
-
-  Boolean { "#t" | "#f" }
-
-  LineComment { ";" ![\n]* }
-
-  space { $[ \t\n\r]+ }
-
-  "(" ")"
+    space      { @whitespace+ }
+    Comment    { "#" ![\n]* }
+    Number     { @digit+ }
+    Identifier { @asciiLetter+ }
 }
 
-@detectDelim
+@skip { space }
+
