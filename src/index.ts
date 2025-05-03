@@ -28,7 +28,7 @@ export const swimdslLanguage: LRLanguage = LRLanguage.define({
   name: "swimdsl",
   parser: parserWithMetadata,
   languageData: {
-    commentTokens: { line: ";" }
+    commentTokens: { line: "#" }
   },
 });
 
