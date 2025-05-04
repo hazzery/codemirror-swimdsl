@@ -10,15 +10,14 @@ const strokeList: Completion[] = [
 
 function completeSwimDSL(context: CompletionContext): CompletionResult | null {
   let nodeBefore = syntaxTree(context.state).resolveInner(context.pos, -1);
-  // You can examine the node type, its parent, or even the node text to decide what completions to offer
-  if (nodeBefore.name === "Stroke" || nodeBefore.parent?.name === "Stroke") {
-    // If the cursor is inside or right after a Stroke field, suggest stroke names.
+  if (nodeBefore.parent?.name === "SingleInstruction") {
     return {
       from: context.pos,
       options: strokeList,
       validFor: /^[A-Za-z]/
     };
   }
+
   // For pace keyword completion at the start of a line (e.g., when writing a PaceDefinition)
   if (nodeBefore.name === "Statement" &&
     context.state.doc.lineAt(context.pos).text.trim().startsWith("P")) {
