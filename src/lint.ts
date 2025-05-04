@@ -51,8 +51,58 @@ function lintSyntaxErrors(node: SyntaxNodeRef, diagnostics: Diagnostic[]) {
     from: node.from,
     to: node.to,
     severity: "error",
-    message: "Syntax error"
+    message: "Syntax error",
   });
+}
+
+const incompatibleGearMap: Map<string, Set<string>> = new Map<string, Set<string>>([
+  ["Default", new Set(["Board", "Bouy"])],
+  ["Kick", new Set(["Bouy", "Paddles"])],
+  ["Pull", new Set(["Board", "Fins"])],
+]);
+
+function lintIncompatibleGear(node: SyntaxNodeRef, editorState: EditorState, diagnostics: Diagnostic[]) {
+  if (node.name !== "Instruction") return;
+
+  const gearSpecificationNode = node.node.getChild("GearSpecification");
+  if (gearSpecificationNode === null) return;
+
+  const strokeTypeNode = node.node.getChild("StrokeType");
+  const strokeType = strokeTypeNode !== null
+    ? editorState.sliceDoc(strokeTypeNode.from, strokeTypeNode.to)
+    : "Default";
+
+  const fromPosition = strokeTypeNode !== null
+    ? strokeTypeNode.from
+    : gearSpecificationNode.from;
+
+  const specifiedGear = gearSpecificationNode.getChildren("RequiredGear").map(child => editorState.sliceDoc(child.from, child.to))
+  const gearSet = new Set(specifiedGear);
+
+  if (gearSet.size !== specifiedGear.length) {
+    diagnostics.push({
+      from: fromPosition,
+      to: gearSpecificationNode.to,
+      severity: "error",
+      message: "Duplicate gear specified. Please do not use the same gear multiple times",
+    })
+  }
+
+  const incompatibleGear = incompatibleGearMap.get(strokeType);
+
+  if (incompatibleGear === undefined) return;
+
+  for (const gearType of gearSet) {
+    if (incompatibleGear.has(gearType)) {
+      diagnostics.push({
+        from: fromPosition,
+        to: gearSpecificationNode.to,
+        severity: "error",
+        message: `'${gearType}' is not compatible with stroke type '${strokeType}'`,
+      })
+    }
+
+  }
 }
 
 function swimdslLintSource(view: EditorView): Diagnostic[] {
@@ -66,6 +116,7 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
   while (treeCursor.next()) {
     lintUndefinedPaceName(treeCursor, declaredIdentifiers, state, diagnostics);
     lintSyntaxErrors(treeCursor, diagnostics);
+    lintIncompatibleGear(treeCursor, state, diagnostics);
   }
 
   return diagnostics;

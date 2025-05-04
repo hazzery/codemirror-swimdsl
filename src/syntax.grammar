@@ -12,7 +12,7 @@ Set {
 }
 
 Instruction {
-  (SingleInstruction | BlockInstruction) Pace?
+  (SingleInstruction | BlockInstruction) StrokeType? GearSpecification? Pace?
 }
 
 BlockInstruction {
@@ -25,6 +25,21 @@ RepeatedInstruction {
 
 SingleInstruction {
     Distance Stroke
+}
+
+StrokeType {
+    "Kick" | "Pull" | "Drill"
+}
+
+GearSpecification {
+    "+" RequiredGear+
+}
+
+RequiredGear {
+    "Fins"
+    | "Board"
+    | "Paddles"
+    | "Bouy"
 }
 
 RestInstruction {

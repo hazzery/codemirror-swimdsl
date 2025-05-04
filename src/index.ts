@@ -16,10 +16,12 @@ let parserWithMetadata: LRParser = parser.configure({
     }),
     styleTags({
       Stroke: tags.className,
+      StrokeType: tags.typeName,
       Duration: tags.integer,
       Percentage: tags.integer,
       Number: tags.integer,
       Identifier: tags.variableName,
+      RequiredGear: tags.macroName,
       Comment: tags.comment,
     })
   ]
