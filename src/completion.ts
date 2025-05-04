@@ -1,4 +1,4 @@
-import { Completion, CompletionContext } from "@codemirror/autocomplete";
+import { Completion, CompletionContext, CompletionResult } from "@codemirror/autocomplete";
 import { syntaxTree } from "@codemirror/language";
 
 const strokeList: Completion[] = [
@@ -8,7 +8,7 @@ const strokeList: Completion[] = [
   { label: "Butterfly", type: "constant" },
 ];
 
-function completeSwimDSL(context: CompletionContext) {
+function completeSwimDSL(context: CompletionContext): CompletionResult | null {
   let nodeBefore = syntaxTree(context.state).resolveInner(context.pos, -1);
   // You can examine the node type, its parent, or even the node text to decide what completions to offer
   if (nodeBefore.name === "Stroke" || nodeBefore.parent?.name === "Stroke") {
