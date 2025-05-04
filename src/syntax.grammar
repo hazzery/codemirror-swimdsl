@@ -12,7 +12,7 @@ Set {
 }
 
 Instruction {
-  SingleInstruction | BlockInstruction
+  (SingleInstruction | BlockInstruction) Pace?
 }
 
 BlockInstruction {
@@ -24,7 +24,7 @@ RepeatedInstruction {
 }
 
 SingleInstruction {
-    Distance Stroke Pace?
+    Distance Stroke
 }
 
 RestInstruction {
