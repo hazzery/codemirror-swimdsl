@@ -1,5 +1,5 @@
 import { syntaxTree } from '@codemirror/language';
-import { linter, Diagnostic } from '@codemirror/lint';
+import { Diagnostic, linter } from '@codemirror/lint';
 import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
 import { SyntaxNodeRef, TreeCursor } from '@lezer/common';
