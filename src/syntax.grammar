@@ -6,15 +6,19 @@
 }
 
 PoolLengthDeclaration {
-    "set PoolLength" Number Identifier
+    "set PoolLength" Number LengthUnit
 }
+
+LengthUnit { identifier }
 
 DistanceUnitDeclaration {
-    "set DistanceUnit" Identifier
+    "set DistanceUnit" DistanceUnit
 }
 
+DistanceUnit { identifier }
+
 PaceDefinition {
-    "Pace" Identifier "=" Percentage
+    "Pace" PaceAlias "=" Percentage
 }
 
 Percentage {
@@ -38,19 +42,19 @@ SingleInstruction {
 
 Distance { Number }
 
-Stroke { Identifier }
+Stroke { identifier }
 
 BlockInstruction {
   "{" Statement+ "}"
 }
 
-StrokeType { Identifier }
+StrokeType { identifier }
 
 GearSpecification {
     "+" RequiredGear+
 }
 
-RequiredGear { Identifier }
+RequiredGear { identifier }
 
 Pace {
     "@" ( Duration 
@@ -66,7 +70,7 @@ PerceivedRate {
     (Percentage | PaceAlias)
 }
 
-PaceAlias { Identifier }  // a named pace, e.g., easy or hard
+PaceAlias { identifier }  // a named pace, e.g., easy or hard
 
 VariableRate {
      PerceivedRate "->" PerceivedRate  // can model increasing or decreasing rate
@@ -85,10 +89,9 @@ RestInstruction {
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
     Message     { ">" ![\n]+ }
-    Identifier  { @asciiLetter+ }
+    identifier  { @asciiLetter+ }
     repititionOperator {"x"}
-    @precedence { repititionOperator, Identifier }
-    @precedence { StringContent, Comment, space }
+    @precedence { repititionOperator, identifier }
 }
 
 @skip { space | Comment }
