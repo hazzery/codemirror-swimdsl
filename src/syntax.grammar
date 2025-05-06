@@ -36,9 +36,7 @@ SingleInstruction {
     Distance Stroke
 }
 
-Distance {
-    Number
-}
+Distance { Number }
 
 Stroke { Identifier }
 
