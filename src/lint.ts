@@ -154,7 +154,7 @@ function lintInvalidStrokeType(
       from: node.from,
       to: node.to,
       severity: "error",
-      message: `${strokeType} is not a valid stroke name.`,
+      message: `${strokeType} is not a valid stroke type.`,
     });
   }
 }
