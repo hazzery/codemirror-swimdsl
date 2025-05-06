@@ -3,7 +3,7 @@ import { Diagnostic, linter } from "@codemirror/lint";
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { SyntaxNodeRef, TreeCursor } from "@lezer/common";
-import { StrokeName, StrokeType } from "./enumerations";
+import { StrokeName, StrokeType, RequiredGear } from "./enumerations";
 
 function undefinedPaceNameMessage(pace_name: string): string {
   return `'${pace_name}' is not a defined pace name.
@@ -159,6 +159,24 @@ function lintInvalidStrokeType(
   }
 }
 
+function lintInvalidRequiredGear(
+  node: SyntaxNodeRef,
+  editorState: EditorState,
+  diagnostics: Diagnostic[],
+): void {
+  if (node.name !== "RequiredGear") return;
+
+  const requiredGear = editorState.sliceDoc(node.from, node.to);
+  if (RequiredGear[requiredGear as keyof typeof RequiredGear] === undefined) {
+    diagnostics.push({
+      from: node.from,
+      to: node.to,
+      severity: "error",
+      message: `${requiredGear} is not the name of a valid peice of gear.`,
+    });
+  }
+}
+
 function swimdslLintSource(view: EditorView): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];
 
@@ -173,6 +191,7 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
     lintIncompatibleGear(treeCursor, editorState, diagnostics);
     lintInvalidStrokeName(treeCursor, editorState, diagnostics);
     lintInvalidStrokeType(treeCursor, editorState, diagnostics);
+    lintInvalidRequiredGear(treeCursor, editorState, diagnostics);
   }
 
   return diagnostics;
