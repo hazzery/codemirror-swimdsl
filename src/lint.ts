@@ -1,8 +1,8 @@
-import { syntaxTree } from '@codemirror/language';
-import { Diagnostic, linter } from '@codemirror/lint';
-import { EditorState } from '@codemirror/state';
-import { EditorView } from '@codemirror/view';
-import { SyntaxNodeRef, TreeCursor } from '@lezer/common';
+import { syntaxTree } from "@codemirror/language";
+import { Diagnostic, linter } from "@codemirror/lint";
+import { EditorState } from "@codemirror/state";
+import { EditorView } from "@codemirror/view";
+import { SyntaxNodeRef, TreeCursor } from "@lezer/common";
 
 function undefinedPaceNameMessage(pace_name: string): string {
   return `'${pace_name}' is not a defined pace name.
@@ -26,25 +26,33 @@ function lintUndefinedPaceName(
 
   if (parent.name === "PaceDefinition") {
     declaredIdentifiers.add(node_value);
-  } else if (parent.name === "PaceAlias" && !declaredIdentifiers.has(node_value)) {
+  } else if (
+    parent.name === "PaceAlias" &&
+    !declaredIdentifiers.has(node_value)
+  ) {
     diagnostics.push({
       from: node.from,
       to: node.to,
       severity: "error",
       message: undefinedPaceNameMessage(node_value),
-      actions: [{
-        name: "Define pace name",
-        apply(view: EditorView, _from: number, _to: number) {
-          view.dispatch(
-            { changes: { from: 0, to: 0, insert: `Pace ${node_value} = _%\n` } },
-          );
+      actions: [
+        {
+          name: "Define pace name",
+          apply(view: EditorView, _from: number, _to: number) {
+            view.dispatch({
+              changes: { from: 0, to: 0, insert: `Pace ${node_value} = _%\n` },
+            });
+          },
         },
-      }],
+      ],
     });
   }
 }
 
-function lintSyntaxErrors(node: SyntaxNodeRef, diagnostics: Diagnostic[]): void {
+function lintSyntaxErrors(
+  node: SyntaxNodeRef,
+  diagnostics: Diagnostic[],
+): void {
   if (node.name !== "⚠") return;
 
   diagnostics.push({
@@ -55,7 +63,10 @@ function lintSyntaxErrors(node: SyntaxNodeRef, diagnostics: Diagnostic[]): void 
   });
 }
 
-const incompatibleGearMap: Map<string, Set<string>> = new Map<string, Set<string>>([
+const incompatibleGearMap: Map<string, Set<string>> = new Map<
+  string,
+  Set<string>
+>([
   ["Default", new Set(["Board", "Bouy"])],
   ["Kick", new Set(["Bouy", "Paddles"])],
   ["Pull", new Set(["Board", "Fins"])],
@@ -72,17 +83,17 @@ function lintIncompatibleGear(
   if (gearSpecificationNode === null) return;
 
   const strokeTypeNode = node.node.getChild("StrokeType");
-  const strokeType = strokeTypeNode !== null
-    ? editorState.sliceDoc(strokeTypeNode.from, strokeTypeNode.to)
-    : "Default";
+  const strokeType =
+    strokeTypeNode !== null
+      ? editorState.sliceDoc(strokeTypeNode.from, strokeTypeNode.to)
+      : "Default";
 
-  const fromPosition = strokeTypeNode !== null
-    ? strokeTypeNode.from
-    : gearSpecificationNode.from;
+  const fromPosition =
+    strokeTypeNode !== null ? strokeTypeNode.from : gearSpecificationNode.from;
 
   const specifiedGear = gearSpecificationNode
     .getChildren("RequiredGear")
-    .map(child => editorState.sliceDoc(child.from, child.to));
+    .map((child) => editorState.sliceDoc(child.from, child.to));
   const gearSet = new Set(specifiedGear);
 
   if (gearSet.size !== specifiedGear.length) {
@@ -90,7 +101,8 @@ function lintIncompatibleGear(
       from: fromPosition,
       to: gearSpecificationNode.to,
       severity: "error",
-      message: "Duplicate gear specified. Please do not use the same gear multiple times",
+      message:
+        "Duplicate gear specified. Please do not use the same gear multiple times",
     });
   }
 
@@ -105,7 +117,7 @@ function lintIncompatibleGear(
         to: gearSpecificationNode.to,
         severity: "error",
         message: `'${gearType}' is not compatible with stroke type '${strokeType}'`,
-      })
+      });
     }
 
   }
