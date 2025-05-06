@@ -3,7 +3,7 @@ import { Diagnostic, linter } from "@codemirror/lint";
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { SyntaxNodeRef, TreeCursor } from "@lezer/common";
-import { StrokeName } from "./enumerations";
+import { StrokeName, StrokeType } from "./enumerations";
 
 function undefinedPaceNameMessage(pace_name: string): string {
   return `'${pace_name}' is not a defined pace name.
@@ -130,13 +130,31 @@ function lintInvalidStrokeName(
 ): void {
   if (node.name !== "Stroke") return;
 
-  const stroke_name = editorState.sliceDoc(node.from, node.to);
-  if (StrokeName[stroke_name as keyof typeof StrokeName] === undefined) {
+  const strokeName = editorState.sliceDoc(node.from, node.to);
+  if (StrokeName[strokeName as keyof typeof StrokeName] === undefined) {
     diagnostics.push({
       from: node.from,
       to: node.to,
       severity: "error",
-      message: `${stroke_name} is not a valid stroke name.`,
+      message: `${strokeName} is not a valid stroke name.`,
+    });
+  }
+}
+
+function lintInvalidStrokeType(
+  node: SyntaxNodeRef,
+  editorState: EditorState,
+  diagnostics: Diagnostic[],
+): void {
+  if (node.name !== "StrokeType") return;
+
+  const strokeType = editorState.sliceDoc(node.from, node.to);
+  if (StrokeType[strokeType as keyof typeof StrokeType] === undefined) {
+    diagnostics.push({
+      from: node.from,
+      to: node.to,
+      severity: "error",
+      message: `${strokeType} is not a valid stroke name.`,
     });
   }
 }
@@ -154,6 +172,7 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
     lintSyntaxErrors(treeCursor, diagnostics);
     lintIncompatibleGear(treeCursor, editorState, diagnostics);
     lintInvalidStrokeName(treeCursor, editorState, diagnostics);
+    lintInvalidStrokeType(treeCursor, editorState, diagnostics);
   }
 
   return diagnostics;
