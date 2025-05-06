@@ -15,7 +15,7 @@ function lintUndefinedPaceName(
   declaredIdentifiers: Set<string>,
   state: EditorState,
   diagnostics: Diagnostic[],
-) {
+): void {
   if (node.name !== "Identifier") return;
 
   let parent = node.node.parent;
@@ -38,13 +38,13 @@ function lintUndefinedPaceName(
           view.dispatch(
             { changes: { from: 0, to: 0, insert: `Pace ${node_value} = _%\n` } },
           );
-        }
-      }]
+        },
+      }],
     });
   }
 }
 
-function lintSyntaxErrors(node: SyntaxNodeRef, diagnostics: Diagnostic[]) {
+function lintSyntaxErrors(node: SyntaxNodeRef, diagnostics: Diagnostic[]): void {
   if (node.name !== "⚠") return;
 
   diagnostics.push({
@@ -61,7 +61,11 @@ const incompatibleGearMap: Map<string, Set<string>> = new Map<string, Set<string
   ["Pull", new Set(["Board", "Fins"])],
 ]);
 
-function lintIncompatibleGear(node: SyntaxNodeRef, editorState: EditorState, diagnostics: Diagnostic[]) {
+function lintIncompatibleGear(
+  node: SyntaxNodeRef,
+  editorState: EditorState,
+  diagnostics: Diagnostic[],
+): void {
   if (node.name !== "Instruction") return;
 
   const gearSpecificationNode = node.node.getChild("GearSpecification");
@@ -76,7 +80,9 @@ function lintIncompatibleGear(node: SyntaxNodeRef, editorState: EditorState, dia
     ? strokeTypeNode.from
     : gearSpecificationNode.from;
 
-  const specifiedGear = gearSpecificationNode.getChildren("RequiredGear").map(child => editorState.sliceDoc(child.from, child.to))
+  const specifiedGear = gearSpecificationNode
+    .getChildren("RequiredGear")
+    .map(child => editorState.sliceDoc(child.from, child.to));
   const gearSet = new Set(specifiedGear);
 
   if (gearSet.size !== specifiedGear.length) {
@@ -85,7 +91,7 @@ function lintIncompatibleGear(node: SyntaxNodeRef, editorState: EditorState, dia
       to: gearSpecificationNode.to,
       severity: "error",
       message: "Duplicate gear specified. Please do not use the same gear multiple times",
-    })
+    });
   }
 
   const incompatibleGear = incompatibleGearMap.get(strokeType);

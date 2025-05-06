@@ -14,7 +14,7 @@ function completeSwimDSL(context: CompletionContext): CompletionResult | null {
     return {
       from: context.pos,
       options: strokeList,
-      validFor: /^[A-Za-z]/
+      validFor: /^[A-Za-z]/,
     };
   }
 
@@ -24,9 +24,10 @@ function completeSwimDSL(context: CompletionContext): CompletionResult | null {
     return {
       from: context.pos,
       options: [{ label: "Pace", type: "keyword", boost: 90 }],
-      validFor: /^Pace?/i
+      validFor: /^Pace?/i,
     };
   }
+
   // // If the previous token was the "@" symbol, offer pace alias completions.
   // // One way is to check the text immediately before the cursor.
   // let line = context.state.doc.lineAt(context.pos);

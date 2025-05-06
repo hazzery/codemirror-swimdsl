@@ -9,10 +9,10 @@ import { parser } from "./syntax.grammar";
 let parserWithMetadata: LRParser = parser.configure({
   props: [
     indentNodeProp.add({
-      Application: delimitedIndent({ closing: ")", align: false })
+      Application: delimitedIndent({ closing: ")", align: false }),
     }),
     foldNodeProp.add({
-      Application: foldInside
+      Application: foldInside,
     }),
     styleTags({
       Stroke: tags.className,
@@ -23,20 +23,20 @@ let parserWithMetadata: LRParser = parser.configure({
       Identifier: tags.variableName,
       RequiredGear: tags.macroName,
       Comment: tags.comment,
-    })
-  ]
+    }),
+  ],
 });
 
 export const swimdslLanguage: LRLanguage = LRLanguage.define({
   name: "swimdsl",
   parser: parserWithMetadata,
   languageData: {
-    commentTokens: { line: "#" }
+    commentTokens: { line: "#" },
   },
 });
 
 export const swimdslCompletion = swimdslLanguage.data.of({
-  autocomplete: completeSwimDsl
+  autocomplete: completeSwimDsl,
 });
 
 export function swimdsl(): LanguageSupport {
