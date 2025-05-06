@@ -24,8 +24,7 @@ function completeSwimDSL(context: CompletionContext): CompletionResult | null {
   }
 
   // For pace keyword completion at the start of a line (e.g., when writing a PaceDefinition)
-  if (nodeBefore.name === "Statement" &&
-    context.state.doc.lineAt(context.pos).text.trim().startsWith("P")) {
+  if (context.state.doc.lineAt(context.pos).text.trim().startsWith("P")) {
     return {
       from: context.pos,
       options: [{ label: "Pace", type: "keyword", boost: 90 }],
