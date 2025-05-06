@@ -1,4 +1,8 @@
-import { Completion, CompletionContext, CompletionResult } from "@codemirror/autocomplete";
+import {
+  Completion,
+  CompletionContext,
+  CompletionResult,
+} from "@codemirror/autocomplete";
 import { syntaxTree } from "@codemirror/language";
 
 const strokeList: Completion[] = [
@@ -9,8 +13,9 @@ const strokeList: Completion[] = [
 ];
 
 function completeSwimDSL(context: CompletionContext): CompletionResult | null {
-  let nodeBefore = syntaxTree(context.state).resolveInner(context.pos, -1);
-  if (nodeBefore.parent?.name === "SingleInstruction") {
+  const nodeBefore = syntaxTree(context.state).resolveInner(context.pos, -1);
+
+  if (nodeBefore.parent?.name === "SingleInstruction" || nodeBefore.name == "Stroke") {
     return {
       from: context.pos,
       options: strokeList,
