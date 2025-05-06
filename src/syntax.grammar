@@ -1,101 +1,96 @@
-@top StatementList { Statement+ }
-
-Statement {
-  Set
-  | RestInstruction
-  | PaceDefinition
-  | Comment
+@top SwimProgramme {
+    PoolLengthDeclaration
+    DistanceUnitDeclaration
+    PaceDefinition*
+    Statement+
 }
 
-Set {
-  Instruction | RepeatedInstruction
+PoolLengthDeclaration {
+    "set PoolLength" Number Identifier
 }
 
-Instruction {
-  (SingleInstruction | BlockInstruction) StrokeType? GearSpecification? Pace?
-}
-
-BlockInstruction {
-  "{" Statement+ "}"
-}
-
-RepeatedInstruction {
-    Number "x" Instruction
-}
-
-SingleInstruction {
-    Distance Stroke
-}
-
-StrokeType {
-    "Kick" | "Pull" | "Drill"
-}
-
-GearSpecification {
-    "+" RequiredGear+
-}
-
-RequiredGear {
-    "Fins"
-    | "Board"
-    | "Paddles"
-    | "Bouy"
-}
-
-RestInstruction {
-    Duration "rest"
-}
-
-Distance {
-    Number
-}
-
-Stroke {
-    "Freestyle"
-  | "Backstroke"
-  | "Butterfly"
-  | "Breaststroke"
+DistanceUnitDeclaration {
+    "set DistanceUnit" Identifier
 }
 
 PaceDefinition {
     "Pace" Identifier "=" Percentage
 }
 
-Pace {
-    "@" ( FixedTime 
-        | PerceivedRate
-        | VariableRate )
+Percentage {
+    Number "%"         // e.g., 60% or 5%
 }
 
-FixedTime {
-    Duration
+Statement {
+  Instruction
+  | RepeatedInstruction
+  | RestInstruction
+  | Message
+}
+
+Instruction {
+  (SingleInstruction | BlockInstruction) StrokeType? GearSpecification? Pace?
+}
+
+SingleInstruction {
+    Distance Stroke
+}
+
+Distance {
+    Number
+}
+
+Stroke { Identifier }
+
+BlockInstruction {
+  "{" Statement+ "}"
+}
+
+StrokeType { Identifier }
+
+GearSpecification {
+    "+" RequiredGear+
+}
+
+RequiredGear { Identifier }
+
+Pace {
+    "@" ( Duration 
+        | PerceivedRate
+        | VariableRate )
 }
 
 Duration {
     Number ":" Number    // minutes:seconds
 }
 
-Percentage {
-    Number "%"         // e.g., 60% or 5%
-}
-
 PerceivedRate {
     (Percentage | PaceAlias)
 }
+
+PaceAlias { Identifier }  // a named pace, e.g., easy or hard
 
 VariableRate {
      PerceivedRate "->" PerceivedRate  // can model increasing or decreasing rate
 }
 
-PaceAlias {
-    Identifier        // a named pace, e.g., easy or hard
+RepeatedInstruction {
+    Number repititionOperator Instruction
+}
+
+RestInstruction {
+    Duration "rest"
 }
 
 @tokens {
-    space      { @whitespace+ }
-    Comment    { "#" ![\n]* }
-    Number     { @digit+ }
-    Identifier { @asciiLetter+ }
+    space       { @whitespace+ }
+    Comment     { "#" ![\n]* }
+    Number      { @digit+ }
+    Message     { ">" ![\n]+ }
+    Identifier  { @asciiLetter+ }
+    repititionOperator {"x"}
+    @precedence { repititionOperator, Identifier }
+    @precedence { StringContent, Comment, space }
 }
 
-@skip { space }
+@skip { space | Comment }
