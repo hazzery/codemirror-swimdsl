@@ -123,56 +123,30 @@ function lintIncompatibleGear(
   }
 }
 
-function lintInvalidStrokeName(
-  node: SyntaxNodeRef,
-  editorState: EditorState,
-  diagnostics: Diagnostic[],
-): void {
-  if (node.name !== "Stroke") return;
+function pascalCaseToSentence(pascalCase: string): string {
+  // Insert a space before all caps that follow a lowercase letter.
+  const sentenceWithSpaces = pascalCase.replace(/([a-z])([A-Z])/g, "$1 $2");
 
-  const strokeName = editorState.sliceDoc(node.from, node.to);
-  if (StrokeName[strokeName as keyof typeof StrokeName] === undefined) {
-    diagnostics.push({
-      from: node.from,
-      to: node.to,
-      severity: "error",
-      message: `${strokeName} is not a valid stroke name.`,
-    });
-  }
+  // Lowercase the entire sentence.
+  return sentenceWithSpaces.toLowerCase();
 }
 
-function lintInvalidStrokeType(
+function lintInvalidNodeValue<Enumeration>(
   node: SyntaxNodeRef,
   editorState: EditorState,
+  nodeName: string,
+  enumeration: Enumeration,
   diagnostics: Diagnostic[],
 ): void {
-  if (node.name !== "StrokeType") return;
+  if (node.name !== nodeName) return;
 
   const strokeType = editorState.sliceDoc(node.from, node.to);
-  if (StrokeType[strokeType as keyof typeof StrokeType] === undefined) {
+  if (enumeration[strokeType as keyof Enumeration] === undefined) {
     diagnostics.push({
       from: node.from,
       to: node.to,
       severity: "error",
-      message: `${strokeType} is not a valid stroke type.`,
-    });
-  }
-}
-
-function lintInvalidRequiredGear(
-  node: SyntaxNodeRef,
-  editorState: EditorState,
-  diagnostics: Diagnostic[],
-): void {
-  if (node.name !== "RequiredGear") return;
-
-  const requiredGear = editorState.sliceDoc(node.from, node.to);
-  if (RequiredGear[requiredGear as keyof typeof RequiredGear] === undefined) {
-    diagnostics.push({
-      from: node.from,
-      to: node.to,
-      severity: "error",
-      message: `${requiredGear} is not the name of a valid peice of gear.`,
+      message: `${strokeType} is not a valid ${pascalCaseToSentence(nodeName)}.`,
     });
   }
 }
@@ -189,9 +163,27 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
     lintUndefinedPaceName(treeCursor, declaredIdentifiers, editorState, diagnostics);
     lintSyntaxErrors(treeCursor, diagnostics);
     lintIncompatibleGear(treeCursor, editorState, diagnostics);
-    lintInvalidStrokeName(treeCursor, editorState, diagnostics);
-    lintInvalidStrokeType(treeCursor, editorState, diagnostics);
-    lintInvalidRequiredGear(treeCursor, editorState, diagnostics);
+    lintInvalidNodeValue(
+      treeCursor,
+      editorState,
+      "Stroke",
+      StrokeName,
+      diagnostics,
+    );
+    lintInvalidNodeValue(
+      treeCursor,
+      editorState,
+      "StrokeType",
+      StrokeType,
+      diagnostics,
+    );
+    lintInvalidNodeValue(
+      treeCursor,
+      editorState,
+      "RequiredGear",
+      RequiredGear,
+      diagnostics,
+    );
   }
 
   return diagnostics;
