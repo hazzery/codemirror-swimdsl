@@ -19,11 +19,11 @@ function lintUndefinedPaceName(
 ): void {
   if (node.name !== "Identifier") return;
 
-  let parent = node.node.parent;
+  const parent = node.node.parent;
   if (parent === null) return;
 
   // Ask the document for the characters that make up the Identifier node
-  let node_value = state.sliceDoc(node.from, node.to);
+  const node_value = state.sliceDoc(node.from, node.to);
 
   if (parent.name === "PaceDefinition") {
     declaredIdentifiers.add(node_value);
@@ -156,11 +156,16 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
 
   const declaredIdentifiers = new Set<string>();
 
-  let editorState = view.state;
-  let treeCursor: TreeCursor = syntaxTree(editorState).cursor();
+  const editorState = view.state;
+  const treeCursor: TreeCursor = syntaxTree(editorState).cursor();
 
   while (treeCursor.next()) {
-    lintUndefinedPaceName(treeCursor, declaredIdentifiers, editorState, diagnostics);
+    lintUndefinedPaceName(
+      treeCursor,
+      declaredIdentifiers,
+      editorState,
+      diagnostics,
+    );
     lintSyntaxErrors(treeCursor, diagnostics);
     lintIncompatibleGear(treeCursor, editorState, diagnostics);
     lintInvalidNodeValue(
