@@ -5,12 +5,15 @@ import {
 } from "@codemirror/autocomplete";
 import { syntaxTree } from "@codemirror/language";
 
-const strokeList: Completion[] = [
-  { label: "Freestyle", type: "constant" },
-  { label: "Backstroke", type: "constant" },
-  { label: "Breaststroke", type: "constant" },
-  { label: "Butterfly", type: "constant" },
-];
+import { StrokeName } from "./enumerations";
+
+const strokeList: Completion[] = Object.keys(StrokeName)
+  .filter((key) => isNaN(Number(key)))
+  .map((strokeName) => ({
+    label: strokeName,
+    type: "constant",
+    boost: strokeName.length,
+  }));
 
 function completeSwimDSL(context: CompletionContext): CompletionResult | null {
   const nodeBefore = syntaxTree(context.state).resolveInner(context.pos, -1);
