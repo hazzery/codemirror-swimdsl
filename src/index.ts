@@ -1,4 +1,11 @@
-import { LRLanguage, LanguageSupport, delimitedIndent, foldInside, foldNodeProp, indentNodeProp } from "@codemirror/language";
+import {
+  LRLanguage,
+  LanguageSupport,
+  delimitedIndent,
+  foldInside,
+  foldNodeProp,
+  indentNodeProp,
+} from "@codemirror/language";
 import { styleTags, tags } from "@lezer/highlight";
 import { LRParser } from "@lezer/lr";
 
@@ -6,7 +13,7 @@ import completeSwimDsl from "./completion";
 import swimdslLinter from "./lint";
 import { parser } from "./syntax.grammar";
 
-let parserWithMetadata: LRParser = parser.configure({
+const parserWithMetadata: LRParser = parser.configure({
   props: [
     indentNodeProp.add({
       Application: delimitedIndent({ closing: ")", align: false }),
@@ -40,5 +47,8 @@ export const swimdslCompletion = swimdslLanguage.data.of({
 });
 
 export function swimdsl(): LanguageSupport {
-  return new LanguageSupport(swimdslLanguage, [swimdslCompletion, swimdslLinter]);
+  return new LanguageSupport(swimdslLanguage, [
+    swimdslCompletion,
+    swimdslLinter,
+  ]);
 }
