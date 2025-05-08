@@ -7,7 +7,7 @@ import { syntaxTree } from "@codemirror/language";
 
 import { StrokeName } from "./enumerations";
 
-const strokeList: Completion[] = Object.keys(StrokeName)
+const strokeNames: Completion[] = Object.keys(StrokeName)
   .filter((key) => isNaN(Number(key)))
   .map((strokeName) => ({
     label: strokeName,
@@ -21,7 +21,7 @@ function completeSwimDSL(context: CompletionContext): CompletionResult | null {
   if (nodeBefore.name === "Distance") {
     return {
       from: context.pos,
-      options: strokeList,
+      options: strokeNames,
       validFor: /^[A-Za-z]/,
     };
   }
@@ -30,7 +30,7 @@ function completeSwimDSL(context: CompletionContext): CompletionResult | null {
     return {
       from: nodeBefore.from,
       to: nodeBefore.to,
-      options: strokeList,
+      options: strokeNames,
       validFor: /^[A-Za-z]/,
     };
   }
