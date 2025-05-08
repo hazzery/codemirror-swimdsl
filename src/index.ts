@@ -39,16 +39,13 @@ export const swimdslLanguage: LRLanguage = LRLanguage.define({
   parser: parserWithMetadata,
   languageData: {
     commentTokens: { line: "#" },
+    autocomplete: completeSwimDsl,
+    closeBrackets: ["{"],
   },
-});
-
-export const swimdslCompletion = swimdslLanguage.data.of({
-  autocomplete: completeSwimDsl,
 });
 
 export function swimdsl(): LanguageSupport {
   return new LanguageSupport(swimdslLanguage, [
-    swimdslCompletion,
     swimdslLinter,
   ]);
 }
