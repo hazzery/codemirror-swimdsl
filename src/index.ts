@@ -34,7 +34,7 @@ const parserWithMetadata: LRParser = parser.configure({
   ],
 });
 
-export const swimdslLanguage: LRLanguage = LRLanguage.define({
+const swimdslLanguage: LRLanguage = LRLanguage.define({
   name: "swimdsl",
   parser: parserWithMetadata,
   languageData: {
