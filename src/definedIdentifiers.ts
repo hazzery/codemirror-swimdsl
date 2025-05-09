@@ -31,33 +31,16 @@ function computeDeclaredIdentifiers(editorState: EditorState): Set<string> {
 /**
  * A StateField holding declared identifiers.
  */
-// export const definedIdentifiersField: StateField<Set<string>> =
-//   StateField.define({
-//     create: computeDeclaredIdentifiers,
-//     update(value: Set<string>, transaction: Transaction): Set<string> {
-//       // Recompute only if the document has changed.
-//       if (transaction.docChanged) {
-//         return computeDeclaredIdentifiers(transaction.state);
-//       }
-//
-//       return value;
-//     },
-//   });
-
 export const definedIdentifiersField: StateField<Set<string>> =
   StateField.define({
-    create(_state: EditorState): Set<string> {
-      return new Set(["Test"]);
-    },
+    create: computeDeclaredIdentifiers,
+
     update(value: Set<string>, transaction: Transaction): Set<string> {
       // Recompute only if the document has changed.
       if (transaction.docChanged) {
-        const newValue = computeDeclaredIdentifiers(transaction.state);
-        console.log("Updating value of StateField", newValue);
-        return newValue;
+        return computeDeclaredIdentifiers(transaction.state);
       }
 
-      console.log("Using old value of StateField", value);
       return value;
     },
   });
