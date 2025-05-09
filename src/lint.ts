@@ -3,6 +3,7 @@ import { Diagnostic, linter } from "@codemirror/lint";
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { SyntaxNodeRef, TreeCursor } from "@lezer/common";
+
 import { StrokeName, StrokeType, RequiredGear } from "./enumerations";
 
 function undefinedPaceNameMessage(pace_name: string): string {
