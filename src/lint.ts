@@ -57,7 +57,7 @@ function lintUndefinedPaceName(
       actions: [
         {
           name: "Define pace name",
-          apply(view: EditorView, _from: number, _to: number) {
+          apply(view: EditorView) {
             view.dispatch({
               changes: { from: 0, to: 0, insert: `Pace ${node_value} = _%\n` },
             });
