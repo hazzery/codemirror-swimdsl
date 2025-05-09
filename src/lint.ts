@@ -18,7 +18,7 @@ function lintUndefinedPaceName(
   state: EditorState,
   diagnostics: Diagnostic[],
 ): void {
-  if (node.name !== "Identifier") return;
+  if (node.name !== "PaceAlias") return;
 
   const parent = node.node.parent;
   if (parent === null) return;
@@ -29,7 +29,7 @@ function lintUndefinedPaceName(
   if (parent.name === "PaceDefinition") {
     declaredIdentifiers.add(node_value);
   } else if (
-    parent.name === "PaceAlias" &&
+    parent.name === "PerceivedRate" &&
     !declaredIdentifiers.has(node_value)
   ) {
     diagnostics.push({
