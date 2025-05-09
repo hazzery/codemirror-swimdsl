@@ -27,7 +27,24 @@ function lintUndefinedPaceName(
   const node_value = state.sliceDoc(node.from, node.to);
 
   if (parent.name === "PaceDefinition") {
-    declaredIdentifiers.add(node_value);
+    if (declaredIdentifiers.has(node_value)) {
+      diagnostics.push({
+        from: node.from,
+        to: node.to,
+        severity: "error",
+        message: `A pace named '${node_value}' has already been defined`,
+        actions: [
+          {
+            name: "Remove duplicated definition",
+            apply(view: EditorView) {
+              view.dispatch({ changes: { from: parent.from, to: parent.to } });
+            },
+          },
+        ],
+      });
+    } else {
+      declaredIdentifiers.add(node_value);
+    }
   } else if (
     parent.name === "PerceivedRate" &&
     !declaredIdentifiers.has(node_value)
