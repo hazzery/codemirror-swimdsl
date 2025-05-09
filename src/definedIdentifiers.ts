@@ -11,8 +11,6 @@ function computeDeclaredIdentifiers(editorState: EditorState): Set<string> {
   const declaredIdentifiers: Set<string> = new Set();
   const treeCursor: TreeCursor = syntaxTree(editorState).cursor();
 
-  console.log("Declaring identifiers");
-
   do {
     if (treeCursor.name !== "PaceDefinition") continue;
 
