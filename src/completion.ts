@@ -6,6 +6,7 @@ import {
 import { syntaxTree } from "@codemirror/language";
 
 import { StrokeName } from "./enumerations";
+import { definedIdentifiersField } from "./definedIdentifiers";
 
 // Convert all stroke names to autocomplpetions.
 const strokeNames: Completion[] = Object.keys(StrokeName)
@@ -40,12 +41,17 @@ function completeSwimDSL(context: CompletionContext): CompletionResult | null {
     };
   }
 
+  // Fetch the list of all defined pace names, and convert to autocomplpetions.
+  const definedPaceNames: Completion[] = Array.from(
+    context.state.field(definedIdentifiersField),
+  ).map((paceName) => ({ label: paceName, type: "variable" }));
+
   // If the cursor is immediately after the @ operator, provide defined pace names as
   // autocomplpetions.
   if (nodeBefore.name === "Pace") {
     return {
       from: context.pos,
-      options: [{ label: "alias", type: "variable" }],
+      options: definedPaceNames,
       validFor: /^[A-Za-z]/,
     };
   }
@@ -56,7 +62,7 @@ function completeSwimDSL(context: CompletionContext): CompletionResult | null {
     return {
       from: nodeBefore.from,
       to: nodeBefore.to,
-      options: [{ label: "alias", type: "variable" }],
+      options: definedPaceNames,
       validFor: /^[A-Za-z]/,
     };
   }

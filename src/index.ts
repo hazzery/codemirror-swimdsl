@@ -10,6 +10,7 @@ import { styleTags, tags } from "@lezer/highlight";
 import { LRParser } from "@lezer/lr";
 
 import completeSwimDsl from "./completion";
+import { definedIdentifiersField } from "./definedIdentifiers";
 import swimdslLinter from "./lint";
 import { parser } from "./syntax.grammar";
 
@@ -46,6 +47,7 @@ const swimdslLanguage: LRLanguage = LRLanguage.define({
 
 export function swimdsl(): LanguageSupport {
   return new LanguageSupport(swimdslLanguage, [
+    definedIdentifiersField.extension,
     swimdslLinter,
   ]);
 }
