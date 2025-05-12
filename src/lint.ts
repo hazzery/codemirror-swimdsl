@@ -4,7 +4,17 @@ import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { SyntaxNodeRef, TreeCursor } from "@lezer/common";
 
-import { StrokeName, StrokeType, RequiredGear, DistanceUnit, LengthUnit } from "./enumerations";
+import {
+  undefinedPaceNameActions,
+  duplicatePaceNameDefinitionActions,
+} from "./actions";
+import {
+  StrokeName,
+  StrokeType,
+  RequiredGear,
+  DistanceUnit,
+  LengthUnit,
+} from "./enumerations";
 
 function undefinedPaceNameMessage(pace_name: string): string {
   return `'${pace_name}' is not a defined pace name.
@@ -33,14 +43,7 @@ function lintUndefinedPaceName(
         to: node.to,
         severity: "error",
         message: `A pace named '${node_value}' has already been defined`,
-        actions: [
-          {
-            name: "Remove duplicated definition",
-            apply(view: EditorView) {
-              view.dispatch({ changes: { from: parent.from, to: parent.to } });
-            },
-          },
-        ],
+        actions: duplicatePaceNameDefinitionActions(parent),
       });
     } else {
       declaredIdentifiers.add(node_value);
@@ -54,16 +57,7 @@ function lintUndefinedPaceName(
       to: node.to,
       severity: "error",
       message: undefinedPaceNameMessage(node_value),
-      actions: [
-        {
-          name: "Define pace name",
-          apply(view: EditorView) {
-            view.dispatch({
-              changes: { from: 0, to: 0, insert: `Pace ${node_value} = _%\n` },
-            });
-          },
-        },
-      ],
+      actions: undefinedPaceNameActions(node_value, declaredIdentifiers),
     });
   }
 }
@@ -220,7 +214,7 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
       "LengthUnit",
       LengthUnit,
       diagnostics,
-    )
+    );
   }
 
   return diagnostics;
