@@ -13,11 +13,11 @@ import {
   undefinedPaceNameDiagnostic,
 } from "./diagnostics";
 import {
-  StrokeName,
-  StrokeType,
-  RequiredGear,
-  DistanceUnit,
-  LengthUnit,
+  strokeNames,
+  strokeTypes,
+  requiredGear,
+  distanceUnits,
+  lengthUnits,
 } from "./enumerations";
 
 function lintUndefinedPaceName(
@@ -118,18 +118,20 @@ function lintIncompatibleGear(
   }
 }
 
-function lintInvalidNodeValue<Enumeration>(
+function lintInvalidNodeValue(
   node: SyntaxNodeRef,
   editorState: EditorState,
   nodeName: string,
-  enumeration: Enumeration,
+  validValues: string[],
   diagnostics: Diagnostic[],
 ): void {
   if (node.name !== nodeName) return;
 
   const nodeValue = editorState.sliceDoc(node.from, node.to);
-  if (enumeration[nodeValue as keyof Enumeration] === undefined) {
-    diagnostics.push(invalidNodeValueDiagnostic(node, nodeValue, nodeName));
+  if (validValues.indexOf(nodeValue) === -1) {
+    diagnostics.push(
+      invalidNodeValueDiagnostic(node, nodeValue, nodeName, validValues),
+    );
   }
 }
 
@@ -154,35 +156,35 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
       treeCursor,
       editorState,
       "Stroke",
-      StrokeName,
+      strokeNames,
       diagnostics,
     );
     lintInvalidNodeValue(
       treeCursor,
       editorState,
       "StrokeType",
-      StrokeType,
+      strokeTypes,
       diagnostics,
     );
     lintInvalidNodeValue(
       treeCursor,
       editorState,
       "RequiredGear",
-      RequiredGear,
+      requiredGear,
       diagnostics,
     );
     lintInvalidNodeValue(
       treeCursor,
       editorState,
       "DistanceUnit",
-      DistanceUnit,
+      distanceUnits,
       diagnostics,
     );
     lintInvalidNodeValue(
       treeCursor,
       editorState,
       "LengthUnit",
-      LengthUnit,
+      lengthUnits,
       diagnostics,
     );
   }

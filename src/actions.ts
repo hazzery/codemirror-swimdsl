@@ -53,3 +53,23 @@ export function duplicatePaceNameDefinitionActions(
     },
   ];
 }
+
+export function invalidNodeValueActions(
+  invalidValue: string,
+  validValues: string[],
+): Action[] {
+  const closestValue = Levenshtein.closest(invalidValue, validValues);
+
+  const distance = Levenshtein.distance(invalidValue, closestValue);
+
+  if (distance > MAX_LEVENSHTIEN_DISTANCE) return [];
+
+  return [
+    {
+      name: `Did you mean ${closestValue}`,
+      apply(view: EditorView, from: number, to: number): void {
+        view.dispatch({ changes: { from, to, insert: closestValue } });
+      },
+    },
+  ];
+}

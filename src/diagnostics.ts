@@ -4,6 +4,7 @@ import { SyntaxNodeRef } from "@lezer/common";
 import {
   undefinedPaceNameActions,
   duplicatePaceNameDefinitionActions,
+  invalidNodeValueActions,
 } from "./actions";
 
 export function duplicatePaceNameDefinitionDiagnostic(
@@ -81,11 +82,13 @@ export function invalidNodeValueDiagnostic(
   node: SyntaxNodeRef,
   nodeValue: string,
   nodeName: string,
+  validValues: string[],
 ): Diagnostic {
   return {
     from: node.from,
     to: node.to,
     severity: "error",
     message: `${nodeValue} is not a valid ${pascalCaseToSentence(nodeName)}.`,
+    actions: invalidNodeValueActions(nodeValue, validValues),
   };
 }
