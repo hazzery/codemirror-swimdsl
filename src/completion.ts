@@ -5,17 +5,15 @@ import {
 } from "@codemirror/autocomplete";
 import { syntaxTree } from "@codemirror/language";
 
-import { StrokeName } from "./enumerations";
+import { strokeNames } from "./enumerations";
 import { definedIdentifiersField } from "./definedIdentifiers";
 
 // Convert all stroke names to autocomplpetions.
-const strokeNames: Completion[] = Object.keys(StrokeName)
-  .filter((key) => isNaN(Number(key)))
-  .map((strokeName) => ({
-    label: strokeName,
-    type: "constant",
-    boost: strokeName.length,
-  }));
+const strokeNameCompletions: Completion[] = strokeNames.map((strokeName) => ({
+  label: strokeName,
+  type: "constant",
+  boost: strokeName.length,
+}));
 
 function completeSwimDSL(context: CompletionContext): CompletionResult | null {
   const nodeBefore = syntaxTree(context.state).resolveInner(context.pos, -1);
@@ -25,7 +23,7 @@ function completeSwimDSL(context: CompletionContext): CompletionResult | null {
   if (nodeBefore.name === "Distance") {
     return {
       from: context.pos,
-      options: strokeNames,
+      options: strokeNameCompletions,
       validFor: /^[A-Za-z]/,
     };
   }
@@ -36,7 +34,7 @@ function completeSwimDSL(context: CompletionContext): CompletionResult | null {
     return {
       from: nodeBefore.from,
       to: nodeBefore.to,
-      options: strokeNames,
+      options: strokeNameCompletions,
       validFor: /^[A-Za-z]/,
     };
   }
