@@ -1,7 +1,8 @@
 import { Action } from "@codemirror/lint";
 import { EditorView } from "@codemirror/view";
 import { SyntaxNodeRef } from "@lezer/common";
-import * as Levenshtein from "fastest-levenshtein";
+
+import { closestLevenshtienDistance } from "./utils";
 
 const MAX_LEVENSHTIEN_DISTANCE: number = 2;
 
@@ -9,12 +10,10 @@ export function undefinedPaceNameActions(
   undefinedName: string,
   definedNames: Set<string>,
 ): Action[] {
-  const closestName = Levenshtein.closest(
+  const [closestName, distance] = closestLevenshtienDistance(
     undefinedName,
     Array.from(definedNames),
   );
-
-  const distance = Levenshtein.distance(undefinedName, closestName);
 
   const actions: Action[] = [];
 
@@ -58,9 +57,10 @@ export function invalidNodeValueActions(
   invalidValue: string,
   validValues: string[],
 ): Action[] {
-  const closestValue = Levenshtein.closest(invalidValue, validValues);
-
-  const distance = Levenshtein.distance(invalidValue, closestValue);
+  const [closestValue, distance] = closestLevenshtienDistance(
+    invalidValue,
+    validValues,
+  );
 
   if (distance > MAX_LEVENSHTIEN_DISTANCE) return [];
 
