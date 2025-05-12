@@ -5,9 +5,13 @@ import { EditorView } from "@codemirror/view";
 import { SyntaxNodeRef, TreeCursor } from "@lezer/common";
 
 import {
-  undefinedPaceNameActions,
-  duplicatePaceNameDefinitionActions,
-} from "./actions";
+  duplicateGearDiagnostic,
+  duplicatePaceNameDefinitionDiagnostic,
+  incompatibleGearDiagnostic,
+  invalidNodeValueDiagnostic,
+  syntaxErrorDiagnostic,
+  undefinedPaceNameDiagnostic,
+} from "./diagnostics";
 import {
   StrokeName,
   StrokeType,
@@ -15,12 +19,6 @@ import {
   DistanceUnit,
   LengthUnit,
 } from "./enumerations";
-
-function undefinedPaceNameMessage(pace_name: string): string {
-  return `'${pace_name}' is not a defined pace name.
-If you wish to be able to use '${pace_name}' in the place of a pace percentage, please define it with the following line:
-Pace ${pace_name} = _%`;
-}
 
 function lintUndefinedPaceName(
   node: SyntaxNodeRef,
@@ -38,13 +36,9 @@ function lintUndefinedPaceName(
 
   if (parent.name === "PaceDefinition") {
     if (declaredIdentifiers.has(node_value)) {
-      diagnostics.push({
-        from: node.from,
-        to: node.to,
-        severity: "error",
-        message: `A pace named '${node_value}' has already been defined`,
-        actions: duplicatePaceNameDefinitionActions(parent),
-      });
+      diagnostics.push(
+        duplicatePaceNameDefinitionDiagnostic(node_value, node, parent),
+      );
     } else {
       declaredIdentifiers.add(node_value);
     }
@@ -52,13 +46,9 @@ function lintUndefinedPaceName(
     parent.name === "PerceivedRate" &&
     !declaredIdentifiers.has(node_value)
   ) {
-    diagnostics.push({
-      from: node.from,
-      to: node.to,
-      severity: "error",
-      message: undefinedPaceNameMessage(node_value),
-      actions: undefinedPaceNameActions(node_value, declaredIdentifiers),
-    });
+    diagnostics.push(
+      undefinedPaceNameDiagnostic(node, node_value, declaredIdentifiers),
+    );
   }
 }
 
@@ -68,12 +58,7 @@ function lintSyntaxErrors(
 ): void {
   if (node.name !== "⚠") return;
 
-  diagnostics.push({
-    from: node.from,
-    to: node.to,
-    severity: "error",
-    message: "Syntax error",
-  });
+  diagnostics.push(syntaxErrorDiagnostic(node));
 }
 
 const incompatibleGearMap: Map<string, Set<string>> = new Map<
@@ -110,13 +95,9 @@ function lintIncompatibleGear(
   const gearSet = new Set(specifiedGear);
 
   if (gearSet.size !== specifiedGear.length) {
-    diagnostics.push({
-      from: fromPosition,
-      to: gearSpecificationNode.to,
-      severity: "error",
-      message:
-        "Duplicate gear specified. Please do not use the same gear multiple times",
-    });
+    diagnostics.push(
+      duplicateGearDiagnostic(fromPosition, gearSpecificationNode.to),
+    );
   }
 
   const incompatibleGear = incompatibleGearMap.get(strokeType);
@@ -125,22 +106,16 @@ function lintIncompatibleGear(
 
   for (const gearType of gearSet) {
     if (incompatibleGear.has(gearType)) {
-      diagnostics.push({
-        from: fromPosition,
-        to: gearSpecificationNode.to,
-        severity: "error",
-        message: `'${gearType}' is not compatible with stroke type '${strokeType}'`,
-      });
+      diagnostics.push(
+        incompatibleGearDiagnostic(
+          fromPosition,
+          gearSpecificationNode.to,
+          gearType,
+          strokeType,
+        ),
+      );
     }
   }
-}
-
-function pascalCaseToSentence(pascalCase: string): string {
-  // Insert a space before all caps that follow a lowercase letter.
-  const sentenceWithSpaces = pascalCase.replace(/([a-z])([A-Z])/g, "$1 $2");
-
-  // Lowercase the entire sentence.
-  return sentenceWithSpaces.toLowerCase();
 }
 
 function lintInvalidNodeValue<Enumeration>(
@@ -152,14 +127,9 @@ function lintInvalidNodeValue<Enumeration>(
 ): void {
   if (node.name !== nodeName) return;
 
-  const strokeType = editorState.sliceDoc(node.from, node.to);
-  if (enumeration[strokeType as keyof Enumeration] === undefined) {
-    diagnostics.push({
-      from: node.from,
-      to: node.to,
-      severity: "error",
-      message: `${strokeType} is not a valid ${pascalCaseToSentence(nodeName)}.`,
-    });
+  const nodeValue = editorState.sliceDoc(node.from, node.to);
+  if (enumeration[nodeValue as keyof Enumeration] === undefined) {
+    diagnostics.push(invalidNodeValueDiagnostic(node, nodeValue, nodeName));
   }
 }
 
