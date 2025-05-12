@@ -18,13 +18,13 @@ export enum StrokeType {
   Kick,
 };
 
-export enum LengthUnits {
+export enum LengthUnit {
   meters,
   metres,
   yards,
 };
 
-export enum DistanceUnits {
+export enum DistanceUnit {
   meters,
   metres,
   yards,
