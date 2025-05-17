@@ -143,7 +143,7 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
   const editorState = view.state;
   const treeCursor: TreeCursor = syntaxTree(editorState).cursor();
 
-  while (treeCursor.next()) {
+  do {
     lintUndefinedPaceName(
       treeCursor,
       declaredIdentifiers,
@@ -187,7 +187,7 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
       lengthUnits,
       diagnostics,
     );
-  }
+  } while (treeCursor.next());
 
   return diagnostics;
 }
