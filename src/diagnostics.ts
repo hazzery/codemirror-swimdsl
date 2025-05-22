@@ -92,3 +92,14 @@ export function invalidNodeValueDiagnostic(
     actions: invalidNodeValueActions(nodeValue, validValues),
   };
 }
+
+export function invalidDurationDiagnostic(
+  numberNode: SyntaxNodeRef,
+): Diagnostic {
+  return {
+    from: numberNode.from,
+    to: numberNode.to,
+    severity: "error",
+    message: `Number too large for duration`,
+  };
+}

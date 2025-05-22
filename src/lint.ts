@@ -8,6 +8,7 @@ import {
   duplicateGearDiagnostic,
   duplicatePaceNameDefinitionDiagnostic,
   incompatibleGearDiagnostic,
+  invalidDurationDiagnostic,
   invalidNodeValueDiagnostic,
   syntaxErrorDiagnostic,
   undefinedPaceNameDiagnostic,
@@ -19,6 +20,8 @@ import {
   distanceUnits,
   lengthUnits,
 } from "./enumerations";
+
+const MAXIMUM_TIME_VALUE: number = 59;
 
 function lintUndefinedPaceName(
   node: SyntaxNodeRef,
@@ -135,6 +138,22 @@ function lintInvalidNodeValue(
   }
 }
 
+function lintInvalidDuration(
+  node: SyntaxNodeRef,
+  editorState: EditorState,
+  diagnostics: Diagnostic[],
+): void {
+  if (node.name !== "Duration") return;
+
+  const numbers = node.node.getChildren("Number");
+  for (const numberNode of numbers) {
+    const number = Number(editorState.sliceDoc(numberNode.from, numberNode.to));
+    if (number > MAXIMUM_TIME_VALUE) {
+      diagnostics.push(invalidDurationDiagnostic(numberNode));
+    }
+  }
+}
+
 function swimdslLintSource(view: EditorView): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];
 
@@ -187,6 +206,7 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
       lengthUnits,
       diagnostics,
     );
+    lintInvalidDuration(treeCursor, editorState, diagnostics);
   } while (treeCursor.next());
 
   return diagnostics;
