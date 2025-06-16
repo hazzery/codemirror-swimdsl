@@ -1,24 +1,19 @@
-@top SwimProgramme {
-    PoolLengthDeclaration
-    DistanceUnitDeclaration
-    PaceDefinition*
-    Statement+
-}
+@top SwimProgramme { Statement+ }
 
 PoolLengthDeclaration {
-    "set PoolLength" Number LengthUnit
+    SetKeyword PoolLengthKeyword Number LengthUnit
 }
 
 LengthUnit { identifier }
 
 DistanceUnitDeclaration {
-    "set DistanceUnit" DistanceUnit
+    SetKeyword DistanceUnitKeyword DistanceUnit
 }
 
 DistanceUnit { identifier }
 
 PaceDefinition {
-    "Pace" PaceAlias "=" Percentage
+    PaceKeyword PaceAlias "=" Percentage
 }
 
 Percentage {
@@ -29,6 +24,9 @@ Statement {
   Instruction
   | RepeatedInstruction
   | RestInstruction
+  | PoolLengthDeclaration
+  | DistanceUnitDeclaration
+  | PaceDefinition
   | Message
 }
 
@@ -85,6 +83,10 @@ RestInstruction {
 }
 
 @tokens {
+    SetKeyword            { "set" }
+    PoolLengthKeyword     { "PoolLength" }
+    DistanceUnitKeyword   { "DistanceUnit" }
+    PaceKeyword           { "Pace" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
@@ -92,6 +94,8 @@ RestInstruction {
     identifier  { @asciiLetter+ }
     repititionOperator {"x"}
     @precedence { repititionOperator, identifier }
+    @precedence { PaceKeyword, identifier }
+    @precedence { SetKeyword, identifier }
 }
 
 @skip { space | Comment }
