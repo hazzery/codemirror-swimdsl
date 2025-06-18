@@ -15,6 +15,15 @@ const strokeNameCompletions: Completion[] = strokeNames.map((strokeName) => ({
   boost: strokeName.length,
 }));
 
+/**
+ * Provide the user with autocomplpetions within the editor based on the current
+ * location of the cursor within the syntax tree.
+ *
+ * @param context - The editor context, contains the current text contents of
+ *    the editor.
+ *
+ * @returns An editor autocompletion if possible, otherwise `null`.
+ */
 function completeSwimDSL(context: CompletionContext): CompletionResult | null {
   const nodeBefore = syntaxTree(context.state).resolveInner(context.pos, -1);
 

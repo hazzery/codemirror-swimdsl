@@ -1,5 +1,14 @@
 import * as Levenshtein from "fastest-levenshtein";
 
+/**
+ * Find the string within `array` which is most similar to `str`.
+ *
+ * @param str - The string to compare to.
+ * @param array - A list of strings to find the closest of.
+ *
+ * @returns An array containing the string which is the closest, and its
+ * Levenshtein distance from `str`.
+ */
 export function closestLevenshtienDistance(
   str: string,
   array: string[],

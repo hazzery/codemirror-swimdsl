@@ -4,8 +4,12 @@ import { EditorState } from "@codemirror/state";
 import { syntaxTree } from "@codemirror/language";
 
 /**
- * This function walks the syntax tree once to compute the declared pace names.
- * You can extend this function if you have other definitions to collect.
+ * Generate a list of all pace names the user has defined in their programme.
+ *
+ * @param editorState - The state of the editor, containing the current text
+ *    contents.
+ *
+ * @returns A set of all defined pace names in the current programme.
  */
 function computeDeclaredIdentifiers(editorState: EditorState): Set<string> {
   const declaredIdentifiers: Set<string> = new Set();
@@ -27,7 +31,10 @@ function computeDeclaredIdentifiers(editorState: EditorState): Set<string> {
 }
 
 /**
- * A StateField holding declared identifiers.
+ * An editor state field is a way of caching state within the editor. Here it is
+ * used to store the set of all defined identifiers so they can be used multiple
+ * times in a single transaction without needing to be recomputed multiple
+ * times.
  */
 export const definedIdentifiersField: StateField<Set<string>> =
   StateField.define({

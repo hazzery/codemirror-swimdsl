@@ -14,6 +14,9 @@ import { definedIdentifiersField } from "./definedIdentifiers";
 import swimdslLinter from "./lint";
 import { parser } from "./syntax.grammar";
 
+/**
+ * The SwimDSL parser configuration.
+ */
 const parserWithMetadata: LRParser = parser.configure({
   props: [
     indentNodeProp.add({
@@ -35,6 +38,9 @@ const parserWithMetadata: LRParser = parser.configure({
   ],
 });
 
+/**
+ * The SwimDSL language supoort configuration for CodeMirror.
+ */
 const swimdslLanguage: LRLanguage = LRLanguage.define({
   name: "swimdsl",
   parser: parserWithMetadata,
@@ -45,6 +51,11 @@ const swimdslLanguage: LRLanguage = LRLanguage.define({
   },
 });
 
+/**
+ * Provide the configured CodeMirror language support extension.
+ *
+ * @returns A CodeMirror extension which provides support for SwimDSL.
+ */
 export function swimdsl(): LanguageSupport {
   return new LanguageSupport(swimdslLanguage, [
     definedIdentifiersField.extension,
