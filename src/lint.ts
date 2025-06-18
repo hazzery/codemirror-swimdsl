@@ -21,6 +21,9 @@ import {
   lengthUnits,
 } from "./enumerations";
 
+/**
+ * The maximum allows value for either minutes and seconds in a duration node.
+ */
 const MAXIMUM_TIME_VALUE: number = 59;
 
 function lintUndefinedPaceName(
