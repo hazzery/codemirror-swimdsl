@@ -42,4 +42,4 @@ export const distanceUnits: string[] = ["meters", "metres", "yards", "Lengths"];
 /**
  * The list of all strings considered valid in place of a gear specification.
  */
-export const requiredGear: string[] = ["Paddles", "Fins", "Bouy", "Board"];
+export const requiredGear: string[] = ["Paddles", "Fins", "Buoy", "Board"];
