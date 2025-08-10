@@ -86,7 +86,7 @@ RestInstruction {
     SetKeyword            { "set" }
     PoolLengthKeyword     { "PoolLength" }
     DistanceUnitKeyword   { "DistanceUnit" }
-    PaceKeyword           { "Pace" }
+    PaceKeyword           { "pace" }
     RestKeyword           { "rest" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
