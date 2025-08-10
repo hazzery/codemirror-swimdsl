@@ -5,7 +5,7 @@ import {
 } from "@codemirror/autocomplete";
 import { syntaxTree } from "@codemirror/language";
 
-import { requiredGear, strokeNames } from "./enumerations";
+import { requiredGear, strokeNames, strokeTypes } from "./enumerations";
 import { definedIdentifiersField } from "./definedIdentifiers";
 
 // Convert all stroke names to autocomplpetions.
@@ -19,6 +19,10 @@ const gearNameCompletions: Completion[] = requiredGear.map((gearName) => ({
   label: gearName,
   type: "constant",
 }));
+
+const strokeModifierCompletions: Completion[] = strokeTypes.map(
+  (strokeModifier) => ({ label: strokeModifier, type: "constant" }),
+);
 
 /**
  * Provide the user with autocomplpetions within the editor based on the current
@@ -99,6 +103,17 @@ function completeSwimDSL(context: CompletionContext): CompletionResult | null {
       from: nodeBefore.from,
       to: nodeBefore.to,
       options: gearNameCompletions,
+      validFor: /^[A-Za-z]/,
+    };
+  }
+
+  // If the cursor is midway through typing a stroke modifier, provide relevant
+  // stroke type autocomplpetions which will replace any existing characters.
+  if (nodeBefore.name === "StrokeType") {
+    return {
+      from: nodeBefore.from,
+      to: nodeBefore.to,
+      options: strokeModifierCompletions,
       validFor: /^[A-Za-z]/,
     };
   }
