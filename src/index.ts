@@ -35,6 +35,8 @@ const parserWithMetadata: LRParser = parser.configure({
       RequiredGear: tags.macroName,
       Comment: tags.comment,
       SetKeyword: tags.keyword,
+      RestKeyword: tags.keyword,
+      PaceKeyword: tags.keyword,
     }),
   ],
 });
