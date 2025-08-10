@@ -24,6 +24,13 @@ const strokeModifierCompletions: Completion[] = strokeTypes.map(
   (strokeModifier) => ({ label: strokeModifier, type: "constant" }),
 );
 
+const nodeCompletioons: [string, string, Completion[]][] = [
+  ["Distance", "Stroke", strokeNameCompletions],
+  ["GearSpecification", "RequiredGear", gearNameCompletions],
+  ["Pace", "PaceAlias", []],
+  ["", "StrokeType", strokeModifierCompletions],
+];
+
 /**
  * Provide the user with autocomplpetions within the editor based on the current
  * location of the cursor within the syntax tree.
@@ -36,83 +43,33 @@ const strokeModifierCompletions: Completion[] = strokeTypes.map(
 function completeSwimDSL(context: CompletionContext): CompletionResult | null {
   const nodeBefore = syntaxTree(context.state).resolveInner(context.pos, -1);
 
-  // If the cursor is immediately after a distance, ready for a stroke name to be
-  // specified, provide stroke name autocomplpetions.
-  if (nodeBefore.name === "Distance") {
-    return {
-      from: context.pos,
-      options: strokeNameCompletions,
-      validFor: /^[A-Za-z]/,
-    };
-  }
-
-  // If the cursor is midway through typing a stroke name, provide relevant stroke name
-  // autocomplpetions which will replace any existing characters.
-  if (nodeBefore.name === "Stroke") {
-    return {
-      from: nodeBefore.from,
-      to: nodeBefore.to,
-      options: strokeNameCompletions,
-      validFor: /^[A-Za-z]/,
-    };
-  }
-
   // Fetch the list of all defined pace names, and convert to autocomplpetions.
-  const definedPaceNames: Completion[] = Array.from(
+  nodeCompletioons[2][2] = Array.from(
     context.state.field(definedIdentifiersField),
   ).map((paceName) => ({ label: paceName, type: "variable" }));
 
-  // If the cursor is immediately after the @ operator, provide defined pace names as
-  // autocomplpetions.
-  if (nodeBefore.name === "Pace") {
-    return {
-      from: context.pos,
-      options: definedPaceNames,
-      validFor: /^[A-Za-z]/,
-    };
-  }
 
-  //If the user is mid-way through typing a pace name, provide relevant defined pace
-  //names which replace any existing characters.
-  if (nodeBefore.name === "PaceAlias") {
-    return {
-      from: nodeBefore.from,
-      to: nodeBefore.to,
-      options: definedPaceNames,
-      validFor: /^[A-Za-z]/,
-    };
-  }
+  for (const [priorNodeName, nodeName, completions] of nodeCompletioons) {
+    // If the user has just typed a character placing the curson in a position
+    // which accepts autocomplpetions, provide the autocomplpetions.
+    if (nodeBefore.name === priorNodeName) {
+      return {
+        from: context.pos,
+        options: completions,
+        validFor: /^[A-Za-z]/,
+      };
+    }
 
-  // If the cursor is immediately after the + symbol, ready for a gear name to
-  // be specified, provide gear name autocomplpetions.
-  if (nodeBefore.name === "GearSpecification") {
-    return {
-      from: context.pos,
-      options: gearNameCompletions,
-      validFor: /^[A-Za-z]/,
-    };
-  }
-
-  // If the cursor is midway through typing a gear name, provide relevant gear
-  // name autocomplpetions which will replace any existing characters.
-  if (nodeBefore.name === "RequiredGear") {
-    return {
-      from: nodeBefore.from,
-      to: nodeBefore.to,
-      options: gearNameCompletions,
-      validFor: /^[A-Za-z]/,
-    };
-  }
-
-  // If the cursor is midway through typing a stroke modifier, provide relevant
-  // stroke type autocomplpetions which will replace any existing characters.
-  if (nodeBefore.name === "StrokeType") {
-    return {
-      from: nodeBefore.from,
-      to: nodeBefore.to,
-      options: strokeModifierCompletions,
-      validFor: /^[A-Za-z]/,
-    };
+    // If the user is midway through typing a node which accepts
+    // autocomplpetions, continue to provide autocomplpetions.
+    if (nodeBefore.name === nodeName) {
+      return {
+        from: nodeBefore.from,
+        to: nodeBefore.to,
+        options: completions,
+        validFor: /^[A-Za-z]/,
+      };
+    }
   }
 
   // No autocomplpetions are available at the current cursor position.
