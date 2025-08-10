@@ -13,8 +13,10 @@ DistanceUnitDeclaration {
 DistanceUnit { identifier }
 
 PaceDefinition {
-    PaceKeyword PaceAlias "=" Percentage
+    PaceKeyword PaceDefinitionName "=" Percentage
 }
+
+PaceDefinitionName { identifier }
 
 Percentage {
     Number "%"         // e.g., 60% or 5%

@@ -74,10 +74,7 @@ function completeSwimDSL(context: CompletionContext): CompletionResult | null {
 
   //If the user is mid-way through typing a pace name, provide relevant defined pace
   //names which replace any existing characters.
-  if (
-    nodeBefore.name === "PaceAlias" &&
-    nodeBefore.parent?.name !== "PaceDefinition"
-  ) {
+  if (nodeBefore.name === "PaceAlias") {
     return {
       from: nodeBefore.from,
       to: nodeBefore.to,
