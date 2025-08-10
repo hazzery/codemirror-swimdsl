@@ -19,15 +19,15 @@ import {
  */
 export function duplicatePaceNameDefinitionDiagnostic(
   duplicatedName: string,
-  paceAliasNode: SyntaxNodeRef,
-  paceDefinitionNode: SyntaxNodeRef,
+  paceDefinitionNameNode: SyntaxNodeRef,
 ): Diagnostic {
+  // TODO: actions line uses non-null assertion operator, it probably shouldn't.
   return {
-    from: paceAliasNode.from,
-    to: paceAliasNode.to,
+    from: paceDefinitionNameNode.from,
+    to: paceDefinitionNameNode.to,
     severity: "error",
     message: `A pace named '${duplicatedName}' has already been defined`,
-    actions: duplicatePaceNameDefinitionActions(paceDefinitionNode),
+    actions: duplicatePaceNameDefinitionActions(paceDefinitionNameNode.node.parent!),
   };
 }
 

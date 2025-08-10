@@ -34,27 +34,30 @@ function lintUndefinedPaceName(
 ): void {
   if (node.name !== "PaceAlias") return;
 
-  const parent = node.node.parent;
-  if (parent === null) return;
-
   // Ask the document for the characters that make up the Identifier node
   const node_value = state.sliceDoc(node.from, node.to);
 
-  if (parent.name === "PaceDefinition") {
-    if (declaredIdentifiers.has(node_value)) {
-      diagnostics.push(
-        duplicatePaceNameDefinitionDiagnostic(node_value, node, parent),
-      );
-    } else {
-      declaredIdentifiers.add(node_value);
-    }
-  } else if (
-    parent.name === "PerceivedRate" &&
-    !declaredIdentifiers.has(node_value)
-  ) {
+  if (!declaredIdentifiers.has(node_value)) {
     diagnostics.push(
       undefinedPaceNameDiagnostic(node, node_value, declaredIdentifiers),
     );
+  }
+}
+
+function lintDuplicatePaceNameDefinition(
+  node: SyntaxNodeRef,
+  declaredIdentifiers: Set<string>,
+  state: EditorState,
+  diagnostics: Diagnostic[],
+): void {
+  if (node.name !== "PaceDefinitionName") return;
+
+  const node_value = state.sliceDoc(node.from, node.to);
+
+  if (declaredIdentifiers.has(node_value)) {
+    diagnostics.push(duplicatePaceNameDefinitionDiagnostic(node_value, node));
+  } else {
+    declaredIdentifiers.add(node_value);
   }
 }
 
@@ -167,6 +170,12 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
 
   do {
     lintUndefinedPaceName(
+      treeCursor,
+      declaredIdentifiers,
+      editorState,
+      diagnostics,
+    );
+    lintDuplicatePaceNameDefinition(
       treeCursor,
       declaredIdentifiers,
       editorState,
