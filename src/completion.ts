@@ -5,7 +5,7 @@ import {
 } from "@codemirror/autocomplete";
 import { syntaxTree } from "@codemirror/language";
 
-import { strokeNames } from "./enumerations";
+import { requiredGear, strokeNames } from "./enumerations";
 import { definedIdentifiersField } from "./definedIdentifiers";
 
 // Convert all stroke names to autocomplpetions.
@@ -13,6 +13,11 @@ const strokeNameCompletions: Completion[] = strokeNames.map((strokeName) => ({
   label: strokeName,
   type: "constant",
   boost: strokeName.length,
+}));
+
+const gearNameCompletions: Completion[] = requiredGear.map((gearName) => ({
+  label: gearName,
+  type: "constant",
 }));
 
 /**
@@ -73,6 +78,27 @@ function completeSwimDSL(context: CompletionContext): CompletionResult | null {
       from: nodeBefore.from,
       to: nodeBefore.to,
       options: definedPaceNames,
+      validFor: /^[A-Za-z]/,
+    };
+  }
+
+  // If the cursor is immediately after the + symbol, ready for a gear name to
+  // be specified, provide gear name autocomplpetions.
+  if (nodeBefore.name === "GearSpecification") {
+    return {
+      from: context.pos,
+      options: gearNameCompletions,
+      validFor: /^[A-Za-z]/,
+    };
+  }
+
+  // If the cursor is midway through typing a gear name, provide relevant gear
+  // name autocomplpetions which will replace any existing characters.
+  if (nodeBefore.name === "RequiredGear") {
+    return {
+      from: nodeBefore.from,
+      to: nodeBefore.to,
+      options: gearNameCompletions,
       validFor: /^[A-Za-z]/,
     };
   }
