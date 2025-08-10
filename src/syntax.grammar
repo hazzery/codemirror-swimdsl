@@ -79,7 +79,7 @@ RepeatedInstruction {
 }
 
 RestInstruction {
-    Duration "rest"
+    Duration RestKeyword
 }
 
 @tokens {
@@ -87,6 +87,7 @@ RestInstruction {
     PoolLengthKeyword     { "PoolLength" }
     DistanceUnitKeyword   { "DistanceUnit" }
     PaceKeyword           { "Pace" }
+    RestKeyword           { "rest" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
