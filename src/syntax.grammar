@@ -1,4 +1,4 @@
-@top SwimProgramme { Statement+ }
+@top SwimProgramme { Statement* }
 
 PoolLengthDeclaration {
     SetKeyword PoolLengthKeyword Number LengthUnit
