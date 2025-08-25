@@ -27,7 +27,7 @@ const parserWithMetadata: LRParser = parser.configure({
     }),
     styleTags({
       Stroke: tags.className,
-      StrokeType: tags.typeName,
+      StrokeModifier: tags.typeName,
       Duration: tags.integer,
       Percentage: tags.integer,
       Number: tags.integer,
@@ -37,6 +37,7 @@ const parserWithMetadata: LRParser = parser.configure({
       SetKeyword: tags.keyword,
       RestKeyword: tags.keyword,
       PaceKeyword: tags.keyword,
+      OnKeyword: tags.keyword,
     }),
   ],
 });

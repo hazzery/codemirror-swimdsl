@@ -13,27 +13,41 @@ DistanceUnitDeclaration {
 DistanceUnit { identifier }
 
 PaceDefinition {
-    PaceKeyword PaceDefinitionName "=" Percentage
+    PaceKeyword PaceDefinitionName "=" Pace
 }
 
 PaceDefinitionName { identifier }
+
+Pace {
+    PerceivedRate | VariableRate
+}
+
+PerceivedRate {
+    (Percentage | PaceAlias)
+}
 
 Percentage {
     Number "%"         // e.g., 60% or 5%
 }
 
+PaceAlias { identifier }  // a named pace, e.g., easy or hard
+
+VariableRate {
+     PerceivedRate "->" PerceivedRate  // can model increasing or decreasing rate
+}
+
 Statement {
-  Instruction
-  | RepeatedInstruction
-  | RestInstruction
-  | PoolLengthDeclaration
-  | DistanceUnitDeclaration
-  | PaceDefinition
-  | Message
+    Instruction
+    | RepeatedInstruction
+    | RestInstruction
+    | PoolLengthDeclaration
+    | DistanceUnitDeclaration
+    | PaceDefinition
+    | Message
 }
 
 Instruction {
-  (SingleInstruction | BlockInstruction) StrokeType? GearSpecification? Pace?
+    (SingleInstruction | BlockInstruction) StrokeModifier? InstructionModifier*
 }
 
 SingleInstruction {
@@ -45,10 +59,14 @@ Distance { Number }
 Stroke { identifier }
 
 BlockInstruction {
-  "{" Statement+ "}"
+    "{" Statement+ "}"
 }
 
-StrokeType { identifier }
+StrokeModifier { identifier }
+
+InstructionModifier {
+  GearSpecification | PaceSpecification | TimeSpecification
+}
 
 GearSpecification {
     "+" RequiredGear+
@@ -56,24 +74,16 @@ GearSpecification {
 
 RequiredGear { identifier }
 
-Pace {
-    "@" ( Duration 
-        | PerceivedRate
-        | VariableRate )
+PaceSpecification {
+    "@" Pace
+}
+
+TimeSpecification {
+    OnKeyword Duration
 }
 
 Duration {
     Number ":" Number    // minutes:seconds
-}
-
-PerceivedRate {
-    (Percentage | PaceAlias)
-}
-
-PaceAlias { identifier }  // a named pace, e.g., easy or hard
-
-VariableRate {
-     PerceivedRate "->" PerceivedRate  // can model increasing or decreasing rate
 }
 
 RepeatedInstruction {
@@ -90,15 +100,17 @@ RestInstruction {
     DistanceUnitKeyword   { "DistanceUnit" }
     PaceKeyword           { "pace" }
     RestKeyword           { "rest" }
+    OnKeyword             { "on" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
     Message     { ">" ![\n]+ }
     identifier  { @asciiLetter+ }
-    repititionOperator {"x"}
+    repititionOperator { "x" }
     @precedence { repititionOperator, identifier }
     @precedence { PaceKeyword, identifier }
     @precedence { SetKeyword, identifier }
+    @precedence { OnKeyword, identifier }
 }
 
 @skip { space | Comment }
