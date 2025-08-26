@@ -1,4 +1,4 @@
-@top SwimProgramme { Statement* }
+@top SwimProgramme { statement* }
 
 PoolLengthDeclaration {
     SetKeyword PoolLengthKeyword Number LengthUnit
@@ -36,7 +36,7 @@ VariableRate {
      PerceivedRate "->" PerceivedRate  // can model increasing or decreasing rate
 }
 
-Statement {
+statement {
     Instruction
     | RepeatedInstruction
     | RestInstruction
@@ -59,7 +59,7 @@ Distance { Number }
 Stroke { identifier }
 
 BlockInstruction {
-    "{" Statement+ "}"
+    "{" statement+ "}"
 }
 
 StrokeModifier { identifier }
