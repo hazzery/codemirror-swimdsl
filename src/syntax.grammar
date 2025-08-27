@@ -1,16 +1,14 @@
 @top SwimProgramme { statement* }
 
-PoolLengthDeclaration {
-    SetKeyword PoolLengthKeyword Number LengthUnit
+ConstantDefinition {
+    SetKeyword ConstantName expression
 }
 
-LengthUnit { identifier }
+ConstantName { identifier }
 
-DistanceUnitDeclaration {
-    SetKeyword DistanceUnitKeyword DistanceUnit
+expression {
+    Number | identifier
 }
-
-DistanceUnit { identifier }
 
 PaceDefinition {
     PaceKeyword PaceDefinitionName "=" Pace
@@ -38,8 +36,7 @@ VariableRate {
 
 statement {
     instruction
-    | PoolLengthDeclaration
-    | DistanceUnitDeclaration
+    | ConstantDefinition
     | PaceDefinition
 }
 
@@ -96,8 +93,6 @@ RestInstruction {
 
 @tokens {
     SetKeyword            { "set" }
-    PoolLengthKeyword     { "PoolLength" }
-    DistanceUnitKeyword   { "DistanceUnit" }
     PaceKeyword           { "pace" }
     RestKeyword           { "rest" }
     OnKeyword             { "on" }
