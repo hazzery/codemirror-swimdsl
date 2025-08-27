@@ -23,7 +23,7 @@ export type Instruction = SwimInstruction | RestInstruction | Message;
 export interface ConstantDefinition {
   statement: Statements.CONSTANT_DEFINITION;
   constantName: string;
-  value: string;
+  value: string | number;
 }
 
 export type Statement = Instruction | PaceDefinition | ConstantDefinition;
