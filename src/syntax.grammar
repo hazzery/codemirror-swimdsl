@@ -37,19 +37,19 @@ VariableRate {
 }
 
 statement {
-    expression
+    instruction
     | PoolLengthDeclaration
     | DistanceUnitDeclaration
     | PaceDefinition
 }
 
-expression {
-    Instruction
+instruction {
+    SwimInstruction
     | RestInstruction
     | Message
 }
 
-Instruction {
+SwimInstruction {
     (Number repititionOperator)?
     (SingleInstruction | BlockInstruction) StrokeModifier? InstructionModifier*
 }
@@ -63,7 +63,7 @@ Distance { Number }
 Stroke { identifier }
 
 BlockInstruction {
-    "{" expression+ "}"
+    "{" instruction+ "}"
 }
 
 StrokeModifier { identifier }
