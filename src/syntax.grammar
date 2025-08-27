@@ -50,7 +50,7 @@ expression {
 }
 
 Instruction {
-    (Number repititionOperator Instruction)?
+    (Number repititionOperator)?
     (SingleInstruction | BlockInstruction) StrokeModifier? InstructionModifier*
 }
 
