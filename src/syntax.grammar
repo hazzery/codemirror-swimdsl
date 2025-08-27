@@ -37,11 +37,15 @@ VariableRate {
 }
 
 statement {
-    Instruction
-    | RestInstruction
+    expression
     | PoolLengthDeclaration
     | DistanceUnitDeclaration
     | PaceDefinition
+}
+
+expression {
+    Instruction
+    | RestInstruction
     | Message
 }
 
@@ -59,7 +63,7 @@ Distance { Number }
 Stroke { identifier }
 
 BlockInstruction {
-    "{" statement+ "}"
+    "{" expression+ "}"
 }
 
 StrokeModifier { identifier }
