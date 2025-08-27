@@ -46,7 +46,7 @@ instruction {
 
 SwimInstruction {
     (Number repititionOperator)?
-    (SingleInstruction | BlockInstruction) StrokeModifier? InstructionModifier*
+    (SingleInstruction | BlockInstruction) StrokeModifier? instructionModifier*
 }
 
 SingleInstruction {
@@ -63,7 +63,7 @@ BlockInstruction {
 
 StrokeModifier { identifier }
 
-InstructionModifier {
+instructionModifier {
   GearSpecification | PaceSpecification | TimeSpecification
 }
 
