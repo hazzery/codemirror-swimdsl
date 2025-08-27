@@ -38,7 +38,6 @@ VariableRate {
 
 statement {
     Instruction
-    | RepeatedInstruction
     | RestInstruction
     | PoolLengthDeclaration
     | DistanceUnitDeclaration
@@ -47,6 +46,7 @@ statement {
 }
 
 Instruction {
+    (Number repititionOperator Instruction)?
     (SingleInstruction | BlockInstruction) StrokeModifier? InstructionModifier*
 }
 
@@ -84,10 +84,6 @@ TimeSpecification {
 
 Duration {
     Number ":" Number    // minutes:seconds
-}
-
-RepeatedInstruction {
-    Number repititionOperator Instruction
 }
 
 RestInstruction {
