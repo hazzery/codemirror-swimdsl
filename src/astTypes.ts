@@ -43,7 +43,7 @@ export interface SwimInstruction {
   statement: Statements.SWIM_INSTRUCTION;
   repetitions?: number;
   instruction: SingleInstruction | BlockInstruction;
-  strokeType?: string;
+  strokeModifier?: string;
   instructionModifiers: InstructionModifier[];
 }
 
@@ -55,7 +55,7 @@ export interface SingleInstruction {
 
 export interface BlockInstruction {
   isBlock: true;
-  statements: Instruction[];
+  instructions: Instruction[];
 }
 
 export interface RestInstruction {
