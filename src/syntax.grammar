@@ -64,7 +64,7 @@ BlockInstruction {
 StrokeModifier { identifier }
 
 instructionModifier {
-  GearSpecification | PaceSpecification | TimeSpecification
+  GearSpecification | PaceSpecification | timeSpecification
 }
 
 GearSpecification {
@@ -77,7 +77,7 @@ PaceSpecification {
     "@" pace
 }
 
-TimeSpecification {
+timeSpecification {
     onKeyword Duration
 }
 
