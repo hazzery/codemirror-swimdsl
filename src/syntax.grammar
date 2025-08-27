@@ -1,37 +1,35 @@
 @top SwimProgramme { statement* }
 
 ConstantDefinition {
-    SetKeyword ConstantName expression
+    setKeyword ConstantName expression
 }
 
 ConstantName { identifier }
 
+StringValue { identifier }
+
 expression {
-    Number | identifier
+    Number | StringValue
 }
 
 PaceDefinition {
-    PaceKeyword PaceDefinitionName "=" Pace
+    paceKeyword PaceDefinitionName "=" pace
 }
 
 PaceDefinitionName { identifier }
 
-Pace {
-    PerceivedRate | VariableRate
+pace {
+    percentage | VariableRate | PaceAlias
 }
 
-PerceivedRate {
-    (Percentage | PaceAlias)
-}
-
-Percentage {
+percentage {
     Number "%"         // e.g., 60% or 5%
 }
 
 PaceAlias { identifier }  // a named pace, e.g., easy or hard
 
 VariableRate {
-     PerceivedRate "->" PerceivedRate  // can model increasing or decreasing rate
+     (percentage | PaceAlias) "->" (percentage | PaceAlias)  // can model increasing or decreasing rate
 }
 
 statement {
@@ -52,10 +50,10 @@ SwimInstruction {
 }
 
 SingleInstruction {
-    Distance Stroke
+    distance Stroke
 }
 
-Distance { Number }
+distance { Number }
 
 Stroke { identifier }
 
@@ -76,11 +74,11 @@ GearSpecification {
 RequiredGear { identifier }
 
 PaceSpecification {
-    "@" Pace
+    "@" pace
 }
 
 TimeSpecification {
-    OnKeyword Duration
+    onKeyword Duration
 }
 
 Duration {
@@ -88,14 +86,14 @@ Duration {
 }
 
 RestInstruction {
-    Duration RestKeyword
+    Duration restKeyword
 }
 
 @tokens {
-    SetKeyword            { "set" }
-    PaceKeyword           { "pace" }
-    RestKeyword           { "rest" }
-    OnKeyword             { "on" }
+    setKeyword            { "set" }
+    paceKeyword           { "pace" }
+    restKeyword           { "rest" }
+    onKeyword             { "on" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
@@ -103,9 +101,9 @@ RestInstruction {
     identifier  { @asciiLetter+ }
     repititionOperator { "x" }
     @precedence { repititionOperator, identifier }
-    @precedence { PaceKeyword, identifier }
-    @precedence { SetKeyword, identifier }
-    @precedence { OnKeyword, identifier }
+    @precedence { paceKeyword, identifier }
+    @precedence { setKeyword, identifier }
+    @precedence { onKeyword, identifier }
 }
 
 @skip { space | Comment }
