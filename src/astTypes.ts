@@ -34,7 +34,7 @@ export interface GearSpecification {
 }
 export interface Time {
   modifier: InstructionModifiers.TIME;
-  time: number;
+  timeSeconds: number;
 }
 
 export type InstructionModifier = GearSpecification | Pace | Time;
@@ -60,8 +60,7 @@ export interface BlockInstruction {
 
 export interface RestInstruction {
   statement: Statements.REST_INSTRUCTION;
-  minutes: number;
-  seconds: number;
+  timeSeconds: number;
 }
 
 export interface PaceAlias {
