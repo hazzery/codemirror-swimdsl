@@ -41,7 +41,7 @@ statement {
 instruction {
     SwimInstruction
     | RestInstruction
-    | Message
+    | messageSpecification
 }
 
 SwimInstruction {
@@ -89,6 +89,10 @@ RestInstruction {
     Duration restKeyword
 }
 
+messageSpecification {
+  ">" Message
+}
+
 @tokens {
     setKeyword            { "set" }
     paceKeyword           { "pace" }
@@ -97,13 +101,15 @@ RestInstruction {
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
-    Message     { ">" ![\n]+ }
+    Message     { ![\n]+ }
     identifier  { @asciiLetter+ }
     repititionOperator { "x" }
     @precedence { repititionOperator, identifier }
     @precedence { paceKeyword, identifier }
     @precedence { setKeyword, identifier }
     @precedence { onKeyword, identifier }
+    @precedence { space, Message }
+    @precedence { Comment, Message }
 }
 
 @skip { space | Comment }
