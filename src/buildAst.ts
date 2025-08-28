@@ -1,0 +1,414 @@
+import { TreeCursor } from "@lezer/common";
+import {
+  BlockInstruction,
+  ConstantDefinition,
+  Instruction,
+  InstructionModifier,
+  InstructionModifiers,
+  Message,
+  Pace,
+  PaceDefinition,
+  Programme,
+  RestInstruction,
+  SingleInstruction,
+  Statement,
+  Statements,
+  SwimInstruction,
+} from "./astTypes";
+import { EditorState } from "@codemirror/state";
+
+/** Create an AST node for a swimming pace.
+ *
+ * Precondition: `cursor` points to one of `Number`, `VariableRate`, or
+ * `PaceAlias`.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ *
+ * @param state - The state of the CodeMirror editor.
+ */
+function visitPace(cursor: TreeCursor, state: EditorState): Pace {
+  if (cursor.name === "Number") {
+    return {
+      modifier: InstructionModifiers.FIXED_PACE,
+      percentage: state.sliceDoc(cursor.from, cursor.to),
+    };
+  }
+
+  if (cursor.name === "VariableRate") {
+    // Move down to the start rate
+    cursor.firstChild();
+    const startPercentage = state.sliceDoc(cursor.from, cursor.to);
+
+    // Move to the finish percentage
+    cursor.nextSibling();
+    const finishPercentage = state.sliceDoc(cursor.from, cursor.to);
+
+    // Move up out of the VariableRate
+    cursor.parent();
+
+    return {
+      modifier: InstructionModifiers.VARYING_PACE,
+      startPercentage,
+      finishPercentage,
+    };
+  }
+
+  return {
+    modifier: InstructionModifiers.PACE_ALIAS,
+    alias: state.sliceDoc(cursor.from, cursor.to),
+  };
+}
+
+/** Create an AST node for a `PaceDefinition` node.
+ *
+ * Precondition: `cursor` points to a `PaceAlias`.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ *
+ * @param state - The state of the CodeMirror editor.
+ */
+function visitPaceDefinition(
+  cursor: TreeCursor,
+  state: EditorState,
+): PaceDefinition {
+  // Move into PaceDefinitionName
+  cursor.firstChild();
+  const name = state.sliceDoc(cursor.from, cursor.to);
+
+  // Move into Number (fixed percentage) | VariableRate | PaceAlias
+  cursor.nextSibling();
+  const pace = visitPace(cursor, state);
+
+  // Move up out of the PaceDefinition
+  cursor.parent();
+
+  return { statement: Statements.PACE_DEFINITION, name, pace };
+}
+
+/** Create an AST node for an `instruction` node.
+ *
+ * Precondition: `cursor` points to any of `SwimInstruction`,
+ * `RestInstruction`, or `Message`.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ *
+ * @param state - The state of the CodeMirror editor.
+ */
+function visitInstruction(cursor: TreeCursor, state: EditorState): Instruction {
+  if (cursor.name === "SwimInstruction") {
+    return visitSwimInstruction(cursor, state);
+  }
+
+  if (cursor.name === "RestInstruction") {
+    return visitRestInstruction(cursor, state);
+  }
+
+  return visitMessage(cursor, state);
+}
+
+/** Create an AST node for a `Duration` node.
+ *
+ * Precondition: `cursor` points to a `Duration` node.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ *
+ * @param state - The state of the CodeMirror editor.
+ */
+function visitDuration(cursor: TreeCursor, state: EditorState): number {
+  // Move down to minutes Number
+  cursor.firstChild();
+  const minutes = Number(state.sliceDoc(cursor.from, cursor.to));
+
+  // Move to seconds Number
+  cursor.nextSibling();
+  const seconds = Number(state.sliceDoc(cursor.from, cursor.to));
+
+  // Move back up to Duration
+  cursor.parent();
+
+  return 60 * minutes + seconds;
+}
+
+/** Create an AST node for an `InstructionMondifier` node.
+ *
+ * Precondition: `cursor` points to one of `GearSpecification`,
+ * `PaceSpecification`, or `Duration`.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ *
+ * @param state - The state of the CodeMirror editor.
+ */
+function visitInstructionModifier(
+  cursor: TreeCursor,
+  state: EditorState,
+): InstructionModifier {
+  if (cursor.name === "GearSpecification") {
+    const gear: string[] = [];
+
+    // Move down into first RequiredGear
+    cursor.firstChild();
+
+    do {
+      gear.push(state.sliceDoc(cursor.from, cursor.to));
+    } while (cursor.nextSibling());
+
+    // Step back up to the GearSpecification
+    cursor.parent();
+
+    return {
+      modifier: InstructionModifiers.GEAR_SPECIFICATION,
+      gear,
+    };
+  }
+
+  if (cursor.name === "PaceSpecification") {
+    // Move into Number | VariableRate | PaceAlias
+    cursor.firstChild();
+    const pace = visitPace(cursor, state);
+
+    // Move back up to PaceSpecification
+    cursor.parent();
+
+    return pace;
+  }
+
+  // We are in Duration
+  const timeSeconds = visitDuration(cursor, state);
+
+  return {
+    modifier: InstructionModifiers.TIME,
+    timeSeconds,
+  };
+}
+
+/** Create an AST node for a `SwimInstruction` node.
+ *
+ * Precondition: `cursor` points to a `SwimInstruction` node.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ *
+ * @param state - The state of the CodeMirror editor.
+ */
+function visitSwimInstruction(
+  cursor: TreeCursor,
+  state: EditorState,
+): SwimInstruction {
+  let repetitions = 1;
+  let strokeModifier = "default";
+  let instruction: SingleInstruction | BlockInstruction;
+  const instructionModifiers: InstructionModifier[] = [];
+
+  // Move into either Number (for repetitions) or SingleInstruction |
+  // BlockInstruction
+  cursor.firstChild();
+
+  if (cursor.name === "Number") {
+    repetitions = Number(state.sliceDoc(cursor.from, cursor.to));
+
+    // Move into SingleInstruction | BlockInstruction
+    cursor.nextSibling();
+  }
+
+  if (cursor.name === "BlockInstruction") {
+    // Move into first Instruction of the block
+    cursor.firstChild();
+
+    const instructions: Instruction[] = [];
+    do {
+      instructions.push(visitInstruction(cursor, state));
+    } while (cursor.nextSibling());
+
+    instruction = { isBlock: true, instructions };
+  } else {
+    // Move into Number
+    cursor.firstChild();
+    const distance = Number(state.sliceDoc(cursor.from, cursor.to));
+
+    // Move into Stroke
+    cursor.nextSibling();
+    const stroke = state.sliceDoc(cursor.from, cursor.to);
+
+    instruction = { isBlock: false, distance, stroke };
+  }
+  // Move back up to SingleInstruction | BlockInstruction
+  cursor.parent();
+
+  if (cursor.nextSibling()) {
+    let hasModifiers = true;
+    if (cursor.name === "StrokeModifier") {
+      strokeModifier = state.sliceDoc(cursor.from, cursor.to);
+
+      // Move away from the StrokeModifier to a potential instruction modifier.
+      hasModifiers = cursor.nextSibling();
+    }
+
+    if (hasModifiers) {
+      do {
+        instructionModifiers.push(visitInstructionModifier(cursor, state));
+      } while (cursor.nextSibling());
+    }
+  }
+
+  // Move up out of the SwimInstruction
+  cursor.parent();
+
+  return {
+    statement: Statements.SWIM_INSTRUCTION,
+    repetitions,
+    instruction,
+    strokeModifier,
+    instructionModifiers,
+  };
+}
+
+/** Create an AST node for a `RestInstruction` node.
+ *
+ * Precondition: `cursor` points to a `RestInstruction` node.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ *
+ * @param state - The state of the CodeMirror editor.
+ */
+function visitRestInstruction(
+  cursor: TreeCursor,
+  state: EditorState,
+): RestInstruction {
+  // Move down to Duration
+  cursor.firstChild();
+
+  const timeSeconds = visitDuration(cursor, state);
+
+  // Move back up to RestInstruction
+  cursor.parent();
+
+  return {
+    statement: Statements.REST_INSTRUCTION,
+    timeSeconds,
+  };
+}
+
+/** Create an AST node for a `Message` node.
+ *
+ * Precondition: `cursor` points to a `Message` node.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ *
+ * @param state - The state of the CodeMirror editor.
+ */
+function visitMessage(cursor: TreeCursor, state: EditorState): Message {
+  return {
+    statement: Statements.MESSAGE,
+    message: state.sliceDoc(cursor.from, cursor.to),
+  };
+}
+
+/** Create an AST node for a `ConstantDefinition` node.
+ *
+ * Precondition: `cursor` points to a `ConstantDefinition` node.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ *
+ * @param state - The state of the CodeMirror editor.
+ */
+function visitConstantDefinition(
+  cursor: TreeCursor,
+  state: EditorState,
+): ConstantDefinition {
+  // Move into ConstantDefinition
+  cursor.firstChild();
+  const constantName = state.sliceDoc(cursor.from, cursor.to);
+
+  // Move into Number | StringValue
+  cursor.nextSibling();
+  let value: string | number = state.sliceDoc(cursor.from, cursor.to);
+  if (cursor.name === "Number") {
+    value = Number(value);
+  }
+
+  // Move up out of the ConstantDefinition
+  cursor.parent();
+  return {
+    statement: Statements.CONSTANT_DEFINITION,
+    constantName,
+    value,
+  };
+}
+
+/** Create an AST for the current program in `state`.
+ *
+ * Precondition: `cursor` points to the topmost node (`SwimProgramme`).
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ *
+ * @param state - The state of the CodeMirror editor.
+ */
+export default function buildAst(
+  cursor: TreeCursor,
+  state: EditorState,
+): Programme {
+  const statements: Statement[] = [];
+
+  function walk(): void {
+    do {
+      let node: Statement | null = null;
+
+      switch (cursor.type.name) {
+        case "SwimInstruction":
+          node = visitSwimInstruction(cursor, state);
+          break;
+        case "RestInstruction":
+          node = visitRestInstruction(cursor, state);
+          break;
+        case "Message":
+          node = visitMessage(cursor, state);
+          break;
+        case "PaceDefinition":
+          node = visitPaceDefinition(cursor, state);
+          break;
+        case "ConstantDefinition":
+          node = visitConstantDefinition(cursor, state);
+          break;
+        default:
+          break;
+      }
+
+      if (node !== null) {
+        statements.push(node);
+      }
+    } while (cursor.nextSibling());
+  }
+
+  cursor.firstChild();
+  walk();
+  return { statements };
+}
