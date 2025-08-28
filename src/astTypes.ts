@@ -23,7 +23,7 @@ export type Instruction = SwimInstruction | RestInstruction | Message;
 export interface ConstantDefinition {
   statement: Statements.CONSTANT_DEFINITION;
   constantName: string;
-  value: string | number;
+  value: string;
 }
 
 export type Statement = Instruction | PaceDefinition | ConstantDefinition;
@@ -34,7 +34,8 @@ export interface GearSpecification {
 }
 export interface Time {
   modifier: InstructionModifiers.TIME;
-  timeSeconds: number;
+  minutes: string;
+  seconds: string;
 }
 
 export type InstructionModifier = GearSpecification | Pace | Time;
@@ -49,7 +50,7 @@ export interface SwimInstruction {
 
 export interface SingleInstruction {
   isBlock: false;
-  distance: number;
+  distance: string;
   stroke: string;
 }
 
@@ -60,7 +61,8 @@ export interface BlockInstruction {
 
 export interface RestInstruction {
   statement: Statements.REST_INSTRUCTION;
-  timeSeconds: number;
+  minutes: string;
+  seconds: string;
 }
 
 export interface PaceAlias {
@@ -72,13 +74,13 @@ export type Pace = FixedExertionPace | VaryingExertionPace | PaceAlias;
 
 export interface FixedExertionPace {
   modifier: InstructionModifiers.FIXED_PACE;
-  percentage: number | string;
+  percentage: string;
 }
 
 export interface VaryingExertionPace {
   modifier: InstructionModifiers.VARYING_PACE;
-  startPercentage: number | string;
-  finishPercentage: number | string;
+  startPercentage: string;
+  finishPercentage: string;
 }
 
 export interface PaceDefinition {

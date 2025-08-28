@@ -134,19 +134,22 @@ function visitInstruction(cursor: TreeCursor, state: EditorState): Instruction {
  *
  * @returns A `PaceDefinition` AST node.
  */
-function visitDuration(cursor: TreeCursor, state: EditorState): number {
+function visitDuration(
+  cursor: TreeCursor,
+  state: EditorState,
+): { minutes: string; seconds: string } {
   // Move down to minutes Number
   cursor.firstChild();
-  const minutes = Number(state.sliceDoc(cursor.from, cursor.to));
+  const minutes = state.sliceDoc(cursor.from, cursor.to);
 
   // Move to seconds Number
   cursor.nextSibling();
-  const seconds = Number(state.sliceDoc(cursor.from, cursor.to));
+  const seconds = state.sliceDoc(cursor.from, cursor.to);
 
   // Move back up to Duration
   cursor.parent();
 
-  return 60 * minutes + seconds;
+  return { minutes, seconds };
 }
 
 /**
@@ -198,11 +201,11 @@ function visitInstructionModifier(
   }
 
   // We are in Duration
-  const timeSeconds = visitDuration(cursor, state);
+  const duration = visitDuration(cursor, state);
 
   return {
     modifier: InstructionModifiers.TIME,
-    timeSeconds,
+    ...duration,
   };
 }
 
@@ -252,7 +255,7 @@ function visitSwimInstruction(
   } else {
     // Move into Number
     cursor.firstChild();
-    const distance = Number(state.sliceDoc(cursor.from, cursor.to));
+    const distance = state.sliceDoc(cursor.from, cursor.to);
 
     // Move into Stroke
     cursor.nextSibling();
@@ -311,14 +314,14 @@ function visitRestInstruction(
   // Move down to Duration
   cursor.firstChild();
 
-  const timeSeconds = visitDuration(cursor, state);
+  const duration = visitDuration(cursor, state);
 
   // Move back up to RestInstruction
   cursor.parent();
 
   return {
     statement: Statements.REST_INSTRUCTION,
-    timeSeconds,
+    ...duration,
   };
 }
 
@@ -365,10 +368,7 @@ function visitConstantDefinition(
 
   // Move into Number | StringValue
   cursor.nextSibling();
-  let value: string | number = state.sliceDoc(cursor.from, cursor.to);
-  if (cursor.name === "Number") {
-    value = Number(value);
-  }
+  let value: string = state.sliceDoc(cursor.from, cursor.to);
 
   // Move up out of the ConstantDefinition
   cursor.parent();
