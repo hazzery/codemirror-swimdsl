@@ -41,9 +41,9 @@ export type InstructionModifier = GearSpecification | Pace | Time;
 
 export interface SwimInstruction {
   statement: Statements.SWIM_INSTRUCTION;
-  repetitions?: number;
+  repetitions: number;
   instruction: SingleInstruction | BlockInstruction;
-  strokeModifier?: string;
+  strokeModifier: string;
   instructionModifiers: InstructionModifier[];
 }
 
