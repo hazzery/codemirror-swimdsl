@@ -17,7 +17,8 @@ import {
 } from "./astTypes";
 import { EditorState } from "@codemirror/state";
 
-/** Create an AST node for a `pace` CST node.
+/**
+ * Create an AST node for a `pace` CST node.
  *
  * Precondition: `cursor` points to one of `Number`, `VariableRate`, or
  * `PaceAlias`.
@@ -26,7 +27,6 @@ import { EditorState } from "@codemirror/state";
  * passed to this function.
  *
  * @param cursor - A reference to a Lezer syntax tree node.
- *
  * @param state - The state of the CodeMirror editor.
  *
  * @returns A `Pace` AST node.
@@ -64,7 +64,8 @@ function visitPace(cursor: TreeCursor, state: EditorState): Pace {
   };
 }
 
-/** Create an AST node for a `PaceDefinition` CST node.
+/**
+ * Create an AST node for a `PaceDefinition` CST node.
  *
  * Precondition: `cursor` points to a `PaceAlias`.
  *
@@ -72,7 +73,6 @@ function visitPace(cursor: TreeCursor, state: EditorState): Pace {
  * passed to this function.
  *
  * @param cursor - A reference to a Lezer syntax tree node.
- *
  * @param state - The state of the CodeMirror editor.
  *
  * @returns A `PaceDefinition` AST node.
@@ -95,7 +95,8 @@ function visitPaceDefinition(
   return { statement: Statements.PACE_DEFINITION, name, pace };
 }
 
-/** Create an AST node for an `instruction` CST node.
+/**
+ * Create an AST node for an `instruction` CST node.
  *
  * Precondition: `cursor` points to any of `SwimInstruction`,
  * `RestInstruction`, or `Message`.
@@ -104,7 +105,6 @@ function visitPaceDefinition(
  * passed to this function.
  *
  * @param cursor - A reference to a Lezer syntax tree node.
- *
  * @param state - The state of the CodeMirror editor.
  *
  * @returns An `Instruction` AST node.
@@ -121,7 +121,8 @@ function visitInstruction(cursor: TreeCursor, state: EditorState): Instruction {
   return visitMessage(cursor, state);
 }
 
-/** Create an AST node for a `Duration` CST node.
+/**
+ * Create an AST node for a `Duration` CST node.
  *
  * Precondition: `cursor` points to a `Duration` node.
  *
@@ -129,7 +130,6 @@ function visitInstruction(cursor: TreeCursor, state: EditorState): Instruction {
  * passed to this function.
  *
  * @param cursor - A reference to a Lezer syntax tree node.
- *
  * @param state - The state of the CodeMirror editor.
  *
  * @returns A `PaceDefinition` AST node.
@@ -149,7 +149,8 @@ function visitDuration(cursor: TreeCursor, state: EditorState): number {
   return 60 * minutes + seconds;
 }
 
-/** Create an AST node for an `InstructionModifier` CST node.
+/**
+ * Create an AST node for an `InstructionModifier` CST node.
  *
  * Precondition: `cursor` points to one of `GearSpecification`,
  * `PaceSpecification`, or `Duration`.
@@ -158,7 +159,6 @@ function visitDuration(cursor: TreeCursor, state: EditorState): number {
  * passed to this function.
  *
  * @param cursor - A reference to a Lezer syntax tree node.
- *
  * @param state - The state of the CodeMirror editor.
  *
  * @returns An `InstructionModifier` AST node.
@@ -206,7 +206,8 @@ function visitInstructionModifier(
   };
 }
 
-/** Create an AST node for a `SwimInstruction` CST node.
+/**
+ * Create an AST node for a `SwimInstruction` CST node.
  *
  * Precondition: `cursor` points to a `SwimInstruction` node.
  *
@@ -214,7 +215,6 @@ function visitInstructionModifier(
  * passed to this function.
  *
  * @param cursor - A reference to a Lezer syntax tree node.
- *
  * @param state - The state of the CodeMirror editor.
  *
  * @returns A `SwimInstruction` AST node.
@@ -291,7 +291,8 @@ function visitSwimInstruction(
   };
 }
 
-/** Create an AST node for a `RestInstruction` CST node.
+/**
+ * Create an AST node for a `RestInstruction` CST node.
  *
  * Precondition: `cursor` points to a `RestInstruction` node.
  *
@@ -299,7 +300,6 @@ function visitSwimInstruction(
  * passed to this function.
  *
  * @param cursor - A reference to a Lezer syntax tree node.
- *
  * @param state - The state of the CodeMirror editor.
  *
  * @returns A `RestInstruction` AST node.
@@ -322,7 +322,8 @@ function visitRestInstruction(
   };
 }
 
-/** Create an AST node for a `Message` CST node.
+/**
+ * Create an AST node for a `Message` CST node.
  *
  * Precondition: `cursor` points to a `Message` node.
  *
@@ -330,7 +331,6 @@ function visitRestInstruction(
  * passed to this function.
  *
  * @param cursor - A reference to a Lezer syntax tree node.
- *
  * @param state - The state of the CodeMirror editor.
  *
  * @returns A `Message` AST node.
@@ -342,7 +342,8 @@ function visitMessage(cursor: TreeCursor, state: EditorState): Message {
   };
 }
 
-/** Create an AST node for a `ConstantDefinition` CST node.
+/**
+ * Create an AST node for a `ConstantDefinition` CST node.
  *
  * Precondition: `cursor` points to a `ConstantDefinition` node.
  *
@@ -350,7 +351,6 @@ function visitMessage(cursor: TreeCursor, state: EditorState): Message {
  * passed to this function.
  *
  * @param cursor - A reference to a Lezer syntax tree node.
- *
  * @param state - The state of the CodeMirror editor.
  *
  * @returns A `ConstantDefinition` AST node.
@@ -379,7 +379,8 @@ function visitConstantDefinition(
   };
 }
 
-/** Create an AST for the current program in `state`.
+/**
+ * Create an AST for the current program in `state`.
  *
  * Precondition: `cursor` points to the topmost node (`SwimProgramme`).
  *
@@ -387,7 +388,6 @@ function visitConstantDefinition(
  * passed to this function.
  *
  * @param cursor - A reference to a Lezer syntax tree node.
- *
  * @param state - The state of the CodeMirror editor.
  *
  * @returns An AST as an objection holding a list of top level statements.
