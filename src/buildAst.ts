@@ -5,6 +5,7 @@ import {
   Instruction,
   InstructionModifier,
   InstructionModifiers,
+  Intensity,
   Message,
   Pace,
   PaceDefinition,
@@ -18,10 +19,9 @@ import {
 import { EditorState } from "@codemirror/state";
 
 /**
- * Create an AST node for a `pace` CST node.
+ * Create an AST node for a `Pace` CST node.
  *
- * Precondition: `cursor` points to one of `Number`, `VariableRate`, or
- * `PaceAlias`.
+ * Precondition: `cursor` points to a `Pace`.
  *
  * Postcondition: `cursor` will point to the same node it pointed to when
  * passed to this function.
@@ -32,35 +32,31 @@ import { EditorState } from "@codemirror/state";
  * @returns A `Pace` AST node.
  */
 function visitPace(cursor: TreeCursor, state: EditorState): Pace {
-  if (cursor.name === "Number") {
-    return {
-      modifier: InstructionModifiers.FIXED_PACE,
-      percentage: state.sliceDoc(cursor.from, cursor.to),
+  // Move down into starting intensity
+  cursor.firstChild();
+
+  const startIntensity: Intensity = {
+    isAlias: cursor.name === "PaceAlias",
+    value: state.sliceDoc(cursor.from, cursor.to),
+  };
+
+  let stopIntensity: Intensity | undefined = undefined;
+
+  // Move to finishing Intensity if it exists
+  if (cursor.nextSibling()) {
+    stopIntensity = {
+      isAlias: cursor.name === "PaceAlias",
+      value: state.sliceDoc(cursor.from, cursor.to),
     };
   }
 
-  if (cursor.name === "VariableRate") {
-    // Move down to the start rate
-    cursor.firstChild();
-    const startPercentage = state.sliceDoc(cursor.from, cursor.to);
-
-    // Move to the finish percentage
-    cursor.nextSibling();
-    const finishPercentage = state.sliceDoc(cursor.from, cursor.to);
-
-    // Move up out of the VariableRate
-    cursor.parent();
-
-    return {
-      modifier: InstructionModifiers.VARYING_PACE,
-      startPercentage,
-      finishPercentage,
-    };
-  }
+  // Move back up to Pace
+  cursor.parent();
 
   return {
-    modifier: InstructionModifiers.PACE_ALIAS,
-    alias: state.sliceDoc(cursor.from, cursor.to),
+    modifier: InstructionModifiers.PACE,
+    startIntensity,
+    stopIntensity,
   };
 }
 
@@ -85,11 +81,11 @@ function visitPaceDefinition(
   cursor.firstChild();
   const name = state.sliceDoc(cursor.from, cursor.to);
 
-  // Move into Number (fixed percentage) | VariableRate | PaceAlias
+  // Move into Pace
   cursor.nextSibling();
   const pace = visitPace(cursor, state);
 
-  // Move up out of the PaceDefinition
+  // Move back up to the PaceDefinition
   cursor.parent();
 
   return { statement: Statements.PACE_DEFINITION, name, pace };
@@ -153,10 +149,10 @@ function visitDuration(
 }
 
 /**
- * Create an AST node for an `InstructionModifier` CST node.
+ * Create an AST node for an `instructionModifier` CST node.
  *
- * Precondition: `cursor` points to one of `GearSpecification`,
- * `PaceSpecification`, or `Duration`.
+ * Precondition: `cursor` points to one of `GearSpecification`, `Pace`, or
+ * `Duration`.
  *
  * Postcondition: `cursor` will point to the same node it pointed to when
  * passed to this function.
@@ -189,23 +185,14 @@ function visitInstructionModifier(
     };
   }
 
-  if (cursor.name === "PaceSpecification") {
-    // Move into Number | VariableRate | PaceAlias
-    cursor.firstChild();
-    const pace = visitPace(cursor, state);
-
-    // Move back up to PaceSpecification
-    cursor.parent();
-
-    return pace;
+  if (cursor.name === "Pace") {
+    return visitPace(cursor, state);
   }
 
   // We are in Duration
-  const duration = visitDuration(cursor, state);
-
   return {
     modifier: InstructionModifiers.TIME,
-    ...duration,
+    ...visitDuration(cursor, state),
   };
 }
 

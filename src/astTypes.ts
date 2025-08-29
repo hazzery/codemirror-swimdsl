@@ -8,9 +8,7 @@ export const enum Statements {
 
 export const enum InstructionModifiers {
   GEAR_SPECIFICATION,
-  FIXED_PACE,
-  VARYING_PACE,
-  PACE_ALIAS,
+  PACE,
   TIME,
 }
 
@@ -32,6 +30,7 @@ export interface GearSpecification {
   modifier: InstructionModifiers.GEAR_SPECIFICATION;
   gear: string[];
 }
+
 export interface Time {
   modifier: InstructionModifiers.TIME;
   minutes: string;
@@ -65,22 +64,15 @@ export interface RestInstruction {
   seconds: string;
 }
 
-export interface PaceAlias {
-  modifier: InstructionModifiers.PACE_ALIAS;
-  alias: string;
+export interface Intensity {
+  isAlias: boolean;
+  value: string;
 }
 
-export type Pace = FixedExertionPace | VaryingExertionPace | PaceAlias;
-
-export interface FixedExertionPace {
-  modifier: InstructionModifiers.FIXED_PACE;
-  percentage: string;
-}
-
-export interface VaryingExertionPace {
-  modifier: InstructionModifiers.VARYING_PACE;
-  startPercentage: string;
-  finishPercentage: string;
+export interface Pace {
+  modifier: InstructionModifiers.PACE;
+  startIntensity: Intensity;
+  stopIntensity?: Intensity;
 }
 
 export interface PaceDefinition {
