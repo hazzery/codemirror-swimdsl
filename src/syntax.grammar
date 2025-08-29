@@ -13,13 +13,17 @@ expression {
 }
 
 PaceDefinition {
-    paceKeyword PaceDefinitionName "=" pace
+    paceKeyword PaceDefinitionName "=" Pace
 }
 
 PaceDefinitionName { identifier }
 
-pace {
-    percentage | VariableRate | PaceAlias
+intensity {
+    percentage | PaceAlias
+}
+
+Pace {
+    intensity ("->" intensity)?
 }
 
 percentage {
@@ -27,10 +31,6 @@ percentage {
 }
 
 PaceAlias { identifier }  // a named pace, e.g., easy or hard
-
-VariableRate {
-     (percentage | PaceAlias) "->" (percentage | PaceAlias)  // can model increasing or decreasing rate
-}
 
 statement {
     instruction
@@ -64,7 +64,7 @@ BlockInstruction {
 StrokeModifier { identifier }
 
 instructionModifier {
-  GearSpecification | PaceSpecification | timeSpecification
+  GearSpecification | paceSpecification | timeSpecification
 }
 
 GearSpecification {
@@ -73,8 +73,8 @@ GearSpecification {
 
 RequiredGear { identifier }
 
-PaceSpecification {
-    "@" pace
+paceSpecification {
+    "@" Pace
 }
 
 timeSpecification {
