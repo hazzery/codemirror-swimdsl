@@ -26,6 +26,17 @@ import {
  */
 const MAXIMUM_TIME_VALUE: number = 59;
 
+/**
+ * Provide a lint error to the user for referencing a pace name which does not
+ * exist.
+ *
+ * @param node - A refernce to a syntax node to lint.
+ * @param declaredIdentifiers - A set of all pace names defined in the current
+ *    SwimDSL document.
+ * @param state - The current state of the CodeMirror code editor.
+ * @param diagnostics - An arrray of diagnostics to append to if `node`
+ *    references an undefined pace name.
+ */
 function lintUndefinedPaceName(
   node: SyntaxNodeRef,
   declaredIdentifiers: Set<string>,
@@ -44,6 +55,17 @@ function lintUndefinedPaceName(
   }
 }
 
+/**
+ * Provide a lint error to the user for providing multiple definitions for the
+ * same pace name.
+ *
+ * @param node - A refernce to a syntax node to lint.
+ * @param declaredIdentifiers - A set of all pace names defined in the current
+ *    SwimDSL document.
+ * @param state - The current state of the CodeMirror code editor.
+ * @param diagnostics - An arrray of diagnostics to append to if `node`
+ *    attempts to redefine a pace name.
+ */
 function lintDuplicatePaceNameDefinition(
   node: SyntaxNodeRef,
   declaredIdentifiers: Set<string>,
@@ -61,6 +83,13 @@ function lintDuplicatePaceNameDefinition(
   }
 }
 
+/**
+ * Provide a lint error to the user for syntax errors.
+ *
+ * @param node - A refernce to a syntax node to lint.
+ * @param diagnostics - An arrray of diagnostics to append to if `node`
+ *    is a syntax error node.
+ */
 function lintSyntaxErrors(
   node: SyntaxNodeRef,
   diagnostics: Diagnostic[],
@@ -79,6 +108,14 @@ const incompatibleGearMap: Map<string, Set<string>> = new Map<
   ["Pull", new Set(["Board", "Fins"])],
 ]);
 
+/**
+ * Provide a lint error to the user for attemping to combine incompatible gear.
+ *
+ * @param node - A refernce to a syntax node to lint.
+ * @param editorState - The current state of the CodeMirror code editor.
+ * @param diagnostics - An arrray of diagnostics to append to if `node`
+ *    specifies a combination of incompatible gear items.
+ */
 function lintIncompatibleGear(
   node: SyntaxNodeRef,
   editorState: EditorState,
@@ -127,6 +164,20 @@ function lintIncompatibleGear(
   }
 }
 
+/**
+ * Provide a lint error to the user for providing an unknown identifier.
+ *
+ * Examples of providing unknown identifiers could be, specifying a stroke of
+ * "Airplane", or a gear item of "Chicken". "Airplane" is not understood by the
+ * system as a known stroke name, nor "Chicken" a gear item.
+ *
+ * @param node - A refernce to a syntax node to lint.
+ * @param editorState - The current state of the CodeMirror code editor.
+ * @param nodeName - The name of the syntax node for which we are linting.
+ * @param validValues - The allowed list of values for this node.
+ * @param diagnostics - An arrray of diagnostics to append to if `node`
+ *    specifies a combination of incompatible gear items.
+ */
 function lintInvalidNodeValue(
   node: SyntaxNodeRef,
   editorState: EditorState,
@@ -144,6 +195,19 @@ function lintInvalidNodeValue(
   }
 }
 
+/**
+ * Provide a lint error to the user for incorrectly specifying a time duration.
+ *
+ * Examples of providing an incorrect duration are "0:62" or "240:00". "0:62"
+ * should instead be specified as "1:02". "240:00" would be equivalent to four
+ * hours, this is simply too long. The maximum duration that can be specified is
+ * "59:59", fifty nine minutes and fifty nine seconds.
+ *
+ * @param node - A refernce to a syntax node to lint.
+ * @param editorState - The current state of the CodeMirror code editor.
+ * @param diagnostics - An arrray of diagnostics to append to if `node`
+ *    specifies a combination of incompatible gear items.
+ */
 function lintInvalidDuration(
   node: SyntaxNodeRef,
   editorState: EditorState,
