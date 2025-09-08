@@ -224,6 +224,14 @@ function lintInvalidDuration(
   }
 }
 
+/**
+ * Lint the entire document in the provided CodeMirror editor view.
+ *
+ * @param view - A CodeMirror editor view object. Contains the current state of
+ *    the document.
+ *
+ * @returns A list of lint diagnostics to display to the user as squiggly lines.
+ */
 function swimdslLintSource(view: EditorView): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];
 
