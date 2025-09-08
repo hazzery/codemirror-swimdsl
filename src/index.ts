@@ -66,3 +66,5 @@ export function swimdsl(): LanguageSupport {
     swimdslLinter,
   ]);
 }
+
+export { default as compileSwimDsl } from "./compiler";
