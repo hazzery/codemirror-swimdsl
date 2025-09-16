@@ -265,14 +265,14 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
     lintInvalidNodeValue(
       treeCursor,
       editorState,
-      "StrokeType",
+      "StrokeModifier",
       strokeTypes,
       diagnostics,
     );
     lintInvalidNodeValue(
       treeCursor,
       editorState,
-      "RequiredGear",
+      "GearSpecification",
       requiredGear,
       diagnostics,
     );
