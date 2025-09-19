@@ -272,7 +272,7 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
     lintInvalidNodeValue(
       treeCursor,
       editorState,
-      "GearSpecification",
+      "RequiredGear",
       requiredGear,
       diagnostics,
     );
