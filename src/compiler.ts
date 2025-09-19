@@ -1,5 +1,6 @@
-import { ViewPlugin, ViewUpdate, EditorView } from "@codemirror/view";
 import { syntaxTree } from "@codemirror/language";
+import { diagnosticCount } from "@codemirror/lint";
+import { EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
 
 import buildAst from "./buildAst";
 import emitXml from "./swimlGen";
@@ -13,7 +14,9 @@ import emitXml from "./swimlGen";
  *
  * @returns A CodeMirror plugin object.
  */
-export default function compilePlugin(onResult: (xml: string) => void): ViewPlugin<{
+export default function compilePlugin(
+  onResult: (xml: string) => void,
+): ViewPlugin<{
   new (view: EditorView): void;
 }> {
   return ViewPlugin.fromClass(
@@ -23,9 +26,9 @@ export default function compilePlugin(onResult: (xml: string) => void): ViewPlug
       }
 
       update(u: ViewUpdate): void {
-        if (u.docChanged) {
-          this.run(u.view);
-        }
+        if (!u.docChanged || diagnosticCount(u.state) !== 0) return;
+
+        this.run(u.view);
       }
 
       run(view: EditorView): void {
