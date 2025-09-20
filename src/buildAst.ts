@@ -196,6 +196,91 @@ function visitInstructionModifier(
   };
 }
 
+function getStroke(strokeName: string) {
+  switch (strokeName) {
+    case "Freestyle":
+    case "Free":
+    case "Fr":
+      return "freestyle";
+
+    case "Backstroke":
+    case "Back":
+    case "Bk":
+      return "backstroke";
+
+    case "Breaststroke":
+    case "Breast":
+    case "Br":
+      return "breaststroke";
+
+    case "Butterfly":
+    case "Fly":
+    case "Fl":
+      return "butterfly";
+
+    case "IndividualMedley":
+    case "Medley":
+    case "Im":
+      return "individualMedley";
+
+    case "ReverseIndividualMedley":
+    case "ReverseMedley":
+    case "ReverseIm":
+      return "reverseIndividualMedley";
+
+    case "IndividualMedleyOverlap":
+    case "MedleyOverlap":
+    case "ImOverlap":
+      return "individualMedleyOverlap";
+
+    case "IndividualMedleyOrder":
+    case "MedleyOrder":
+    case "ImOrder":
+      return "individualMedleyOrder";
+
+    case "ReverseIndividualMedleyOrder":
+    case "ReverseMedleyOrder":
+    case "ReverseImOrder":
+      return "reverseIndividualMedleyOrder";
+
+    case "NumberOne":
+      return "nr1";
+
+    case "NumberTwo":
+      return "nr2";
+
+    case "NumberThree":
+      return "nr3";
+
+    case "NumberFour":
+      return "nr4";
+
+    case "NotFreestyle":
+    case "NotFree":
+    case "NotFr":
+      return "notFreestyle";
+
+    case "NotBackstroke":
+    case "NotBack":
+    case "NotBk":
+      return "notBackstroke";
+
+    case "NotBreastroke":
+    case "NotBreast":
+    case "NotBr":
+      return "notBreastroke";
+
+    case "NotButterfly":
+    case "NotFly":
+    case "NotFl":
+      return "notButterfly";
+
+    case "Choice":
+    default:
+      return "any";
+  }
+}
+
 /**
  * Create an AST node for a `SwimInstruction` CST node.
  *
@@ -246,7 +331,7 @@ function visitSwimInstruction(
 
     // Move into Stroke
     cursor.nextSibling();
-    const stroke = state.sliceDoc(cursor.from, cursor.to);
+    const stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
 
     instruction = { isBlock: false, distance, stroke };
   }
