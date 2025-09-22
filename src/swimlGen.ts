@@ -227,7 +227,6 @@ export default function emitXml(programme: Programme): string {
         break;
 
       case Statements.PACE_DEFINITION:
-        doc.ele("pace").att("pace", statement.name).txt(String(statement.pace));
         break;
 
       case Statements.CONSTANT_DEFINITION:
