@@ -186,12 +186,44 @@ function writeConstantDefinition(
   definition: ConstantDefinition,
 ) {
   switch (definition.constantName) {
+    case "Title":
+      xmlParent.ele("title").txt(definition.value);
+      break;
+
+    case "Author":
+      xmlParent.ele("author").txt(definition.value);
+      break;
+
+    case "Description":
+      xmlParent.ele("programDescription").txt(definition.value);
+      break;
+
+    case "Date":
+      xmlParent.ele("creationDate").txt(definition.value);
+      break;
+
     case "PoolLength":
       xmlParent.ele("poolLength").txt(definition.value);
       break;
 
     case "LengthUnit":
       xmlParent.ele("lengthUnit").txt(definition.value);
+      break;
+
+    case "Align":
+      xmlParent.ele("programAlign").txt(definition.value);
+      break;
+
+    case "NumeralSystem":
+      xmlParent.ele("numeralSystem").txt(definition.value);
+      break;
+
+    case "HideIntro":
+      xmlParent.ele("hideIntro").txt(definition.value);
+      break;
+
+    case "LayoutWidth":
+      xmlParent.ele("layoutWidth").txt(definition.value);
       break;
   }
 }
