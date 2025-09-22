@@ -54,16 +54,22 @@ export const strokeNames: string[] = [
 export const strokeTypes: string[] = ["Pull", "Kick", "Drill"];
 
 /**
- * The list of all strings considered valid in place of a lendth unit.
- */
-export const lengthUnits: string[] = ["meters", "metres", "yards"];
-
-/**
- * The list of all strings considered valid in place of a distance unit.
- */
-export const distanceUnits: string[] = ["meters", "metres", "yards", "Lengths"];
-
-/**
  * The list of all strings considered valid in place of a gear specification.
  */
 export const requiredGear: string[] = ["Paddles", "Fins", "Buoy", "Board"];
+
+/**
+ * The list of all strings considered valid in place of a constant name.
+ */
+export const constantNames: string[] = [
+  "Title",
+  "Author",
+  "Description",
+  "Date",
+  "PoolLength",
+  "LengthUnit",
+  "Align",
+  "NumeralSystem",
+  "HideIntro",
+  "LayoutWidth",
+];
