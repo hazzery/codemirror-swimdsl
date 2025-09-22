@@ -73,3 +73,8 @@ export const constantNames: string[] = [
   "HideIntro",
   "LayoutWidth",
 ];
+
+/**
+ * The list of all strings considered valid in place of a boolean.
+ */
+export const booleans: string[] = ["True", "False"];
