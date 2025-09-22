@@ -1,5 +1,6 @@
 import { create } from "xmlbuilder2";
 import {
+  ConstantDefinition,
   Instruction,
   InstructionModifier,
   InstructionModifiers,
@@ -180,6 +181,21 @@ function writeMessage(xmlParent: XMLBuilder, instruction: Message): void {
   xmlParent.ele("instruction").ele("segmentName").txt(instruction.message);
 }
 
+function writeConstantDefinition(
+  xmlParent: XMLBuilder,
+  definition: ConstantDefinition,
+) {
+  switch (definition.constantName) {
+    case "PoolLength":
+      xmlParent.ele("poolLength").txt(definition.value);
+      break;
+
+    case "LengthUnit":
+      xmlParent.ele("lengthUnit").txt(definition.value);
+      break;
+  }
+}
+
 /**
  * Given a complete AST for a SwimDSL document, generate a valid swiML XML
  * document describing the same programme.
@@ -215,7 +231,7 @@ export default function emitXml(programme: Programme): string {
         break;
 
       case Statements.CONSTANT_DEFINITION:
-        doc.ele(statement.constantName).txt(statement.value);
+        writeConstantDefinition(doc, statement);
         break;
     }
   }
