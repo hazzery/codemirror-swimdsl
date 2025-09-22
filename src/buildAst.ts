@@ -438,7 +438,7 @@ function visitConstantDefinition(
   cursor.firstChild();
   const constantName = state.sliceDoc(cursor.from, cursor.to);
 
-  // Move into Number | StringValue
+  // Move into Number | String
   cursor.nextSibling();
   let value: string = state.sliceDoc(cursor.from, cursor.to);
 
