@@ -6,10 +6,12 @@ ConstantDefinition {
 
 ConstantName { identifier }
 
-StringValue { identifier }
-
 expression {
-    Number | StringValue
+    Number | string
+}
+
+string {
+    '"' StringContent '"'
 }
 
 PaceDefinition {
@@ -102,8 +104,11 @@ messageSpecification {
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
     Message     { ![\n]+ }
+    StringContent { (!["\\] | "\\" _)+ }
     identifier  { @asciiLetter+ }
     repititionOperator { "x" }
+    @precedence { StringContent, space }
+    @precedence { StringContent, Comment }
     @precedence { repititionOperator, identifier }
     @precedence { paceKeyword, identifier }
     @precedence { setKeyword, identifier }
