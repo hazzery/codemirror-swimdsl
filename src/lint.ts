@@ -14,6 +14,7 @@ import {
   undefinedPaceNameDiagnostic,
 } from "./diagnostics";
 import {
+  booleans,
   constantNames,
   requiredGear,
   strokeNames,
@@ -273,6 +274,13 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
       editorState,
       "RequiredGear",
       requiredGear,
+      diagnostics,
+    );
+    lintInvalidNodeValue(
+      treeCursor,
+      editorState,
+      "Boolean",
+      booleans,
       diagnostics,
     );
     lintInvalidNodeValue(

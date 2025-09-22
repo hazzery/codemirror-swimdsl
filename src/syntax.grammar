@@ -7,11 +7,15 @@ ConstantDefinition {
 ConstantName { identifier }
 
 expression {
-    Number | string
+    Number | string | Boolean
 }
 
 string {
     '"' StringContent '"'
+}
+
+Boolean {
+  identifier
 }
 
 PaceDefinition {

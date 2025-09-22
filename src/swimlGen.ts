@@ -211,7 +211,7 @@ function writeConstantDefinition(
       break;
 
     case "Align":
-      xmlParent.ele("programAlign").txt(definition.value);
+      xmlParent.ele("programAlign").txt(definition.value.toLowerCase());
       break;
 
     case "NumeralSystem":
@@ -219,7 +219,7 @@ function writeConstantDefinition(
       break;
 
     case "HideIntro":
-      xmlParent.ele("hideIntro").txt(definition.value);
+      xmlParent.ele("hideIntro").txt(definition.value.toLowerCase());
       break;
 
     case "LayoutWidth":
