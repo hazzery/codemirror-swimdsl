@@ -14,11 +14,10 @@ import {
   undefinedPaceNameDiagnostic,
 } from "./diagnostics";
 import {
+  constantNames,
+  requiredGear,
   strokeNames,
   strokeTypes,
-  requiredGear,
-  distanceUnits,
-  lengthUnits,
 } from "./enumerations";
 
 /**
@@ -279,15 +278,8 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
     lintInvalidNodeValue(
       treeCursor,
       editorState,
-      "DistanceUnit",
-      distanceUnits,
-      diagnostics,
-    );
-    lintInvalidNodeValue(
-      treeCursor,
-      editorState,
-      "LengthUnit",
-      lengthUnits,
+      "ConstantName",
+      constantNames,
       diagnostics,
     );
     lintInvalidDuration(treeCursor, editorState, diagnostics);
