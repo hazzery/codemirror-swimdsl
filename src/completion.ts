@@ -5,7 +5,12 @@ import {
 } from "@codemirror/autocomplete";
 import { syntaxTree } from "@codemirror/language";
 
-import { requiredGear, strokeNames, strokeTypes } from "./enumerations";
+import {
+  constantNames,
+  requiredGear,
+  strokeNames,
+  strokeTypes,
+} from "./enumerations";
 import { definedIdentifiersField } from "./definedIdentifiers";
 
 const enum CompletableNodes {
@@ -13,6 +18,7 @@ const enum CompletableNodes {
   GEAR_NAME,
   PACE_ALIAS,
   STROKE_MODIFIER,
+  CONSTANT_NAME,
   NUMBER_COMPLETEABLE_NODES,
 }
 
@@ -36,6 +42,10 @@ const gearNameCompletions: Completion[] = requiredGear.map((gearName) => ({
 
 const strokeModifierCompletions: Completion[] = strokeTypes.map(
   (strokeModifier) => ({ label: strokeModifier, type: "constant" }),
+);
+
+const constantNameCompletions: Completion[] = constantNames.map(
+  (constantName) => ({ label: constantName, type: "constant" }),
 );
 
 const nodeCompletions: Map<CompletableNodes, NodeCompletionSpec> = new Map([
@@ -69,6 +79,14 @@ const nodeCompletions: Map<CompletableNodes, NodeCompletionSpec> = new Map([
       priorNodeName: "",
       nodeName: "StrokeType",
       completions: strokeModifierCompletions,
+    },
+  ],
+  [
+    CompletableNodes.CONSTANT_NAME,
+    {
+      priorNodeName: "ConstantDefinition",
+      nodeName: "ConstantName",
+      completions: constantNameCompletions,
     },
   ],
 ]);
