@@ -84,7 +84,7 @@ const nodeCompletions: Map<CompletableNodes, NodeCompletionSpec> = new Map([
   [
     CompletableNodes.CONSTANT_NAME,
     {
-      priorNodeName: "ConstantDefinition",
+      priorNodeName: "", // Needs to be setKeyword, but this doesn't show in tree
       nodeName: "ConstantName",
       completions: constantNameCompletions,
     },
