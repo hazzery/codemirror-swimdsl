@@ -148,6 +148,34 @@ function visitDuration(
   return { minutes, seconds };
 }
 
+function getEquipment(equipmentName: string | undefined) {
+  switch (equipmentName) {
+    case "Board":
+      return "board";
+
+    case "Pads":
+      return "pads";
+
+    case "PullBuoy":
+      return "pullBuoy";
+
+    case "Fins":
+      return "fins";
+
+    case "Snorkel":
+      return "snorkel";
+
+    case "Chute":
+      return "chute";
+
+    case "StretchCord":
+      return "stretchCord";
+
+    default:
+      return "";
+  }
+}
+
 /**
  * Create an AST node for an `instructionModifier` CST node.
  *
@@ -173,7 +201,8 @@ function visitInstructionModifier(
     cursor.firstChild();
 
     do {
-      gear.push(state.sliceDoc(cursor.from, cursor.to));
+      const equipmentName = state.sliceDoc(cursor.from, cursor.to);
+      gear.push(getEquipment(equipmentName));
     } while (cursor.nextSibling());
 
     // Step back up to the GearSpecification

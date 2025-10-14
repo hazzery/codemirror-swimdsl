@@ -56,7 +56,15 @@ export const strokeTypes: string[] = ["Pull", "Kick", "Drill"];
 /**
  * The list of all strings considered valid in place of a gear specification.
  */
-export const requiredGear: string[] = ["Paddles", "Fins", "Buoy", "Board"];
+export const requiredGear: string[] = [
+  "Board",
+  "Pads",
+  "PullBuoy",
+  "Fins",
+  "Snorkel",
+  "Chute",
+  "StretchCord",
+];
 
 /**
  * The list of all strings considered valid in place of a constant name.
