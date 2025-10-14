@@ -103,8 +103,8 @@ const incompatibleGearMap: Map<string, Set<string>> = new Map<
   string,
   Set<string>
 >([
-  ["Default", new Set(["Board", "Bouy"])],
-  ["Kick", new Set(["Bouy", "Paddles"])],
+  ["Default", new Set(["Board", "PullBuoy"])],
+  ["Kick", new Set(["PullBuoy", "Pads"])],
   ["Pull", new Set(["Board", "Fins"])],
 ]);
 
