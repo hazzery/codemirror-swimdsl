@@ -75,45 +75,45 @@ export function syntaxErrorDiagnostic(errorNode: SyntaxNodeRef): Diagnostic {
 
 /**
  * Provides the user with an error message when they reference a particular
- * piece of gear multiple times within the same instruction.
+ * piece of equipment multiple times within the same instruction.
  *
  * @param from - The position of the first character to include in the error.
  * @param to - The position of the last character to include in the error.
  *
- * @returns An editor diagnostic for a duplicated gear specification.
+ * @returns An editor diagnostic for a duplicated equipment specification.
  */
-export function duplicateGearDiagnostic(from: number, to: number): Diagnostic {
+export function duplicateEquipmentDiagnostic(from: number, to: number): Diagnostic {
   return {
     from,
     to,
     severity: "error",
     message:
-      "Duplicate gear specified. Please do not use the same gear multiple times",
+      "Duplicate equipment specified. Please do not use the same equipment multiple times",
   };
 }
 
 /**
  * Provide the user with an error message when they attempt to mix a piece of
- * swimming gear with a stroke type which that gear cannont be used with.
+ * swimming equipment with a stroke type which that equipment cannont be used with.
  *
  * @param from - The position of the first character to include in the error.
  * @param to - The position of the last character to include in the error.
- * @param gearType - The name of the piece of gear the user specified.
+ * @param equipmentName - The name of the piece of equipment the user specified.
  * @param strokeType - The name of the stroke type the user specified.
  *
- * @returns An editor diagnostic for incompatible gear.
+ * @returns An editor diagnostic for incompatible equipment.
  */
-export function incompatibleGearDiagnostic(
+export function incompatibleEquipmentDiagnostic(
   from: number,
   to: number,
-  gearType: string,
+  equipmentName: string,
   strokeType: string,
 ): Diagnostic {
   return {
     from,
     to,
     severity: "error",
-    message: `'${gearType}' is not compatible with stroke type '${strokeType}'`,
+    message: `'${equipmentName}' is not compatible with stroke type '${strokeType}'`,
   };
 }
 

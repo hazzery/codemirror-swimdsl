@@ -32,7 +32,7 @@ const parserWithMetadata: LRParser = parser.configure({
       Percentage: tags.integer,
       Number: tags.integer,
       Identifier: tags.variableName,
-      RequiredGear: tags.macroName,
+      EquipmentName: tags.macroName,
       Comment: tags.comment,
       SetKeyword: tags.keyword,
       RestKeyword: tags.keyword,

@@ -70,14 +70,14 @@ BlockInstruction {
 StrokeModifier { identifier }
 
 instructionModifier {
-  GearSpecification | paceSpecification | timeSpecification
+  EquipmentSpecification | paceSpecification | timeSpecification
 }
 
-GearSpecification {
-    "+" RequiredGear+
+EquipmentSpecification {
+    "+" EquipmentName+
 }
 
-RequiredGear { identifier }
+EquipmentName { identifier }
 
 paceSpecification {
     "@" Pace

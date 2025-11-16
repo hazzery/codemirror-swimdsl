@@ -7,7 +7,7 @@ import { syntaxTree } from "@codemirror/language";
 
 import {
   constantNames,
-  requiredGear,
+  equipmentNames,
   strokeNames,
   strokeTypes,
 } from "./enumerations";
@@ -15,7 +15,7 @@ import { definedIdentifiersField } from "./definedIdentifiers";
 
 const enum CompletableNodes {
   STROKE_NAME,
-  GEAR_NAME,
+  EQUIPMENT_NAME,
   PACE_ALIAS,
   STROKE_MODIFIER,
   CONSTANT_NAME,
@@ -35,10 +35,12 @@ const strokeNameCompletions: Completion[] = strokeNames.map((strokeName) => ({
   boost: strokeName.length,
 }));
 
-const gearNameCompletions: Completion[] = requiredGear.map((gearName) => ({
-  label: gearName,
-  type: "constant",
-}));
+const equipmentNameCompletions: Completion[] = equipmentNames.map(
+  (equipment) => ({
+    label: equipment,
+    type: "constant",
+  }),
+);
 
 const strokeModifierCompletions: Completion[] = strokeTypes.map(
   (strokeModifier) => ({ label: strokeModifier, type: "constant" }),
@@ -58,11 +60,11 @@ const nodeCompletions: Map<CompletableNodes, NodeCompletionSpec> = new Map([
     },
   ],
   [
-    CompletableNodes.GEAR_NAME,
+    CompletableNodes.EQUIPMENT_NAME,
     {
-      priorNodeName: "GearSpecification",
-      nodeName: "RequiredGear",
-      completions: gearNameCompletions,
+      priorNodeName: "EquipmentSpecification",
+      nodeName: "EquipmentName",
+      completions: equipmentNameCompletions,
     },
   ],
   [
