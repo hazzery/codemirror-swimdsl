@@ -179,7 +179,7 @@ function getEquipment(equipmentName: string | undefined) {
 /**
  * Create an AST node for an `instructionModifier` CST node.
  *
- * Precondition: `cursor` points to one of `GearSpecification`, `Pace`, or
+ * Precondition: `cursor` points to one of `EquipmentSpecification`, `Pace`, or
  * `Duration`.
  *
  * Postcondition: `cursor` will point to the same node it pointed to when
@@ -194,23 +194,23 @@ function visitInstructionModifier(
   cursor: TreeCursor,
   state: EditorState,
 ): InstructionModifier {
-  if (cursor.name === "GearSpecification") {
-    const gear: string[] = [];
+  if (cursor.name === "EquipmentSpecification") {
+    const equipment: string[] = [];
 
-    // Move down into first RequiredGear
+    // Move down into first EquipmentName
     cursor.firstChild();
 
     do {
       const equipmentName = state.sliceDoc(cursor.from, cursor.to);
-      gear.push(getEquipment(equipmentName));
+      equipment.push(getEquipment(equipmentName));
     } while (cursor.nextSibling());
 
-    // Step back up to the GearSpecification
+    // Step back up to the EquipmentSpecification
     cursor.parent();
 
     return {
-      modifier: InstructionModifiers.GEAR_SPECIFICATION,
-      gear,
+      modifier: InstructionModifiers.EQUIPMENT_SPECIFICATION,
+      equipment,
     };
   }
 

@@ -99,9 +99,9 @@ function writeInstructionModifier(
       }
       break;
 
-    case InstructionModifiers.GEAR_SPECIFICATION:
-      for (const gear of modifier.gear) {
-        xmlParent.ele("equipment").txt(gear);
+    case InstructionModifiers.EQUIPMENT_SPECIFICATION:
+      for (const equipment of modifier.equipment) {
+        xmlParent.ele("equipment").txt(equipment);
       }
       break;
 

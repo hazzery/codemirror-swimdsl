@@ -7,7 +7,7 @@ export const enum Statements {
 }
 
 export const enum InstructionModifiers {
-  GEAR_SPECIFICATION,
+  EQUIPMENT_SPECIFICATION,
   PACE,
   TIME,
 }
@@ -26,9 +26,9 @@ export interface ConstantDefinition {
 
 export type Statement = Instruction | PaceDefinition | ConstantDefinition;
 
-export interface GearSpecification {
-  modifier: InstructionModifiers.GEAR_SPECIFICATION;
-  gear: string[];
+export interface EquipmentSpecification {
+  modifier: InstructionModifiers.EQUIPMENT_SPECIFICATION;
+  equipment: string[];
 }
 
 export interface Time {
@@ -37,7 +37,7 @@ export interface Time {
   seconds: string;
 }
 
-export type InstructionModifier = GearSpecification | Pace | Time;
+export type InstructionModifier = EquipmentSpecification | Pace | Time;
 
 export interface SwimInstruction {
   statement: Statements.SWIM_INSTRUCTION;

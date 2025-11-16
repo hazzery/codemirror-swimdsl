@@ -5,9 +5,9 @@ import { EditorView } from "@codemirror/view";
 import { SyntaxNodeRef, TreeCursor } from "@lezer/common";
 
 import {
-  duplicateGearDiagnostic,
+  duplicateEquipmentDiagnostic,
   duplicatePaceNameDefinitionDiagnostic,
-  incompatibleGearDiagnostic,
+  incompatibleEquipmentDiagnostic,
   invalidDurationDiagnostic,
   invalidNodeValueDiagnostic,
   syntaxErrorDiagnostic,
@@ -16,7 +16,7 @@ import {
 import {
   booleans,
   constantNames,
-  requiredGear,
+  equipmentNames,
   strokeNames,
   strokeTypes,
 } from "./enumerations";
@@ -99,7 +99,7 @@ function lintSyntaxErrors(
   diagnostics.push(syntaxErrorDiagnostic(node));
 }
 
-const incompatibleGearMap: Map<string, Set<string>> = new Map<
+const incompatibleEquipmentMap: Map<string, Set<string>> = new Map<
   string,
   Set<string>
 >([
@@ -109,22 +109,23 @@ const incompatibleGearMap: Map<string, Set<string>> = new Map<
 ]);
 
 /**
- * Provide a lint error to the user for attemping to combine incompatible gear.
+ * Provide a lint error to the user for attemping to combine incompatible
+ * equipment.
  *
  * @param node - A refernce to a syntax node to lint.
  * @param editorState - The current state of the CodeMirror code editor.
  * @param diagnostics - An arrray of diagnostics to append to if `node`
- *    specifies a combination of incompatible gear items.
+ *    specifies a combination of incompatible equipment items.
  */
-function lintIncompatibleGear(
+function lintIncompatibleEquipment(
   node: SyntaxNodeRef,
   editorState: EditorState,
   diagnostics: Diagnostic[],
 ): void {
   if (node.name !== "Instruction") return;
 
-  const gearSpecificationNode = node.node.getChild("GearSpecification");
-  if (gearSpecificationNode === null) return;
+  const equipmentSpecificationNode = node.node.getChild("EquipmentSpecification");
+  if (equipmentSpecificationNode === null) return;
 
   const strokeTypeNode = node.node.getChild("StrokeType");
   const strokeType =
@@ -133,30 +134,32 @@ function lintIncompatibleGear(
       : "Default";
 
   const fromPosition =
-    strokeTypeNode !== null ? strokeTypeNode.from : gearSpecificationNode.from;
+    strokeTypeNode !== null
+      ? strokeTypeNode.from
+      : equipmentSpecificationNode.from;
 
-  const specifiedGear = gearSpecificationNode
-    .getChildren("RequiredGear")
+  const specifiedEquipment = equipmentSpecificationNode
+    .getChildren("EquipmentName")
     .map((child) => editorState.sliceDoc(child.from, child.to));
-  const gearSet = new Set(specifiedGear);
+  const equipmentSet = new Set(specifiedEquipment);
 
-  if (gearSet.size !== specifiedGear.length) {
+  if (equipmentSet.size !== specifiedEquipment.length) {
     diagnostics.push(
-      duplicateGearDiagnostic(fromPosition, gearSpecificationNode.to),
+      duplicateEquipmentDiagnostic(fromPosition, equipmentSpecificationNode.to),
     );
   }
 
-  const incompatibleGear = incompatibleGearMap.get(strokeType);
+  const incompatibleEquipment = incompatibleEquipmentMap.get(strokeType);
 
-  if (incompatibleGear === undefined) return;
+  if (incompatibleEquipment === undefined) return;
 
-  for (const gearType of gearSet) {
-    if (incompatibleGear.has(gearType)) {
+  for (const equipmentName of equipmentSet) {
+    if (incompatibleEquipment.has(equipmentName)) {
       diagnostics.push(
-        incompatibleGearDiagnostic(
+        incompatibleEquipmentDiagnostic(
           fromPosition,
-          gearSpecificationNode.to,
-          gearType,
+          equipmentSpecificationNode.to,
+          equipmentName,
           strokeType,
         ),
       );
@@ -168,15 +171,15 @@ function lintIncompatibleGear(
  * Provide a lint error to the user for providing an unknown identifier.
  *
  * Examples of providing unknown identifiers could be, specifying a stroke of
- * "Airplane", or a gear item of "Chicken". "Airplane" is not understood by the
- * system as a known stroke name, nor "Chicken" a gear item.
+ * "Airplane", or "Chicken" as a piece of euqipment. "Airplane" is not understood by the
+ * system as a known stroke name, nor "Chicken" a valid piece of equipment.
  *
  * @param node - A refernce to a syntax node to lint.
  * @param editorState - The current state of the CodeMirror code editor.
  * @param nodeName - The name of the syntax node for which we are linting.
  * @param validValues - The allowed list of values for this node.
  * @param diagnostics - An arrray of diagnostics to append to if `node`
- *    specifies a combination of incompatible gear items.
+ *    specifies a combination of incompatible pieces of equipment.
  */
 function lintInvalidNodeValue(
   node: SyntaxNodeRef,
@@ -206,7 +209,7 @@ function lintInvalidNodeValue(
  * @param node - A refernce to a syntax node to lint.
  * @param editorState - The current state of the CodeMirror code editor.
  * @param diagnostics - An arrray of diagnostics to append to if `node`
- *    specifies a combination of incompatible gear items.
+ *    specifies a combination of incompatible pieces of equipment.
  */
 function lintInvalidDuration(
   node: SyntaxNodeRef,
@@ -254,7 +257,7 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
       diagnostics,
     );
     lintSyntaxErrors(treeCursor, diagnostics);
-    lintIncompatibleGear(treeCursor, editorState, diagnostics);
+    lintIncompatibleEquipment(treeCursor, editorState, diagnostics);
     lintInvalidNodeValue(
       treeCursor,
       editorState,
@@ -272,8 +275,8 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
     lintInvalidNodeValue(
       treeCursor,
       editorState,
-      "RequiredGear",
-      requiredGear,
+      "EquipmentName",
+      equipmentNames,
       diagnostics,
     );
     lintInvalidNodeValue(
