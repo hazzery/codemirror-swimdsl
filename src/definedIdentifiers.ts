@@ -12,7 +12,7 @@ import { syntaxTree } from "@codemirror/language";
  * @returns A set of all defined pace names in the current programme.
  */
 function computeDeclaredIdentifiers(editorState: EditorState): Set<string> {
-  const declaredIdentifiers: Set<string> = new Set();
+  const declaredIdentifiers = new Set<string>();
   const treeCursor: TreeCursor = syntaxTree(editorState).cursor();
 
   do {

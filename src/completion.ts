@@ -50,7 +50,7 @@ const constantNameCompletions: Completion[] = constantNames.map(
   (constantName) => ({ label: constantName, type: "constant" }),
 );
 
-const nodeCompletions: Map<CompletableNodes, NodeCompletionSpec> = new Map([
+const nodeCompletions = new Map<CompletableNodes, NodeCompletionSpec>([
   [
     CompletableNodes.STROKE_NAME,
     {
