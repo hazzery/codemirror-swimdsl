@@ -16,9 +16,7 @@ import emitXml from "./swimlGen";
  */
 export default function compilePlugin(
   onResult: (xml: string) => void,
-): ViewPlugin<{
-  new (view: EditorView): void;
-}> {
+): ViewPlugin<new (view: EditorView) => void> {
   return ViewPlugin.fromClass(
     class {
       constructor(public view: EditorView) {

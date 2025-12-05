@@ -89,7 +89,7 @@ function writeInstructionModifier(
   modifier: InstructionModifier,
 ): void {
   switch (modifier.modifier) {
-    case InstructionModifiers.PACE:
+    case InstructionModifiers.PACE: {
       const intensity = xmlParent.ele("intensity");
 
       writeIntensity(intensity.ele("startIntensity"), modifier.startIntensity);
@@ -98,7 +98,7 @@ function writeInstructionModifier(
         writeIntensity(intensity.ele("stopIntensity"), modifier.stopIntensity);
       }
       break;
-
+    }
     case InstructionModifiers.EQUIPMENT_SPECIFICATION:
       for (const equipment of modifier.equipment) {
         xmlParent.ele("equipment").txt(equipment);

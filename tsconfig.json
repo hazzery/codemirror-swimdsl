@@ -5,9 +5,11 @@
     "module": "es2020",
     "newLine": "lf",
     "declaration": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "skipLibCheck": true,
+    "outDir": "dist"
   },
   "include": [
     "src/*.ts"
-  ]
+  ],
 }

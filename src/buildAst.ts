@@ -469,7 +469,7 @@ function visitConstantDefinition(
 
   // Move into Number | StringContent | Boolean
   cursor.nextSibling();
-  let value: string = state.sliceDoc(cursor.from, cursor.to);
+  const value: string = state.sliceDoc(cursor.from, cursor.to);
 
   // Move up out of the ConstantDefinition
   cursor.parent();
