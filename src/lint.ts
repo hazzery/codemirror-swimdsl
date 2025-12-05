@@ -75,9 +75,12 @@ function lintDuplicatePaceNameDefinition(
   if (node.name !== "PaceDefinitionName") return;
 
   const node_value = state.sliceDoc(node.from, node.to);
+  const paceDefinitionNode = node.node.parent;
+
+  if (paceDefinitionNode === null) return;
 
   if (declaredIdentifiers.has(node_value)) {
-    diagnostics.push(duplicatePaceNameDefinitionDiagnostic(node_value, node));
+    diagnostics.push(duplicatePaceNameDefinitionDiagnostic(node_value, node, paceDefinitionNode));
   } else {
     declaredIdentifiers.add(node_value);
   }
