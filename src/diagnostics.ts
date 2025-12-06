@@ -12,7 +12,7 @@ import {
  * define a pace name multiple times.
  *
  * @param duplicatedName - The pace name which has been defined twice.
- * @param paceAliasNode - The syntax tree node for the pace alias.
+ * @param paceDefinitionNameNode - The syntax tree node for the pace definition name.
  * @param paceDefinitionNode - The syntax tree node for the pace definition.
  *
  * @returns An editor diagnostic for a duplicated pace name.
@@ -20,14 +20,14 @@ import {
 export function duplicatePaceNameDefinitionDiagnostic(
   duplicatedName: string,
   paceDefinitionNameNode: SyntaxNodeRef,
+  paceDefinitionNode: SyntaxNodeRef,
 ): Diagnostic {
-  // TODO: actions line uses non-null assertion operator, it probably shouldn't.
   return {
     from: paceDefinitionNameNode.from,
     to: paceDefinitionNameNode.to,
     severity: "error",
     message: `A pace named '${duplicatedName}' has already been defined`,
-    actions: duplicatePaceNameDefinitionActions(paceDefinitionNameNode.node.parent!),
+    actions: duplicatePaceNameDefinitionActions(paceDefinitionNode),
   };
 }
 

@@ -9,7 +9,7 @@ import { closestLevenshtienDistance } from "./utils";
  * indentifier for the editor to suggest replacing the rerror with the valid
  * identifier.
  */
-const MAX_LEVENSHTIEN_DISTANCE: number = 2;
+const MAX_LEVENSHTIEN_DISTANCE = 2;
 
 /**
  * Provide the user with a list of actions they can to resolve an undefined

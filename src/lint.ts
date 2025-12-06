@@ -24,7 +24,7 @@ import {
 /**
  * The maximum allows value for either minutes and seconds in a duration node.
  */
-const MAXIMUM_TIME_VALUE: number = 59;
+const MAXIMUM_TIME_VALUE = 59;
 
 /**
  * Provide a lint error to the user for referencing a pace name which does not
@@ -75,9 +75,12 @@ function lintDuplicatePaceNameDefinition(
   if (node.name !== "PaceDefinitionName") return;
 
   const node_value = state.sliceDoc(node.from, node.to);
+  const paceDefinitionNode = node.node.parent;
+
+  if (paceDefinitionNode === null) return;
 
   if (declaredIdentifiers.has(node_value)) {
-    diagnostics.push(duplicatePaceNameDefinitionDiagnostic(node_value, node));
+    diagnostics.push(duplicatePaceNameDefinitionDiagnostic(node_value, node, paceDefinitionNode));
   } else {
     declaredIdentifiers.add(node_value);
   }
@@ -124,7 +127,9 @@ function lintIncompatibleEquipment(
 ): void {
   if (node.name !== "Instruction") return;
 
-  const equipmentSpecificationNode = node.node.getChild("EquipmentSpecification");
+  const equipmentSpecificationNode = node.node.getChild(
+    "EquipmentSpecification",
+  );
   if (equipmentSpecificationNode === null) return;
 
   const strokeTypeNode = node.node.getChild("StrokeType");
@@ -191,7 +196,7 @@ function lintInvalidNodeValue(
   if (node.name !== nodeName) return;
 
   const nodeValue = editorState.sliceDoc(node.from, node.to);
-  if (validValues.indexOf(nodeValue) === -1) {
+  if (!validValues.includes(nodeValue)) {
     diagnostics.push(
       invalidNodeValueDiagnostic(node, nodeValue, nodeName, validValues),
     );

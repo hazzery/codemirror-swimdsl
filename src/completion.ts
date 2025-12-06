@@ -19,7 +19,6 @@ const enum CompletableNodes {
   PACE_ALIAS,
   STROKE_MODIFIER,
   CONSTANT_NAME,
-  NUMBER_COMPLETEABLE_NODES,
 }
 
 interface NodeCompletionSpec {
@@ -50,48 +49,33 @@ const constantNameCompletions: Completion[] = constantNames.map(
   (constantName) => ({ label: constantName, type: "constant" }),
 );
 
-const nodeCompletions: Map<CompletableNodes, NodeCompletionSpec> = new Map([
-  [
-    CompletableNodes.STROKE_NAME,
-    {
-      priorNodeName: "Distance",
-      nodeName: "Stroke",
-      completions: strokeNameCompletions,
-    },
-  ],
-  [
-    CompletableNodes.EQUIPMENT_NAME,
-    {
-      priorNodeName: "EquipmentSpecification",
-      nodeName: "EquipmentName",
-      completions: equipmentNameCompletions,
-    },
-  ],
-  [
-    CompletableNodes.PACE_ALIAS,
-    {
-      priorNodeName: "Pace",
-      nodeName: "PaceAlias",
-      completions: [] as Completion[],
-    },
-  ],
-  [
-    CompletableNodes.STROKE_MODIFIER,
-    {
-      priorNodeName: "",
-      nodeName: "StrokeType",
-      completions: strokeModifierCompletions,
-    },
-  ],
-  [
-    CompletableNodes.CONSTANT_NAME,
-    {
-      priorNodeName: "", // Needs to be setKeyword, but this doesn't show in tree
-      nodeName: "ConstantName",
-      completions: constantNameCompletions,
-    },
-  ],
-]);
+const nodeCompletions: Record<CompletableNodes, NodeCompletionSpec> = {
+  [CompletableNodes.STROKE_NAME]: {
+    priorNodeName: "Distance",
+    nodeName: "Stroke",
+    completions: strokeNameCompletions,
+  },
+  [CompletableNodes.EQUIPMENT_NAME]: {
+    priorNodeName: "EquipmentSpecification",
+    nodeName: "EquipmentName",
+    completions: equipmentNameCompletions,
+  },
+  [CompletableNodes.PACE_ALIAS]: {
+    priorNodeName: "Pace",
+    nodeName: "PaceAlias",
+    completions: [] as Completion[],
+  },
+  [CompletableNodes.STROKE_MODIFIER]: {
+    priorNodeName: "",
+    nodeName: "StrokeType",
+    completions: strokeModifierCompletions,
+  },
+  [CompletableNodes.CONSTANT_NAME]: {
+    priorNodeName: "", // TODO: Needs to be setKeyword, but this doesn't show in the syntax tree
+    nodeName: "ConstantName",
+    completions: constantNameCompletions,
+  },
+};
 
 /**
  * Provide the user with autocomplpetions within the editor based on the current
@@ -106,15 +90,13 @@ function completeSwimDSL(context: CompletionContext): CompletionResult | null {
   const nodeBefore = syntaxTree(context.state).resolveInner(context.pos, -1);
 
   // Fetch the list of all defined pace names, and convert to autocomplpetions.
-  nodeCompletions.get(CompletableNodes.PACE_ALIAS)!.completions = Array.from(
+  nodeCompletions[CompletableNodes.PACE_ALIAS].completions = Array.from(
     context.state.field(definedIdentifiersField),
   ).map((paceName) => ({ label: paceName, type: "variable" }));
 
-  for (const {
-    priorNodeName,
-    nodeName,
-    completions,
-  } of nodeCompletions.values()) {
+  for (const { priorNodeName, nodeName, completions } of Object.values(
+    nodeCompletions,
+  )) {
     // If the user has just typed a character placing the curson in a position
     // which accepts autocomplpetions, provide the autocomplpetions.
     if (nodeBefore.name === priorNodeName) {
