@@ -4,7 +4,7 @@
   "description": "swimdsl language support for CodeMirror",
   "scripts": {
     "test": "mocha test/test.js",
-    "prepare": "rollup -c",
+    "prepare": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
     "lint": "eslint ."
   },
   "author": {
