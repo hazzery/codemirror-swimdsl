@@ -4,7 +4,7 @@ import { lezer } from "@lezer/generator/rollup";
 
 const config: RollupOptions = {
   input: "src/index.ts",
-  external: (id: string) => id != "tslib" && !/^(\.?\/|\w:)/.test(id),
+  external: (id: string) => id !== "tslib" && !/^(\.?\/|\w:)/.test(id),
   output: [
     { file: "dist/index.cjs", format: "cjs" },
     { dir: "./dist", format: "es" },
