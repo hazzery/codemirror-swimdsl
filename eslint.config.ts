@@ -1,9 +1,8 @@
 import js from "@eslint/js";
-import { defineConfig } from "eslint/config";
+import { defineConfig, type Config } from "eslint/config";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
-/** @type {import('eslint').Linter.Config[]} */
 export default defineConfig([
   {
     ignores: ["dist"],
@@ -12,8 +11,8 @@ export default defineConfig([
     files: ["**/*.ts"],
     extends: [
       js.configs.recommended,
-      tseslint.configs.strictTypeChecked,
-      tseslint.configs.stylisticTypeChecked,
+      ...(tseslint.configs.strictTypeChecked as Config[]),
+      ...(tseslint.configs.stylisticTypeChecked as Config[]),
     ],
     languageOptions: {
       ecmaVersion: 2020,
