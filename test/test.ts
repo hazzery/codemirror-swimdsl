@@ -14,12 +14,12 @@ for (const file of fs.readdirSync(caseDir)) {
   if (!name) continue;
 
   describe(name, () => {
-    for (const { name, run } of fileTests(
+    for (const test of fileTests(
       fs.readFileSync(path.join(caseDir, file), "utf8"),
       file,
     ))
-      it(name, () => {
-        run(swimdslLanguage.parser);
+      it(test.name, () => {
+        test.run(swimdslLanguage.parser);
       });
   });
 }

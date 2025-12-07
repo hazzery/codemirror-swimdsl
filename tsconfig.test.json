@@ -3,7 +3,7 @@
   "compilerOptions": {
     "composite": true,
     "noEmit": true,
-    "types": ["node", "mocha"]
+    "outDir": "dist-node"
   },
   "include": ["test/*.ts"]
 }

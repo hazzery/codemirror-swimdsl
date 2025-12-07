@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 .rollup.cache
+*.tsbuildinfo
 
 node_modules
 dist

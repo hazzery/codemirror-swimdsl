@@ -1,5 +1,11 @@
+.github
+.rollup.cache
+/dist-node
 /src
 /test
-/node_modules
-rollup.config.js
+rollup.config.ts
+eslint.config.ts
 tsconfig.json
+tsconfig.*.json
+.nvmrc
+*.tsbuildinfo
