@@ -12,7 +12,7 @@ const config: RollupOptions = {
   plugins: [
     lezer(),
     typescript({
-      declarationDir: "./dist",
+      tsconfig: "./tsconfig.lib.json",
     }),
   ],
 };
