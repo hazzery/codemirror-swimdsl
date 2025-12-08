@@ -350,7 +350,7 @@ SwimProgramme(SwimInstruction(
         SwimInstruction(SingleInstruction(Number, Stroke)))))))
 
 
-# Constant definition with string
+## Constant definition with string
 
 set Title "Programme Title"
 
