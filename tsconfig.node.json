@@ -3,7 +3,11 @@
   "compilerOptions": {
     "composite": true,
     "noEmit": true,
-    "outDir": "dist-node"
+    "outDir": "dist-node",
+    "target": "esnext",
+    "lib": ["esnext"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
   },
-  "include": ["eslint.config.ts", "rollup.config.ts"]
+  "include": ["eslint.config.ts", "rollup.config.ts", "test/*.ts"]
 }
