@@ -152,7 +152,7 @@ SwimProgramme(
   PaceDefinition(PaceDefinitionName, Pace(Number)))
 
 
-# Pace definition with start and stop intensity percentages
+## Pace definition with start and stop intensity percentages
 
 pace warmup = 40% -> 60%
 
