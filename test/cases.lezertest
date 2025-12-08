@@ -152,7 +152,7 @@ SwimProgramme(
   PaceDefinition(PaceDefinitionName, Pace(Number)))
 
 
-# Pace definition with start and stop intensity percentages
+## Pace definition with start and stop intensity percentages
 
 pace warmup = 40% -> 60%
 
@@ -230,7 +230,7 @@ SwimProgramme(SwimInstruction(
   Pace(Number, Number)))
 
 
-# Block instruction with a single instruction
+## Block instruction with a single instruction
 
 { 50 Freestyle }
 
@@ -240,7 +240,7 @@ SwimProgramme(SwimInstruction(BlockInstruction(
   SwimInstruction(SingleInstruction(Number, Stroke)))))
 
 
-##  Block instruction with multiple single instructions
+## Block instruction with multiple single instructions
 
 {
   50 Backstroke
@@ -350,7 +350,7 @@ SwimProgramme(SwimInstruction(
         SwimInstruction(SingleInstruction(Number, Stroke)))))))
 
 
-# Constant definition with string
+## Constant definition with string
 
 set Title "Programme Title"
 
