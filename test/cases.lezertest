@@ -230,7 +230,7 @@ SwimProgramme(SwimInstruction(
   Pace(Number, Number)))
 
 
-# Block instruction with a single instruction
+## Block instruction with a single instruction
 
 { 50 Freestyle }
 
