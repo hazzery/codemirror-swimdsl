@@ -7,9 +7,13 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+.rollup.cache
+*.tsbuildinfo
+
 node_modules
 dist
 dist-ssr
+dist-node
 *.local
 
 # Editor directories and files

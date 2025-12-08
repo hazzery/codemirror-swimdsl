@@ -67,4 +67,5 @@ export function swimdsl(): LanguageSupport {
   ]);
 }
 
+export { swimdslLanguage };
 export { default as compileSwimDsl } from "./compiler";

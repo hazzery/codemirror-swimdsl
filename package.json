@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "swimdsl language support for CodeMirror",
   "scripts": {
-    "test": "mocha test/test.js",
-    "prepare": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
+    "test": "mocha test/test.ts",
+    "prepare": "rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript={tsconfig:\\\"tsconfig.node.json\\\"}",
     "lint": "eslint ."
   },
   "author": {
@@ -41,6 +41,7 @@
     "@eslint/js": "^9.26.0",
     "@lezer/generator": "^1.7.3",
     "@rollup/plugin-typescript": "^12.1.2",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^24.10.1",
     "eslint": "^9.26.0",
     "globals": "^16.0.0",

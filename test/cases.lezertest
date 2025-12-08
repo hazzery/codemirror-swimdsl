@@ -1,0 +1,506 @@
+## One single instruction
+
+200 Freestyle
+
+==>
+
+SwimProgramme(SwimInstruction(SingleInstruction(Number, Stroke)))
+
+
+## Multiple single instructions
+
+100 Backstroke
+50 Breaststroke
+
+==>
+
+SwimProgramme(
+  SwimInstruction(SingleInstruction(Number, Stroke)),
+  SwimInstruction(SingleInstruction(Number, Stroke)))
+
+
+## Single instruction with a stroke modifier
+
+100 Backstroke Kick
+
+==>
+
+SwimProgramme(SwimInstruction(SingleInstruction(Number, Stroke), StrokeModifier))
+
+
+## Single instruction with a single equipment item
+
+200 Freestyle + Fins
+
+==>
+
+SwimProgramme(SwimInstruction(
+  SingleInstruction(Number, Stroke),
+  EquipmentSpecification(EquipmentName)))
+
+
+## Single instruction with two equipment items
+
+100 Backstroke Kick + Fins Board
+
+==>
+
+SwimProgramme(SwimInstruction(
+  SingleInstruction(Number, Stroke),
+  StrokeModifier,
+  EquipmentSpecification(EquipmentName, EquipmentName)))
+
+
+## Single instruction with three Equipment Items
+
+50 Freestyle Pull + PullBuoy Pads Snorkel
+
+==>
+
+SwimProgramme(SwimInstruction(
+  SingleInstruction(Number, Stroke),
+  StrokeModifier,
+  EquipmentSpecification(EquipmentName, EquipmentName, EquipmentName)))
+
+
+## Single instruction with start intensity percentage
+
+100 Backstroke @ 60%
+
+==>
+
+SwimProgramme(SwimInstruction(
+  SingleInstruction(Number, Stroke),
+  Pace(Number)))
+
+
+## Single instruction with start and stop intensity percentages
+
+50 Butterfly @ 55% -> 75%
+
+==>
+
+SwimProgramme(SwimInstruction(
+  SingleInstruction(Number, Stroke),
+  Pace(Number, Number)))
+
+
+## Single instruction with start intensity zone
+
+150 Backstroke @ medium
+
+==>
+
+SwimProgramme(SwimInstruction(
+  SingleInstruction(Number, Stroke),
+  Pace(PaceAlias)))
+
+
+## Single instruction with start and stop intensity zones
+
+200 Freestyle @ easy -> hard
+
+==>
+
+SwimProgramme(SwimInstruction(
+  SingleInstruction(Number, Stroke),
+  Pace(PaceAlias, PaceAlias)))
+
+
+## Single instruction with start intensity percentage and stop intensity zone
+
+100 Freestyle @ 50% -> hard
+
+==>
+
+SwimProgramme(SwimInstruction(
+  SingleInstruction(Number, Stroke),
+  Pace(Number, PaceAlias)))
+
+
+## Single instruction with start intensity zone and stop intensity percentage
+
+100 Freestyle @ easy -> 85%
+
+==>
+
+SwimProgramme(SwimInstruction(
+  SingleInstruction(Number, Stroke),
+  Pace(PaceAlias, Number)))
+
+
+## Pace definition
+
+pace easy = 45%
+
+==>
+
+SwimProgramme(PaceDefinition(PaceDefinitionName, Pace(Number)))
+
+
+## Multiple pace definitions
+
+pace easy = 45%
+pace medium = 65%
+pace hard = 90%
+
+==>
+
+SwimProgramme(
+  PaceDefinition(PaceDefinitionName, Pace(Number)),
+  PaceDefinition(PaceDefinitionName, Pace(Number)),
+  PaceDefinition(PaceDefinitionName, Pace(Number)))
+
+
+## Pace definition with start and stop intensity percentages
+
+pace warmup = 40% -> 60%
+
+==>
+
+SwimProgramme(PaceDefinition(PaceDefinitionName, Pace(Number, Number)))
+
+
+## Single instruction with rest since start
+
+125 Breaststroke on 2:30
+
+==>
+
+SwimProgramme(SwimInstruction(
+  SingleInstruction(Number, Stroke),
+  Duration(Number, Number)))
+
+
+## Rest instruction
+
+1:00 rest
+
+==>
+
+SwimProgramme(RestInstruction(Duration(Number, Number)))
+
+
+## Multiple rest instructions
+
+1:00 rest
+0:30 rest
+0:15 rest
+
+==>
+
+SwimProgramme(
+  RestInstruction(Duration(Number, Number)),
+  RestInstruction(Duration(Number, Number)),
+  RestInstruction(Duration(Number, Number)))
+
+
+## Repeated single instruction
+
+8 x 25 Freestyle
+
+==>
+
+SwimProgramme(SwimInstruction(
+  Number,
+  SingleInstruction(Number, Stroke)))
+
+
+## Repeated single instruction with rest from start
+
+8 x 25 Freestyle on 0:30
+
+==>
+
+SwimProgramme(SwimInstruction(
+  Number,
+  SingleInstruction(Number, Stroke),
+  Duration(Number, Number)))
+
+
+## Repeated single instruction with intensity
+
+6 x 100 Freestyle @ 60% -> 80%
+
+==>
+
+SwimProgramme(SwimInstruction(
+  Number,
+  SingleInstruction(Number, Stroke),
+  Pace(Number, Number)))
+
+
+## Block instruction with a single instruction
+
+{ 50 Freestyle }
+
+==>
+
+SwimProgramme(SwimInstruction(BlockInstruction(
+  SwimInstruction(SingleInstruction(Number, Stroke)))))
+
+
+## Block instruction with multiple single instructions
+
+{
+  50 Backstroke
+  100 Freestyle
+}
+
+==>
+
+SwimProgramme(SwimInstruction(BlockInstruction(
+  SwimInstruction(SingleInstruction(Number, Stroke)),
+  SwimInstruction(SingleInstruction(Number, Stroke)))))
+
+
+## Block instruction with intensity
+
+{
+  50 Backstroke
+  100 Freestyle
+} @ 70%
+
+==>
+
+SwimProgramme(SwimInstruction(
+  BlockInstruction(
+    SwimInstruction(SingleInstruction(Number, Stroke)),
+    SwimInstruction(SingleInstruction(Number, Stroke))),
+  Pace(Number)))
+
+
+## Block instruction with rest from start
+
+{
+  25 Butterfly
+  25 Backstroke
+  25 Breaststroke
+  25 Freestyle
+} on 2:00
+
+==>
+
+SwimProgramme(SwimInstruction(
+  BlockInstruction(
+    SwimInstruction(SingleInstruction(Number, Stroke)),
+    SwimInstruction(SingleInstruction(Number, Stroke)),
+    SwimInstruction(SingleInstruction(Number, Stroke)),
+    SwimInstruction(SingleInstruction(Number, Stroke))),
+  Duration(Number, Number)))
+
+
+## Repeated block instruction
+
+2 x {
+  50 Backstroke
+  100 Freestyle
+}
+
+==>
+
+SwimProgramme(SwimInstruction(
+  Number,
+  BlockInstruction(
+    SwimInstruction(SingleInstruction(Number, Stroke)),
+    SwimInstruction(SingleInstruction(Number, Stroke)))))
+
+
+## Block instruction with multiple instruction modifiers
+
+2 x {
+  50 Backstroke
+  100 Freestyle
+  0:30 rest
+} Pull + PullBuoy @ 70%
+
+==>
+
+SwimProgramme(SwimInstruction(
+  Number,
+  BlockInstruction(
+    SwimInstruction(SingleInstruction(Number, Stroke)),
+    SwimInstruction(SingleInstruction(Number, Stroke)),
+    RestInstruction(Duration(Number, Number))),
+  StrokeModifier,
+  EquipmentSpecification(EquipmentName),
+  Pace(Number)))
+
+
+## Two levels of nested block instructions
+
+2 x {
+  50 Freestyle
+  2 x {
+    50 Backstroke
+    50 Breaststroke
+  }
+}
+
+==>
+
+SwimProgramme(SwimInstruction(
+  Number,
+  BlockInstruction(
+    SwimInstruction(SingleInstruction(Number, Stroke)),
+    SwimInstruction(
+      Number,
+      BlockInstruction(
+        SwimInstruction(SingleInstruction(Number, Stroke)),
+        SwimInstruction(SingleInstruction(Number, Stroke)))))))
+
+
+## Constant definition with string
+
+set Title "Programme Title"
+
+==>
+
+SwimProgramme(ConstantDefinition(ConstantName, StringContent))
+
+
+## Constant definition with number
+
+set PoolLength 25
+
+==>
+
+SwimProgramme(ConstantDefinition(ConstantName, Number))
+
+
+## Constant definition with boolean
+
+set Align True
+
+==>
+
+SwimProgramme(ConstantDefinition(ConstantName, Boolean))
+
+
+## Multiple Constant Definitions
+
+set PoolLength 25
+set LengthUnit "metres"
+set Align True
+
+==>
+
+SwimProgramme(
+  ConstantDefinition(ConstantName, Number),
+  ConstantDefinition(ConstantName, StringContent),
+  ConstantDefinition(ConstantName, Boolean))
+
+
+## Segment name
+
+> Warm up
+
+==>
+
+SwimProgramme(Message)
+
+
+## Multiple segment names
+
+> Warm up
+> Main Set
+> Cool down
+
+==>
+
+SwimProgramme(
+  Message,
+  Message,
+  Message)
+
+
+## All instruction modifiers combined
+
+4 x 100 Freestyle Kick + Fins Board @ 70% -> 80% on 1:30
+
+==>
+
+SwimProgramme(SwimInstruction(
+  Number,
+  SingleInstruction(Number, Stroke),
+  StrokeModifier,
+  EquipmentSpecification(EquipmentName, EquipmentName),
+  Pace(Number, Number),
+  Duration(Number, Number)))
+
+
+## Full Programme Structure
+
+set PoolLength 25
+set Title "Test Programme"
+
+pace easy = 50%
+pace hard = 90%
+
+> Warm up
+200 Freestyle @ easy
+
+> Main Set
+4 x 100 Backstroke on 1:30
+0:30 rest
+
+==>
+
+SwimProgramme(
+  ConstantDefinition(ConstantName, Number),
+  ConstantDefinition(ConstantName, StringContent),
+  PaceDefinition(PaceDefinitionName, Pace(Number)),
+  PaceDefinition(PaceDefinitionName, Pace(Number)),
+  Message,
+  SwimInstruction(
+    SingleInstruction(Number, Stroke),
+    Pace(PaceAlias)),
+  Message,
+  SwimInstruction(
+    Number,
+    SingleInstruction(Number, Stroke),
+    Duration(Number, Number)),
+  RestInstruction(Duration(Number, Number)))
+
+
+## Multiple Block instructions
+
+{ 50 Freestyle } @ 60%
+{ 50 Backstroke } @ 70%
+
+==>
+
+SwimProgramme(
+  SwimInstruction(
+    BlockInstruction(SwimInstruction(SingleInstruction(Number, Stroke))),
+    Pace(Number)),
+  SwimInstruction(
+    BlockInstruction(SwimInstruction(SingleInstruction(Number, Stroke))),
+    Pace(Number)))
+
+
+## Complex Nested Structure
+
+2 x {
+  > Round
+  100 Freestyle @ 60%
+  4 x 25 Backstroke Kick + Fins on 0:30
+  0:30 rest
+}
+
+==>
+
+SwimProgramme(SwimInstruction(
+  Number,
+  BlockInstruction(
+    Message,
+    SwimInstruction(
+      SingleInstruction(Number, Stroke),
+      Pace(Number)),
+    SwimInstruction(
+      Number,
+      SingleInstruction(Number, Stroke),
+      StrokeModifier,
+      EquipmentSpecification(EquipmentName),
+      Duration(Number, Number)),
+    RestInstruction(Duration(Number, Number)))))
