@@ -240,7 +240,7 @@ SwimProgramme(SwimInstruction(BlockInstruction(
   SwimInstruction(SingleInstruction(Number, Stroke)))))
 
 
-##  Block instruction with multiple single instructions
+## Block instruction with multiple single instructions
 
 {
   50 Backstroke
