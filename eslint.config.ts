@@ -2,6 +2,7 @@ import js from "@eslint/js";
 import { defineConfig, type Config } from "eslint/config";
 import globals from "globals";
 import tseslint from "typescript-eslint";
+import tsdoc from "eslint-plugin-tsdoc";
 
 export default defineConfig([
   {
@@ -21,6 +22,12 @@ export default defineConfig([
         projectService: true,
         tsconfigRootDir: import.meta.dirname,
       },
+    },
+    plugins: {
+      tsdoc,
+    },
+    rules: {
+      "tsdoc/syntax": "error",
     },
   },
 ]);

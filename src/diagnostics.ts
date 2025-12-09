@@ -82,7 +82,10 @@ export function syntaxErrorDiagnostic(errorNode: SyntaxNodeRef): Diagnostic {
  *
  * @returns An editor diagnostic for a duplicated equipment specification.
  */
-export function duplicateEquipmentDiagnostic(from: number, to: number): Diagnostic {
+export function duplicateEquipmentDiagnostic(
+  from: number,
+  to: number,
+): Diagnostic {
   return {
     from,
     to,
@@ -120,9 +123,9 @@ export function incompatibleEquipmentDiagnostic(
 /**
  * Convert a string from "PascalCase" to "sentence case".
  *
- * @param - pascalCase - The string written in Pascal case.
+ * @param pascalCase - The string written in Pascal case.
  *
- * @returns The input string converted to sentense case.
+ * @returns The input string converted to sentence case.
  */
 function pascalCaseToSentence(pascalCase: string): string {
   // Insert a space before all caps that follow a lowercase letter.
@@ -139,7 +142,7 @@ function pascalCaseToSentence(pascalCase: string): string {
  * @param node - The syntax tree node who's value is invalid.
  * @param nodeValue - The node's string value.
  * @param nodeName - The nodes name in the syntax tree.
- * @param validValues A list of values which would be valid in place of the
+ * @param validValues - A list of values which would be valid in place of the
  *    invalid value.
  *
  * @returns An editor diagnostic for an invalid node value.
