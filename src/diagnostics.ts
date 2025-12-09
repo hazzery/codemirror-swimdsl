@@ -125,7 +125,7 @@ export function incompatibleEquipmentDiagnostic(
  *
  * @param pascalCase - The string written in Pascal case.
  *
- * @returns The input string converted to sentense case.
+ * @returns The input string converted to sentence case.
  */
 function pascalCaseToSentence(pascalCase: string): string {
   // Insert a space before all caps that follow a lowercase letter.
