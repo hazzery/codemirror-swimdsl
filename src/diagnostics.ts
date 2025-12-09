@@ -82,7 +82,10 @@ export function syntaxErrorDiagnostic(errorNode: SyntaxNodeRef): Diagnostic {
  *
  * @returns An editor diagnostic for a duplicated equipment specification.
  */
-export function duplicateEquipmentDiagnostic(from: number, to: number): Diagnostic {
+export function duplicateEquipmentDiagnostic(
+  from: number,
+  to: number,
+): Diagnostic {
   return {
     from,
     to,
