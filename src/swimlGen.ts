@@ -230,7 +230,6 @@ function writeConstantDefinition(
       xmlParent.ele("layoutWidth").txt(definition.value);
       break;
     case "Email":
-      console.log("Writing email 2");
       if (!author) author = xmlParent.ele("author");
       author.ele("email").txt(definition.value);
       break;
