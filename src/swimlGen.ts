@@ -12,6 +12,7 @@ import {
   SwimInstruction,
 } from "./astTypes";
 import { XMLBuilder } from "xmlbuilder2/lib/interfaces";
+import { xml } from "@codemirror/lang-xml";
 
 const XML_NAMESPACE = "https://github.com/bartneck/swiML";
 const XSI_LINK = "http://www.w3.org/2001/XMLSchema-instance";
@@ -184,14 +185,17 @@ function writeMessage(xmlParent: XMLBuilder, instruction: Message): void {
 function writeConstantDefinition(
   xmlParent: XMLBuilder,
   definition: ConstantDefinition,
+  author?: XMLBuilder,
 ) {
+  // const author = xmlParent.ele("author");
   switch (definition.constantName) {
     case "Title":
       xmlParent.ele("title").txt(definition.value);
       break;
 
     case "Author":
-      xmlParent.ele("author").ele("firstName").txt(definition.value);
+      if (!author) author = xmlParent.ele("author");
+      author.ele("firstName").txt(definition.value).up();
       break;
 
     case "Description":
@@ -225,7 +229,13 @@ function writeConstantDefinition(
     case "LayoutWidth":
       xmlParent.ele("layoutWidth").txt(definition.value);
       break;
+    case "Email":
+      console.log("Writing email 2");
+      if (!author) author = xmlParent.ele("author");
+      author.ele("email").txt(definition.value);
+      break;
   }
+  return author;
 }
 
 /**
@@ -243,6 +253,8 @@ export default function emitXml(programme: Programme): string {
     "xmlns:xsi": XSI_LINK,
     "xsi:schemaLocation": SCHEMA_LOCATION,
   });
+
+  let author: XMLBuilder | undefined = undefined;
 
   for (const statement of programme.statements) {
     switch (statement.statement) {
@@ -262,7 +274,7 @@ export default function emitXml(programme: Programme): string {
         break;
 
       case Statements.CONSTANT_DEFINITION:
-        writeConstantDefinition(doc, statement);
+        author = writeConstantDefinition(doc, statement, author);
         break;
     }
   }

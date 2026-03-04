@@ -72,6 +72,7 @@ export const equipmentNames: string[] = [
 export const constantNames: string[] = [
   "Title",
   "Author",
+  "Email",
   "Description",
   "Date",
   "PoolLength",
