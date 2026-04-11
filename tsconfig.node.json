@@ -1,13 +1,11 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "composite": true,
     "noEmit": true,
-    "outDir": "dist-node",
     "target": "esnext",
     "lib": ["esnext"],
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
+    "module": "preserve",
+    "moduleResolution": "bundler"
   },
   "include": ["eslint.config.ts", "rollup.config.ts", "test/*.ts"]
 }

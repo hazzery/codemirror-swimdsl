@@ -13,6 +13,7 @@ const config: RollupOptions = {
     lezer(),
     typescript({
       tsconfig: "./tsconfig.lib.json",
+      outputToFilesystem: true,
     }),
   ],
 };
