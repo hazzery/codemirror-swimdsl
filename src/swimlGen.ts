@@ -1,5 +1,6 @@
 import { create } from "xmlbuilder2";
 import {
+  AuthorDefintion,
   ConstantDefinition,
   Instruction,
   InstructionModifier,
@@ -236,6 +237,27 @@ function writeConstantDefinition(
 }
 
 /**
+ * Write an AST AuthorDefintion node into the XML document.
+ *
+ * @param xmlParent - The parent XML node to write the author definition inside
+ *    of.
+ * @param instruction - The AST author definition node to write as XML.
+ */
+function writeAuthorDefinition(
+  xmlParent: XMLBuilder,
+  definition: AuthorDefintion,
+): void {
+  const authorNode = xmlParent.ele("author");
+
+  authorNode.ele("firstName").txt(definition.firstName);
+  authorNode.ele("lastName").txt(definition.lastName);
+
+  if (definition.emailAddress) {
+    authorNode.ele("email").txt(definition.emailAddress);
+  }
+}
+
+/**
  * Given a complete AST for a SwimDSL document, generate a valid swiML XML
  * document describing the same programme.
  *
@@ -270,6 +292,10 @@ export default function emitXml(programme: Programme): string {
 
       case Statements.CONSTANT_DEFINITION:
         writeConstantDefinition(doc, statement);
+        break;
+
+      case Statements.AUTHOR_DEFINITION:
+        writeAuthorDefinition(doc, statement);
         break;
     }
   }
