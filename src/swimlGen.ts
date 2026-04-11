@@ -181,10 +181,17 @@ function writeMessage(xmlParent: XMLBuilder, instruction: Message): void {
   xmlParent.ele("instruction").ele("segmentName").txt(instruction.message);
 }
 
+/**
+ * Write an AST ConstantDefinition node into the XML document.
+ *
+ * @param xmlParent - The parent XML node to write the constant definition
+ *    inside of.
+ * @param definition - The AST constant definition node to write as XML.
+ */
 function writeConstantDefinition(
   xmlParent: XMLBuilder,
   definition: ConstantDefinition,
-) {
+): void {
   switch (definition.constantName) {
     case "Title":
       xmlParent.ele("title").txt(definition.value);

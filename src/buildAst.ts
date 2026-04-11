@@ -148,7 +148,14 @@ function visitDuration(
   return { minutes, seconds };
 }
 
-function getEquipment(equipmentName: string | undefined) {
+/**
+ * Convert the swimDSL equipment name to the swiML equipment name.
+ *
+ * @param equipmentName - The swimDSL name of an eqipment item.
+ *
+ * @returns The swiML name of the same item.
+ */
+function getEquipment(equipmentName: string | undefined): string {
   switch (equipmentName) {
     case "Board":
       return "board";
@@ -225,7 +232,14 @@ function visitInstructionModifier(
   };
 }
 
-function getStroke(strokeName: string) {
+/**
+ * Convert the swimDSL stroke name to the swiML stroke name.
+ *
+ * @param strokeName - The swimDSL name of stroke.
+ *
+ * @returns The swiML name of the same stroke.
+ */
+function getStroke(strokeName: string): string {
   switch (strokeName) {
     case "Freestyle":
     case "Free":
