@@ -44,7 +44,7 @@ export function undefinedPaceNameActions(
     name: "Define pace name",
     apply(view: EditorView) {
       view.dispatch({
-        changes: { from: 0, to: 0, insert: `Pace ${undefinedName} = _%\n` },
+        changes: { from: 0, to: 0, insert: `pace ${undefinedName} = _%\n` },
       });
     },
   });
