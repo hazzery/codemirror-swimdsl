@@ -72,7 +72,7 @@ export interface Intensity {
 export interface Pace {
   modifier: InstructionModifiers.PACE;
   startIntensity: Intensity;
-  stopIntensity?: Intensity;
+  stopIntensity?: Intensity | undefined;
 }
 
 export interface PaceDefinition {

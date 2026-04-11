@@ -4,7 +4,7 @@ import * as Levenshtein from "fastest-levenshtein";
  * Find the string within `array` which is most similar to `str`.
  *
  * @param str - The string to compare to.
- * @param array - A list of strings to find the closest of.
+ * @param array - A non-empty list of strings to find the closest of.
  *
  * @returns An array containing the string which is the closest, and its
  * Levenshtein distance from `str`.
@@ -17,7 +17,11 @@ export function closestLevenshtienDistance(
   let min_index = 0;
 
   for (let i = 0; i < array.length; i++) {
-    const dist = Levenshtein.distance(str, array[i]);
+    // Because of `"noUncheckedIndexedAccess": true` in tsconfig, array accesses
+    // return a type of `T | undefined`. As we know here that `i < array.length`
+    // the non-null assertion operator is appropriate.
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const dist = Levenshtein.distance(str, array[i]!);
 
     if (dist < min_distance) {
       min_distance = dist;
@@ -25,5 +29,7 @@ export function closestLevenshtienDistance(
     }
   }
 
-  return [array[min_index], min_distance];
+  // Read above comment
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return [array[min_index]!, min_distance];
 }
