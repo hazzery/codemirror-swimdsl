@@ -3,6 +3,7 @@ import { EditorView } from "@codemirror/view";
 import { SyntaxNodeRef } from "@lezer/common";
 
 import { closestLevenshtienDistance } from "./utils";
+import type { NonEmptyArray, ReadonlyNonEmptyArray } from "./types";
 
 /**
  * The maximum distance between a typed identifier, and the closest valid
@@ -24,20 +25,22 @@ export function undefinedPaceNameActions(
   undefinedName: string,
   definedNames: Set<string>,
 ): Action[] {
-  const [closestName, distance] = closestLevenshtienDistance(
-    undefinedName,
-    Array.from(definedNames),
-  );
-
   const actions: Action[] = [];
 
-  if (distance <= MAX_LEVENSHTIEN_DISTANCE) {
-    actions.push({
-      name: `Did you mean '${closestName}'?`,
-      apply(view: EditorView, from: number, to: number) {
-        view.dispatch({ changes: { from, to, insert: closestName } });
-      },
-    });
+  if (definedNames.size > 0) {
+    const [closestName, distance] = closestLevenshtienDistance(
+      undefinedName,
+      Array.from(definedNames) as NonEmptyArray<string>,
+    );
+
+    if (distance <= MAX_LEVENSHTIEN_DISTANCE) {
+      actions.push({
+        name: `Did you mean '${closestName}'?`,
+        apply(view: EditorView, from: number, to: number) {
+          view.dispatch({ changes: { from, to, insert: closestName } });
+        },
+      });
+    }
   }
 
   actions.push({
@@ -88,7 +91,7 @@ export function duplicatePaceNameDefinitionActions(
  */
 export function invalidNodeValueActions(
   invalidValue: string,
-  validValues: string[],
+  validValues: ReadonlyNonEmptyArray<string>,
 ): Action[] {
   const [closestValue, distance] = closestLevenshtienDistance(
     invalidValue,

@@ -20,6 +20,7 @@ import {
   strokeNames,
   strokeTypes,
 } from "./enumerations";
+import type { ReadonlyNonEmptyArray } from "./types";
 
 /**
  * The maximum allows value for either minutes and seconds in a duration node.
@@ -80,7 +81,13 @@ function lintDuplicatePaceNameDefinition(
   if (paceDefinitionNode === null) return;
 
   if (declaredIdentifiers.has(node_value)) {
-    diagnostics.push(duplicatePaceNameDefinitionDiagnostic(node_value, node, paceDefinitionNode));
+    diagnostics.push(
+      duplicatePaceNameDefinitionDiagnostic(
+        node_value,
+        node,
+        paceDefinitionNode,
+      ),
+    );
   } else {
     declaredIdentifiers.add(node_value);
   }
@@ -190,7 +197,7 @@ function lintInvalidNodeValue(
   node: SyntaxNodeRef,
   editorState: EditorState,
   nodeName: string,
-  validValues: string[],
+  validValues: ReadonlyNonEmptyArray<string>,
   diagnostics: Diagnostic[],
 ): void {
   if (node.name !== nodeName) return;
