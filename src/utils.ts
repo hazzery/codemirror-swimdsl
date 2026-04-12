@@ -1,4 +1,5 @@
 import * as Levenshtein from "fastest-levenshtein";
+import type { ReadonlyNonEmptyArray } from "./types";
 
 /**
  * Find the string within `array` which is most similar to `str`.
@@ -11,25 +12,16 @@ import * as Levenshtein from "fastest-levenshtein";
  */
 export function closestLevenshtienDistance(
   str: string,
-  array: string[],
+  array: ReadonlyNonEmptyArray<string>,
 ): [string, number] {
-  let min_distance = Infinity;
-  let min_index = 0;
+  const [first, ...rest] = array;
 
-  for (let i = 0; i < array.length; i++) {
-    // Because of `"noUncheckedIndexedAccess": true` in tsconfig, array accesses
-    // return a type of `T | undefined`. As we know here that `i < array.length`
-    // the non-null assertion operator is appropriate.
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const dist = Levenshtein.distance(str, array[i]!);
+  return rest.reduce(
+    ([minStr, minDist], item) => {
+      const dist = Levenshtein.distance(str, item);
 
-    if (dist < min_distance) {
-      min_distance = dist;
-      min_index = i;
-    }
-  }
-
-  // Read above comment
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return [array[min_index]!, min_distance];
+      return dist < minDist ? [item, dist] : [minStr, minDist];
+    },
+    [first, Levenshtein.distance(str, first)],
+  );
 }

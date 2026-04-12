@@ -6,6 +6,7 @@ import {
   duplicatePaceNameDefinitionActions,
   invalidNodeValueActions,
 } from "./actions";
+import type { ReadonlyNonEmptyArray } from "./types";
 
 /**
  * Provides the user with an error message and resolution actions when they
@@ -151,7 +152,7 @@ export function invalidNodeValueDiagnostic(
   node: SyntaxNodeRef,
   nodeValue: string,
   nodeName: string,
-  validValues: string[],
+  validValues: ReadonlyNonEmptyArray<string>,
 ): Diagnostic {
   return {
     from: node.from,

@@ -1,7 +1,7 @@
 /**
  * The list of all strings considered valid in place of a stroke name.
  */
-export const strokeNames: string[] = [
+export const strokeNames = [
   "Freestyle",
   "Free",
   "Fr",
@@ -46,17 +46,17 @@ export const strokeNames: string[] = [
   "NotButterfly",
   "NotFly",
   "NotFl",
-];
+] as const;
 
 /**
  * The list of all strings considered valid in place of a stroke type.
  */
-export const strokeTypes: string[] = ["Pull", "Kick", "Drill"];
+export const strokeTypes = ["Pull", "Kick", "Drill"] as const;
 
 /**
  * The list of all strings considered valid in place of an equipment name.
  */
-export const equipmentNames: string[] = [
+export const equipmentNames = [
   "Board",
   "Pads",
   "PullBuoy",
@@ -64,12 +64,12 @@ export const equipmentNames: string[] = [
   "Snorkel",
   "Chute",
   "StretchCord",
-];
+] as const;
 
 /**
  * The list of all strings considered valid in place of a constant name.
  */
-export const constantNames: string[] = [
+export const constantNames = [
   "Title",
   "Author",
   "Description",
@@ -80,9 +80,9 @@ export const constantNames: string[] = [
   "NumeralSystem",
   "HideIntro",
   "LayoutWidth",
-];
+] as const;
 
 /**
  * The list of all strings considered valid in place of a boolean.
  */
-export const booleans: string[] = ["True", "False"];
+export const booleans = ["True", "False"] as const;
