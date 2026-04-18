@@ -71,7 +71,6 @@ export const equipmentNames = [
  */
 export const constantNames = [
   "Title",
-  "Author",
   "Description",
   "Date",
   "PoolLength",

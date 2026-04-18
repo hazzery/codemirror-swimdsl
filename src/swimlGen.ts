@@ -198,10 +198,6 @@ function writeConstantDefinition(
       xmlParent.ele("title").txt(definition.value);
       break;
 
-    case "Author":
-      xmlParent.ele("author").ele("firstName").txt(definition.value);
-      break;
-
     case "Description":
       xmlParent.ele("programDescription").txt(definition.value);
       break;
