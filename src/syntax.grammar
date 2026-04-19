@@ -18,6 +18,10 @@ Boolean {
   identifier
 }
 
+AuthorDefinition {
+    authorKeyword string string string?
+}
+
 PaceDefinition {
     paceKeyword PaceDefinitionName "=" Pace
 }
@@ -41,6 +45,7 @@ PaceAlias { identifier }  // a named pace, e.g., easy or hard
 statement {
     instruction
     | ConstantDefinition
+    | AuthorDefinition
     | PaceDefinition
 }
 
@@ -101,6 +106,7 @@ messageSpecification {
 
 @tokens {
     setKeyword            { "set" }
+    authorKeyword         { "author" }
     paceKeyword           { "pace" }
     restKeyword           { "rest" }
     onKeyword             { "on" }
@@ -116,6 +122,7 @@ messageSpecification {
     @precedence { repititionOperator, identifier }
     @precedence { paceKeyword, identifier }
     @precedence { setKeyword, identifier }
+    @precedence { authorKeyword, identifier }
     @precedence { onKeyword, identifier }
     @precedence { space, Message }
     @precedence { Comment, Message }

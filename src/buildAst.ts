@@ -1,5 +1,6 @@
 import { TreeCursor } from "@lezer/common";
 import {
+  AuthorDefintion,
   BlockInstruction,
   ConstantDefinition,
   Instruction,
@@ -495,6 +496,47 @@ function visitConstantDefinition(
 }
 
 /**
+ * Create an AST node for a `AuthorDefinition` CST node.
+ *
+ * Precondition: `cursor` points to an `AuthorDefinition` node.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ *
+ * @returns An `AuthorDefinition` AST node.
+ */
+function visitAuthorDefinition(
+  cursor: TreeCursor,
+  state: EditorState,
+): AuthorDefintion {
+  // Move into AuthorDefinition's first child, the first name
+  cursor.firstChild();
+  const firstName = state.sliceDoc(cursor.from, cursor.to);
+
+  // Move into last name
+  cursor.nextSibling();
+  const lastName = state.sliceDoc(cursor.from, cursor.to);
+
+  let emailAddress: string | undefined;
+  // Move into email address, if it exists
+  if (cursor.nextSibling()) {
+    emailAddress = state.sliceDoc(cursor.from, cursor.to);
+  }
+
+  // Move back up to the AuthorDefinition
+  cursor.parent();
+  return {
+    statement: Statements.AUTHOR_DEFINITION,
+    firstName,
+    lastName,
+    emailAddress,
+  };
+}
+
+/**
  * Create an AST for the current program in `state`.
  *
  * Precondition: `cursor` points to the topmost node (`SwimProgramme`).
@@ -532,6 +574,9 @@ export default function buildAst(
           break;
         case "ConstantDefinition":
           node = visitConstantDefinition(cursor, state);
+          break;
+        case "AuthorDefinition":
+          node = visitAuthorDefinition(cursor, state);
           break;
         default:
           break;

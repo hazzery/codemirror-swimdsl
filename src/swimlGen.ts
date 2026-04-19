@@ -1,5 +1,6 @@
 import { create } from "xmlbuilder2";
 import {
+  AuthorDefintion,
   ConstantDefinition,
   Instruction,
   InstructionModifier,
@@ -197,10 +198,6 @@ function writeConstantDefinition(
       xmlParent.ele("title").txt(definition.value);
       break;
 
-    case "Author":
-      xmlParent.ele("author").ele("firstName").txt(definition.value);
-      break;
-
     case "Description":
       xmlParent.ele("programDescription").txt(definition.value);
       break;
@@ -232,6 +229,27 @@ function writeConstantDefinition(
     case "LayoutWidth":
       xmlParent.ele("layoutWidth").txt(definition.value);
       break;
+  }
+}
+
+/**
+ * Write an AST AuthorDefintion node into the XML document.
+ *
+ * @param xmlParent - The parent XML node to write the author definition inside
+ *    of.
+ * @param instruction - The AST author definition node to write as XML.
+ */
+function writeAuthorDefinition(
+  xmlParent: XMLBuilder,
+  definition: AuthorDefintion,
+): void {
+  const authorNode = xmlParent.ele("author");
+
+  authorNode.ele("firstName").txt(definition.firstName);
+  authorNode.ele("lastName").txt(definition.lastName);
+
+  if (definition.emailAddress) {
+    authorNode.ele("email").txt(definition.emailAddress);
   }
 }
 
@@ -270,6 +288,10 @@ export default function emitXml(programme: Programme): string {
 
       case Statements.CONSTANT_DEFINITION:
         writeConstantDefinition(doc, statement);
+        break;
+
+      case Statements.AUTHOR_DEFINITION:
+        writeAuthorDefinition(doc, statement);
         break;
     }
   }

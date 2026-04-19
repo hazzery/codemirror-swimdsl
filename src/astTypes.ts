@@ -4,6 +4,7 @@ export const enum Statements {
   MESSAGE,
   PACE_DEFINITION,
   CONSTANT_DEFINITION,
+  AUTHOR_DEFINITION,
 }
 
 export const enum InstructionModifiers {
@@ -24,7 +25,18 @@ export interface ConstantDefinition {
   value: string;
 }
 
-export type Statement = Instruction | PaceDefinition | ConstantDefinition;
+export interface AuthorDefintion {
+  statement: Statements.AUTHOR_DEFINITION;
+  firstName: string;
+  lastName: string;
+  emailAddress?: string | undefined;
+}
+
+export type Statement =
+  | Instruction
+  | PaceDefinition
+  | ConstantDefinition
+  | AuthorDefintion;
 
 export interface EquipmentSpecification {
   modifier: InstructionModifiers.EQUIPMENT_SPECIFICATION;
