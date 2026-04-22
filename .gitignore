@@ -1,3 +1,5 @@
+# `npm pack` output
+codemirror-lang-swimdsl-*.tgz
 # Logs
 logs
 *.log
