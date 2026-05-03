@@ -1,4 +1,4 @@
-import { TreeCursor } from "@lezer/common";
+import {TreeCursor} from "@lezer/common";
 import {
   AuthorDefintion,
   BlockInstruction,
@@ -15,9 +15,11 @@ import {
   SingleInstruction,
   Statement,
   Statements,
+  StrokeModifier,
+  StrokeModifiers,
   SwimInstruction,
 } from "./astTypes";
-import { EditorState } from "@codemirror/state";
+import {EditorState} from "@codemirror/state";
 
 /**
  * Create an AST node for a `Pace` CST node.
@@ -234,6 +236,27 @@ function visitInstructionModifier(
 }
 
 /**
+ * Create an AST node for an `instructionModifier` CST node.
+ * Precondition: `cursor` points to one of `EquipmentSpecification`, `Pace`, or
+ * `Duration`.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ */
+function visitStrokeModifier(
+  // cursor: TreeCursor,
+  // state: EditorState,
+): StrokeModifier {
+
+  // Underwater is the only stroke modifier currently.
+  return {
+    modifier: StrokeModifiers.UNDERWATER,
+    isTrue: true,
+  }
+
+}
+
+/**
  * Convert the swimDSL stroke name to the swiML stroke name.
  *
  * @param strokeName - The swimDSL name of stroke.
@@ -343,7 +366,7 @@ function visitSwimInstruction(
   state: EditorState,
 ): SwimInstruction {
   let repetitions = 1;
-  let strokeModifier = "default";
+  let strokeModifier: StrokeModifier[] = [];
   let instruction: SingleInstruction | BlockInstruction;
   const instructionModifiers: InstructionModifier[] = [];
 
@@ -385,8 +408,8 @@ function visitSwimInstruction(
   if (cursor.nextSibling()) {
     let hasModifiers = true;
     if (cursor.name === "StrokeModifier") {
-      strokeModifier = state.sliceDoc(cursor.from, cursor.to);
-
+      // strokeModifier = state.sliceDoc(cursor.from, cursor.to);
+      strokeModifier.push(visitStrokeModifier());
       // Move away from the StrokeModifier to a potential instruction modifier.
       hasModifiers = cursor.nextSibling();
     }

@@ -13,6 +13,10 @@ export const enum InstructionModifiers {
   TIME,
 }
 
+export const enum StrokeModifiers {
+  UNDERWATER,
+}
+
 export interface Programme {
   statements: Statement[];
 }
@@ -49,13 +53,20 @@ export interface Time {
   seconds: string;
 }
 
+export interface Underwater {
+  modifier: StrokeModifiers.UNDERWATER;
+  isTrue: boolean;
+}
+
+export type StrokeModifier = Underwater;
+
 export type InstructionModifier = EquipmentSpecification | Pace | Time;
 
 export interface SwimInstruction {
   statement: Statements.SWIM_INSTRUCTION;
   repetitions: number;
   instruction: SingleInstruction | BlockInstruction;
-  strokeModifier: string;
+  strokeModifier: StrokeModifier[];
   instructionModifiers: InstructionModifier[];
 }
 
