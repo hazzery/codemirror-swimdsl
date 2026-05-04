@@ -51,7 +51,7 @@ export const strokeNames = [
 /**
  * The list of all strings considered valid in place of a stroke type.
  */
-export const strokeTypes = ["Pull", "Kick", "Drill"] as const;
+export const strokeTypes = ["Pull", "Kick", "Drill", "Underwater"] as const;
 
 /**
  * The list of all strings considered valid in place of an equipment name.

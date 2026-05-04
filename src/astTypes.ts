@@ -15,6 +15,7 @@ export const enum InstructionModifiers {
 
 export const enum StrokeModifiers {
   UNDERWATER,
+  STROKE_TYPE
 }
 
 export interface Programme {
@@ -58,7 +59,12 @@ export interface Underwater {
   isTrue: boolean;
 }
 
-export type StrokeModifier = Underwater;
+// Placeholder for the Kick | Pull | Drill
+export interface StrokeType {
+  modifier: StrokeModifiers.STROKE_TYPE
+}
+
+export type StrokeModifier = Underwater | StrokeType;
 
 export type InstructionModifier = EquipmentSpecification | Pace | Time;
 

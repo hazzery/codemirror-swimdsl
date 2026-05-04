@@ -244,15 +244,26 @@ function visitInstructionModifier(
  * passed to this function.
  */
 function visitStrokeModifier(
-  // cursor: TreeCursor,
-  // state: EditorState,
+  cursor: TreeCursor,
+  state: EditorState,
 ): StrokeModifier {
 
-  // Underwater is the only stroke modifier currently.
-  return {
-    modifier: StrokeModifiers.UNDERWATER,
-    isTrue: true,
+  const strokeModifier = state.sliceDoc(cursor.from, cursor.to);
+
+  if (strokeModifier === "Underwater") {
+    console.log("Underwater")
+    return {
+      modifier: StrokeModifiers.UNDERWATER,
+      isTrue: true,
+    }
   }
+  else {
+    console.log("Cursor:", cursor.name);
+    return {
+      modifier: StrokeModifiers.STROKE_TYPE
+    }
+  }
+
 
 }
 
@@ -409,8 +420,9 @@ function visitSwimInstruction(
     let hasModifiers = true;
     if (cursor.name === "StrokeModifier") {
       // strokeModifier = state.sliceDoc(cursor.from, cursor.to);
-      strokeModifier.push(visitStrokeModifier());
+      strokeModifier.push(visitStrokeModifier(cursor, state));
       // Move away from the StrokeModifier to a potential instruction modifier.
+      cursor.parent();
       hasModifiers = cursor.nextSibling();
     }
 

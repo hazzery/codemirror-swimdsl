@@ -72,7 +72,9 @@ BlockInstruction {
     "{" instruction+ "}"
 }
 
-StrokeModifier { identifier }
+StrokeModifier {
+    identifier
+}
 
 instructionModifier {
   EquipmentSpecification | paceSpecification | timeSpecification
