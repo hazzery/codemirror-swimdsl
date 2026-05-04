@@ -15,8 +15,7 @@ import {
   SingleInstruction,
   Statement,
   Statements,
-  StrokeModifier,
-  StrokeModifiers,
+  // StrokeModifiers,
   SwimInstruction,
 } from "./astTypes";
 import {EditorState} from "@codemirror/state";
@@ -228,6 +227,13 @@ function visitInstructionModifier(
     return visitPace(cursor, state);
   }
 
+  if (cursor.name === "Underwater") {
+    return {
+      modifier: InstructionModifiers.UNDERWATER,
+      isTrue: true,
+    }
+  }
+
   // We are in Duration
   return {
     modifier: InstructionModifiers.TIME,
@@ -235,37 +241,35 @@ function visitInstructionModifier(
   };
 }
 
-/**
- * Create an AST node for an `instructionModifier` CST node.
- * Precondition: `cursor` points to one of `EquipmentSpecification`, `Pace`, or
- * `Duration`.
- *
- * Postcondition: `cursor` will point to the same node it pointed to when
- * passed to this function.
- */
-function visitStrokeModifier(
-  cursor: TreeCursor,
-  state: EditorState,
-): StrokeModifier {
-
-  const strokeModifier = state.sliceDoc(cursor.from, cursor.to);
-
-  if (strokeModifier === "Underwater") {
-    console.log("Underwater")
-    return {
-      modifier: StrokeModifiers.UNDERWATER,
-      isTrue: true,
-    }
-  }
-  else {
-    console.log("Cursor:", cursor.name);
-    return {
-      modifier: StrokeModifiers.STROKE_TYPE
-    }
-  }
-
-
-}
+// /**
+//  * Create an AST node for an `instructionModifier` CST node.
+//  * Precondition: `cursor` points to one of `EquipmentSpecification`, `Pace`, or
+//  * `Duration`.
+//  *
+//  * Postcondition: `cursor` will point to the same node it pointed to when
+//  * passed to this function.
+//  */
+// function visitStrokeModifier(
+//   cursor: TreeCursor,
+//   state: EditorState,
+// ): StrokeModifier {
+//
+//   const strokeModifier = state.sliceDoc(cursor.from, cursor.to);
+//
+//   if (strokeModifier === "Underwater") {
+//     console.log("Underwater")
+//     return {
+//       modifier: StrokeModifiers.UNDERWATER,
+//       isTrue: true,
+//     }
+//   }
+//   else {
+//     console.log("Cursor:", cursor.name);
+//     return {
+//       modifier: StrokeModifiers.STROKE_TYPE
+//     }
+//   }
+// }
 
 /**
  * Convert the swimDSL stroke name to the swiML stroke name.
@@ -377,7 +381,8 @@ function visitSwimInstruction(
   state: EditorState,
 ): SwimInstruction {
   let repetitions = 1;
-  let strokeModifier: StrokeModifier[] = [];
+  // let strokeModifier: StrokeModifier[] = [];
+  let strokeModifier = "default";
   let instruction: SingleInstruction | BlockInstruction;
   const instructionModifiers: InstructionModifier[] = [];
 
@@ -419,10 +424,17 @@ function visitSwimInstruction(
   if (cursor.nextSibling()) {
     let hasModifiers = true;
     if (cursor.name === "StrokeModifier") {
-      // strokeModifier = state.sliceDoc(cursor.from, cursor.to);
-      strokeModifier.push(visitStrokeModifier(cursor, state));
+      strokeModifier = state.sliceDoc(cursor.from, cursor.to);
+
+      //// StrokeModifier attepmt
+      // strokeModifier.push(visitStrokeModifier(cursor, state));
+      // do {
+      //   strokeModifier.push(visitStrokeModifier(cursor, state));
+      //   cursor.nextSibling();
+      // } while (cursor.name === "StrokeModifier");
+      // cursor.parent();
+
       // Move away from the StrokeModifier to a potential instruction modifier.
-      cursor.parent();
       hasModifiers = cursor.nextSibling();
     }
 

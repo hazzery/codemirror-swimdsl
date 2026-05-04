@@ -10,8 +10,8 @@ import {
   Programme,
   RestInstruction,
   Statements,
-  StrokeModifier,
-  StrokeModifiers,
+  // StrokeModifier,
+  // StrokeModifiers,
   SwimInstruction,
 } from "./astTypes";
 import {XMLBuilder} from "xmlbuilder2/lib/interfaces";
@@ -114,26 +114,31 @@ function writeInstructionModifier(
         .ele("sinceStart")
         .txt(xmlDuration(modifier.minutes, modifier.seconds));
       break;
-  }
-}
 
-/**
- * Write an AST StrokeModifier node into the XML document.
- *
- * @param xmlParent - The parent XML node to write the instruction modifier
- *    inside of
- * @param modifier - The AST instruction modifier node to write as XML.
- */
-function writeStrokeModifier(
-  xmlParent: XMLBuilder,
-  modifier: StrokeModifier,
-): void {
-  switch (modifier.modifier) {
-    case StrokeModifiers.UNDERWATER:
-      xmlParent.ele("underwater").txt(modifier.isTrue.toString());
+    case InstructionModifiers.UNDERWATER:
+      xmlParent
+        .ele("underwater").txt(modifier.isTrue.toString())
       break;
   }
 }
+
+// /**
+//  * Write an AST StrokeModifier node into the XML document.
+//  *
+//  * @param xmlParent - The parent XML node to write the instruction modifier
+//  *    inside of
+//  * @param modifier - The AST instruction modifier node to write as XML.
+//  */
+// function writeStrokeModifier(
+//   xmlParent: XMLBuilder,
+//   modifier: StrokeModifier,
+// ): void {
+//   switch (modifier.modifier) {
+//     case StrokeModifiers.UNDERWATER:
+//       xmlParent.ele("underwater").txt(modifier.isTrue.toString());
+//       break;
+//   }
+// }
 
 /**
  * Write an AST SwimInstruction node into the XML document.
@@ -166,11 +171,11 @@ function writeSwimInstruction(
       .ele("standardStroke")
       .txt(instruction.instruction.stroke);
   }
-  if (instruction.strokeModifier.length > 0) {
-    for (const modifier of instruction.strokeModifier) {
-      writeStrokeModifier(parent, modifier);
-    }
-  }
+  // if (instruction.strokeModifier.length > 0) {
+  //   for (const modifier of instruction.strokeModifier) {
+  //     writeStrokeModifier(parent, modifier);
+  //   }
+  // }
   if (instruction.instructionModifiers.length > 0) {
     for (const modifier of instruction.instructionModifiers) {
       writeInstructionModifier(parent, modifier);
@@ -261,7 +266,7 @@ function writeConstantDefinition(
  *
  * @param xmlParent - The parent XML node to write the author definition inside
  *    of.
- * @param instruction - The AST author definition node to write as XML.
+ * @param definition - The AST author definition node to write as XML.
  */
 function writeAuthorDefinition(
   xmlParent: XMLBuilder,
