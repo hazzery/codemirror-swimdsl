@@ -1,4 +1,4 @@
-import {TreeCursor} from "@lezer/common";
+import { TreeCursor } from "@lezer/common";
 import {
   AuthorDefintion,
   BlockInstruction,
@@ -255,6 +255,13 @@ function visitInstructionModifier(
 
   if (cursor.name === "Breathe") {
     return visitBreathe(cursor, state);
+  }
+
+  if (cursor.name === "Underwater") {
+    return {
+      modifier: InstructionModifiers.UNDERWATER,
+      isTrue: true,
+    };
   }
 
   // We are in Duration

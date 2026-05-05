@@ -118,6 +118,10 @@ function writeInstructionModifier(
         .ele("sinceStart")
         .txt(xmlDuration(modifier.minutes, modifier.seconds));
       break;
+
+    case InstructionModifiers.UNDERWATER:
+      xmlParent.ele("underwater").txt(modifier.isTrue.toString());
+      break;
   }
 }
 

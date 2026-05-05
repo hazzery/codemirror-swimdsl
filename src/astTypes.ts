@@ -12,6 +12,7 @@ export const enum InstructionModifiers {
   PACE,
   TIME,
   BREATHE,
+  UNDERWATER,
 }
 
 export interface Programme {
@@ -50,7 +51,17 @@ export interface Time {
   seconds: string;
 }
 
-export type InstructionModifier = EquipmentSpecification | Pace | Time | Breathe;
+export interface Underwater {
+  modifier: InstructionModifiers.UNDERWATER;
+  isTrue: boolean;
+}
+
+export type InstructionModifier =
+  | EquipmentSpecification
+  | Pace
+  | Time
+  | Underwater
+  | Breathe;
 
 export interface SwimInstruction {
   statement: Statements.SWIM_INSTRUCTION;
