@@ -350,7 +350,6 @@ function visitSwimInstruction(
   state: EditorState,
 ): SwimInstruction {
   let repetitions = 1;
-  // let strokeModifier: StrokeModifier[] = [];
   let strokeModifier = "default";
   let instruction: SingleInstruction | BlockInstruction;
   const instructionModifiers: InstructionModifier[] = [];

@@ -10,8 +10,6 @@ import {
   Programme,
   RestInstruction,
   Statements,
-  // StrokeModifier,
-  // StrokeModifiers,
   SwimInstruction,
 } from "./astTypes";
 import {XMLBuilder} from "xmlbuilder2/lib/interfaces";
