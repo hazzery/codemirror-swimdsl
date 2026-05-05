@@ -122,24 +122,6 @@ function writeInstructionModifier(
   }
 }
 
-// /**
-//  * Write an AST StrokeModifier node into the XML document.
-//  *
-//  * @param xmlParent - The parent XML node to write the instruction modifier
-//  *    inside of
-//  * @param modifier - The AST instruction modifier node to write as XML.
-//  */
-// function writeStrokeModifier(
-//   xmlParent: XMLBuilder,
-//   modifier: StrokeModifier,
-// ): void {
-//   switch (modifier.modifier) {
-//     case StrokeModifiers.UNDERWATER:
-//       xmlParent.ele("underwater").txt(modifier.isTrue.toString());
-//       break;
-//   }
-// }
-
 /**
  * Write an AST SwimInstruction node into the XML document.
  *
@@ -171,11 +153,6 @@ function writeSwimInstruction(
       .ele("standardStroke")
       .txt(instruction.instruction.stroke);
   }
-  // if (instruction.strokeModifier.length > 0) {
-  //   for (const modifier of instruction.strokeModifier) {
-  //     writeStrokeModifier(parent, modifier);
-  //   }
-  // }
   if (instruction.instructionModifiers.length > 0) {
     for (const modifier of instruction.instructionModifiers) {
       writeInstructionModifier(parent, modifier);

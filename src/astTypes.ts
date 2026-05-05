@@ -14,11 +14,6 @@ export const enum InstructionModifiers {
   UNDERWATER,
 }
 
-// export const enum StrokeModifiers {
-//   UNDERWATER,
-//   STROKE_TYPE
-// }
-
 export interface Programme {
   statements: Statement[];
 }
@@ -60,20 +55,12 @@ export interface Underwater {
   isTrue: boolean;
 }
 
-// // Placeholder for the Kick | Pull | Drill
-// export interface StrokeType {
-//   modifier: StrokeModifiers.STROKE_TYPE
-// }
-
-// export type StrokeModifier = Underwater | StrokeType;
-
 export type InstructionModifier = EquipmentSpecification | Pace | Time | Underwater;
 
 export interface SwimInstruction {
   statement: Statements.SWIM_INSTRUCTION;
   repetitions: number;
   instruction: SingleInstruction | BlockInstruction;
-  // strokeModifier: StrokeModifier[];
   strokeModifier: string;
   instructionModifiers: InstructionModifier[];
 }

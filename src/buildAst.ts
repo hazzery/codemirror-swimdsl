@@ -15,7 +15,6 @@ import {
   SingleInstruction,
   Statement,
   Statements,
-  // StrokeModifiers,
   SwimInstruction,
 } from "./astTypes";
 import {EditorState} from "@codemirror/state";
@@ -241,36 +240,6 @@ function visitInstructionModifier(
   };
 }
 
-// /**
-//  * Create an AST node for an `instructionModifier` CST node.
-//  * Precondition: `cursor` points to one of `EquipmentSpecification`, `Pace`, or
-//  * `Duration`.
-//  *
-//  * Postcondition: `cursor` will point to the same node it pointed to when
-//  * passed to this function.
-//  */
-// function visitStrokeModifier(
-//   cursor: TreeCursor,
-//   state: EditorState,
-// ): StrokeModifier {
-//
-//   const strokeModifier = state.sliceDoc(cursor.from, cursor.to);
-//
-//   if (strokeModifier === "Underwater") {
-//     console.log("Underwater")
-//     return {
-//       modifier: StrokeModifiers.UNDERWATER,
-//       isTrue: true,
-//     }
-//   }
-//   else {
-//     console.log("Cursor:", cursor.name);
-//     return {
-//       modifier: StrokeModifiers.STROKE_TYPE
-//     }
-//   }
-// }
-
 /**
  * Convert the swimDSL stroke name to the swiML stroke name.
  *
@@ -425,14 +394,6 @@ function visitSwimInstruction(
     let hasModifiers = true;
     if (cursor.name === "StrokeModifier") {
       strokeModifier = state.sliceDoc(cursor.from, cursor.to);
-
-      //// StrokeModifier attepmt
-      // strokeModifier.push(visitStrokeModifier(cursor, state));
-      // do {
-      //   strokeModifier.push(visitStrokeModifier(cursor, state));
-      //   cursor.nextSibling();
-      // } while (cursor.name === "StrokeModifier");
-      // cursor.parent();
 
       // Move away from the StrokeModifier to a potential instruction modifier.
       hasModifiers = cursor.nextSibling();
