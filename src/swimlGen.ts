@@ -107,9 +107,7 @@ function writeInstructionModifier(
       break;
 
     case InstructionModifiers.BREATHE:
-      xmlParent
-        .ele("breath")
-        .txt(modifier.breatheStrokes)
+      xmlParent.ele("breath").txt(modifier.breatheStrokes);
       break;
 
     case InstructionModifiers.TIME:
