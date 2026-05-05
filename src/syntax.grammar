@@ -74,8 +74,12 @@ BlockInstruction {
 
 StrokeModifier { identifier }
 
+Underwater {
+    underwaterKeyword
+}
+
 instructionModifier {
-  EquipmentSpecification | paceSpecification | timeSpecification
+  EquipmentSpecification | paceSpecification | timeSpecification | Underwater
 }
 
 EquipmentSpecification {
@@ -110,6 +114,7 @@ messageSpecification {
     paceKeyword           { "pace" }
     restKeyword           { "rest" }
     onKeyword             { "on" }
+    underwaterKeyword     { "Underwater" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
@@ -126,6 +131,7 @@ messageSpecification {
     @precedence { onKeyword, identifier }
     @precedence { space, Message }
     @precedence { Comment, Message }
+    @precedence { underwaterKeyword, identifier }
 }
 
 @skip { space | Comment }

@@ -226,6 +226,13 @@ function visitInstructionModifier(
     return visitPace(cursor, state);
   }
 
+  if (cursor.name === "Underwater") {
+    return {
+      modifier: InstructionModifiers.UNDERWATER,
+      isTrue: true,
+    };
+  }
+
   // We are in Duration
   return {
     modifier: InstructionModifiers.TIME,
