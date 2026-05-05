@@ -1,4 +1,4 @@
-import {create} from "xmlbuilder2";
+import { create } from "xmlbuilder2";
 import {
   AuthorDefintion,
   ConstantDefinition,
@@ -12,7 +12,7 @@ import {
   Statements,
   SwimInstruction,
 } from "./astTypes";
-import {XMLBuilder} from "xmlbuilder2/lib/interfaces";
+import { XMLBuilder } from "xmlbuilder2/lib/interfaces";
 
 const XML_NAMESPACE = "https://github.com/bartneck/swiML";
 const XSI_LINK = "http://www.w3.org/2001/XMLSchema-instance";
@@ -114,8 +114,7 @@ function writeInstructionModifier(
       break;
 
     case InstructionModifiers.UNDERWATER:
-      xmlParent
-        .ele("underwater").txt(modifier.isTrue.toString())
+      xmlParent.ele("underwater").txt(modifier.isTrue.toString());
       break;
   }
 }
@@ -151,6 +150,7 @@ function writeSwimInstruction(
       .ele("standardStroke")
       .txt(instruction.instruction.stroke);
   }
+
   if (instruction.instructionModifiers.length > 0) {
     for (const modifier of instruction.instructionModifiers) {
       writeInstructionModifier(parent, modifier);

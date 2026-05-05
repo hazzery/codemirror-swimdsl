@@ -55,7 +55,11 @@ export interface Underwater {
   isTrue: boolean;
 }
 
-export type InstructionModifier = EquipmentSpecification | Pace | Time | Underwater;
+export type InstructionModifier =
+  | EquipmentSpecification
+  | Pace
+  | Time
+  | Underwater;
 
 export interface SwimInstruction {
   statement: Statements.SWIM_INSTRUCTION;

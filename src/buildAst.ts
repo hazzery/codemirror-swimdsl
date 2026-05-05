@@ -1,4 +1,4 @@
-import {TreeCursor} from "@lezer/common";
+import { TreeCursor } from "@lezer/common";
 import {
   AuthorDefintion,
   BlockInstruction,
@@ -17,7 +17,7 @@ import {
   Statements,
   SwimInstruction,
 } from "./astTypes";
-import {EditorState} from "@codemirror/state";
+import { EditorState } from "@codemirror/state";
 
 /**
  * Create an AST node for a `Pace` CST node.
@@ -230,7 +230,7 @@ function visitInstructionModifier(
     return {
       modifier: InstructionModifiers.UNDERWATER,
       isTrue: true,
-    }
+    };
   }
 
   // We are in Duration
