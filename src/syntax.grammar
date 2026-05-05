@@ -75,7 +75,11 @@ BlockInstruction {
 StrokeModifier { identifier }
 
 instructionModifier {
-  EquipmentSpecification | paceSpecification | timeSpecification
+  EquipmentSpecification | paceSpecification | timeSpecification | Breathe
+}
+
+Breathe {
+    breatheKeyword Number
 }
 
 EquipmentSpecification {
@@ -110,6 +114,7 @@ messageSpecification {
     paceKeyword           { "pace" }
     restKeyword           { "rest" }
     onKeyword             { "on" }
+    breatheKeyword        { "breathe" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
@@ -126,6 +131,7 @@ messageSpecification {
     @precedence { onKeyword, identifier }
     @precedence { space, Message }
     @precedence { Comment, Message }
+    @precedence { breatheKeyword, identifier }
 }
 
 @skip { space | Comment }
