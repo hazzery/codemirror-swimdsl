@@ -116,7 +116,7 @@ function visitBreathe(cursor: TreeCursor, state: EditorState): Breathe {
   return {
     modifier: InstructionModifiers.BREATHE,
     breatheStrokes: breatheStrokes,
-  }
+  };
 }
 
 /**

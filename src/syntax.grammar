@@ -79,7 +79,11 @@ Underwater {
 }
 
 instructionModifier {
-  EquipmentSpecification | paceSpecification | timeSpecification | Underwater | Breathe
+    EquipmentSpecification
+    | paceSpecification
+    | timeSpecification
+    | Underwater
+    | Breathe
 }
 
 Breathe {
