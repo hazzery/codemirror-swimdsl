@@ -79,7 +79,15 @@ Underwater {
 }
 
 instructionModifier {
-  EquipmentSpecification | paceSpecification | timeSpecification | Underwater
+    EquipmentSpecification
+    | paceSpecification
+    | timeSpecification
+    | Underwater
+    | Breathe
+}
+
+Breathe {
+    breatheKeyword Number
 }
 
 EquipmentSpecification {
@@ -115,6 +123,7 @@ messageSpecification {
     restKeyword           { "rest" }
     onKeyword             { "on" }
     underwaterKeyword     { "Underwater" }
+    breatheKeyword        { "breathe" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
@@ -132,6 +141,7 @@ messageSpecification {
     @precedence { space, Message }
     @precedence { Comment, Message }
     @precedence { underwaterKeyword, identifier }
+    @precedence { breatheKeyword, identifier }
 }
 
 @skip { space | Comment }

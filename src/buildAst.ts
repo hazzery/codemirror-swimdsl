@@ -2,6 +2,7 @@ import { TreeCursor } from "@lezer/common";
 import {
   AuthorDefintion,
   BlockInstruction,
+  Breathe,
   ConstantDefinition,
   Instruction,
   InstructionModifier,
@@ -90,6 +91,32 @@ function visitPaceDefinition(
   cursor.parent();
 
   return { statement: Statements.PACE_DEFINITION, name, pace };
+}
+
+/**
+ * Creates an AST node for `Breathe` CST node
+ *
+ * Precondition: `cursor` points to a `Breathe`.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ *
+ * @returns A `Breathe` AST node
+ */
+function visitBreathe(cursor: TreeCursor, state: EditorState): Breathe {
+  // Move into the breatheStrokes value
+  cursor.firstChild();
+  const breatheStrokes = state.sliceDoc(cursor.from, cursor.to);
+
+  // Step back up to the Breathe
+  cursor.parent();
+  return {
+    modifier: InstructionModifiers.BREATHE,
+    breatheStrokes: breatheStrokes,
+  };
 }
 
 /**
@@ -224,6 +251,10 @@ function visitInstructionModifier(
 
   if (cursor.name === "Pace") {
     return visitPace(cursor, state);
+  }
+
+  if (cursor.name === "Breathe") {
+    return visitBreathe(cursor, state);
   }
 
   if (cursor.name === "Underwater") {
