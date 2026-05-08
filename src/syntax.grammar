@@ -84,6 +84,11 @@ instructionModifier {
     | timeSpecification
     | Underwater
     | Breathe
+    | InstructionDescription
+}
+
+InstructionDescription {
+    "--" string
 }
 
 Breathe {
