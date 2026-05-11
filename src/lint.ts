@@ -194,26 +194,30 @@ function lintMultipleRest(
   editorState: EditorState,
   diagnostics: Diagnostic[],
 ): void {
-  if (node.name !== "Duration") return;
+  if (node.name !== "Duration" && node.name !== "InOut") return;
 
   const parent = node.node.parent;
   if (!parent) return;
 
-  const restSpecifications: SyntaxNode[] = parent.getChildren("Duration");
-  if (restSpecifications.length <= 1) return;
+  const durationNodes: SyntaxNode[] = parent.getChildren("Duration");
+  const inOutNodes: SyntaxNode[] = parent.getChildren("InOut");
+  const allSpecs = [...durationNodes, ...inOutNodes]
+    .sort((a, b) => a.from - b.from);
 
-  // Only push the diagnostic once, when visiting the first Duration
-  if (restSpecifications[0]?.from !== node.from) return;
+  if (allSpecs.length <= 1) return;
 
-  const firstRest = restSpecifications[0];
-  const lastRest = restSpecifications[restSpecifications.length - 1];
+  // Only push the diagnostic once, when visiting the first node
+  if (allSpecs[0]?.from !== node.from) return;
 
-  if (lastRest !== undefined) {
-    const prevWord = editorState.wordAt(firstRest.from - 1);
-    const fromPosition = prevWord ? prevWord.from : firstRest.from;
+  const firstSpec = allSpecs[0];
+  const lastSpec = allSpecs[allSpecs.length - 1];
+
+  if (lastSpec !== undefined) {
+    const prevWord = editorState.wordAt(firstSpec.from - 1);
+    const fromPosition = prevWord ? prevWord.from : firstSpec.from;
 
     diagnostics.push(
-      multipleRestDiagnostic(fromPosition, lastRest.to),
+      multipleRestDiagnostic(fromPosition, lastSpec.to),
     );
   }
 }

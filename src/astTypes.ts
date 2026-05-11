@@ -13,6 +13,7 @@ export const enum InstructionModifiers {
   TIME,
   BREATHE,
   UNDERWATER,
+  IN_OUT,
 }
 
 export interface Programme {
@@ -62,7 +63,8 @@ export type InstructionModifier =
   | Pace
   | Time
   | Underwater
-  | Breathe;
+  | Breathe
+  | InOut;
 
 export interface SwimInstruction {
   statement: Statements.SWIM_INSTRUCTION;
@@ -114,4 +116,9 @@ export interface Message {
 export interface Breathe {
   modifier: InstructionModifiers.BREATHE;
   breatheStrokes: string;
+}
+
+export interface InOut {
+  modifier: InstructionModifiers.IN_OUT;
+  swimmersIn: string;
 }

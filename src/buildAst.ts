@@ -264,6 +264,17 @@ function visitInstructionModifier(
     };
   }
 
+  if (cursor.name === "InOut") {
+    cursor.firstChild();
+    const swimmersIn = state.sliceDoc(cursor.from, cursor.to);
+    cursor.parent();
+
+    return {
+      modifier: InstructionModifiers.IN_OUT,
+      swimmersIn,
+    };
+  }
+
   // We are in Duration
   // Get the specified rest keyword
   const getType = state.wordAt(cursor.from - 1);
