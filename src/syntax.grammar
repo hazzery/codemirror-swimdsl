@@ -66,7 +66,7 @@ SingleInstruction {
     distance Stroke
 }
 
-distance { Number }
+distance { Number lapsKeyword? }
 
 Stroke { identifier }
 
@@ -120,6 +120,7 @@ messageSpecification {
     StringContent { (!["\\] | "\\" _)+ }
     identifier  { @asciiLetter+ }
     repititionOperator { "x" }
+    lapsKeyword { "laps" | "lap" }
     @precedence { StringContent, space }
     @precedence { StringContent, Comment }
     @precedence { repititionOperator, identifier }
@@ -129,6 +130,8 @@ messageSpecification {
     @precedence { onKeyword, identifier }
     @precedence { space, Message }
     @precedence { Comment, Message }
+    @precedence { lapsKeyword, identifier }
+    @precedence { lapsKeyword, Message }
     @precedence { repetitionDescriptionOperator, Message }
 }
 

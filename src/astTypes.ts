@@ -64,6 +64,7 @@ export interface SingleInstruction {
   isBlock: false;
   distance: string;
   stroke: string;
+  isLaps: boolean;
 }
 
 export interface BlockInstruction {

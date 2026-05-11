@@ -370,17 +370,31 @@ function visitSwimInstruction(
 
     instruction = { isBlock: true, instructions };
   } else {
-    // Move into Number
-    cursor.firstChild();
-    const distance = state.sliceDoc(cursor.from, cursor.to);
+    // cursor is on SingleInstruction
+    cursor.firstChild(); // into Number
+    const distanceNum = state.sliceDoc(cursor.from, cursor.to);
 
-    // Move into Stroke
-    cursor.nextSibling();
-    const stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
+    let isLaps = false;
+    let stroke = "any";
 
-    instruction = { isBlock: false, distance, stroke };
+    if (cursor.nextSibling()) {
+      const nextText = state.sliceDoc(cursor.from, cursor.to);
+      const nextName = cursor.name;
+
+      if (nextName === "lapsKeyword") {
+        isLaps = true;
+        if (cursor.nextSibling()) {
+          stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
+        }
+      } else {
+        stroke = getStroke(nextText);
+      }
+    }
+
+    instruction = { isBlock: false, distance: distanceNum, stroke, isLaps };
+    cursor.parent(); // Move back up to SingleInstruction
   }
-  // Move back up to SingleInstruction | BlockInstruction
+  // Move back up to SwimInstruction
   cursor.parent();
 
   if (cursor.nextSibling()) {
