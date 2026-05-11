@@ -2,7 +2,7 @@ import { syntaxTree } from "@codemirror/language";
 import { Diagnostic, linter } from "@codemirror/lint";
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
-import { SyntaxNodeRef, TreeCursor } from "@lezer/common";
+import { SyntaxNode, SyntaxNodeRef, TreeCursor } from "@lezer/common";
 
 import {
   duplicateEquipmentDiagnostic,
@@ -10,6 +10,7 @@ import {
   incompatibleEquipmentDiagnostic,
   invalidDurationDiagnostic,
   invalidNodeValueDiagnostic,
+  multipleRestDiagnostic,
   syntaxErrorDiagnostic,
   undefinedPaceNameDiagnostic,
 } from "./diagnostics";
@@ -180,6 +181,44 @@ function lintIncompatibleEquipment(
 }
 
 /**
+ * Provide a lint error to the user for attempting to specify multiple
+ * rest durations per instruction.
+ *
+ * @param node - A reference to a syntax node to lint.
+ * @param editorState - The current state of the CodeMirror code editor.
+ * @param diagnostics - An array of diagnostics to append to if `node`
+ *    specifies a combination of incompatible equipment items.
+ */
+function lintMultipleRest(
+  node: SyntaxNodeRef,
+  editorState: EditorState,
+  diagnostics: Diagnostic[],
+): void {
+  if (node.name !== "Duration") return;
+
+  const parent = node.node.parent;
+  if (!parent) return;
+
+  const restSpecifications: SyntaxNode[] = parent.getChildren("Duration");
+  if (restSpecifications.length <= 1) return;
+
+  // Only push the diagnostic once, when visiting the first Duration
+  if (restSpecifications[0]?.from !== node.from) return;
+
+  const firstRest = restSpecifications[0];
+  const lastRest = restSpecifications[restSpecifications.length - 1];
+
+  if (lastRest !== undefined) {
+    const prevWord = editorState.wordAt(firstRest.from - 1);
+    const fromPosition = prevWord ? prevWord.from : firstRest.from;
+
+    diagnostics.push(
+      multipleRestDiagnostic(fromPosition, lastRest.to),
+    );
+  }
+}
+
+/**
  * Provide a lint error to the user for providing an unknown identifier.
  *
  * Examples of providing unknown identifiers could be, specifying a stroke of
@@ -306,6 +345,7 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
       diagnostics,
     );
     lintInvalidDuration(treeCursor, editorState, diagnostics);
+    lintMultipleRest(treeCursor, editorState, diagnostics);
   } while (treeCursor.next());
 
   return diagnostics;
