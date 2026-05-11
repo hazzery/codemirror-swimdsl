@@ -57,6 +57,7 @@ export interface SwimInstruction {
   instruction: SingleInstruction | BlockInstruction;
   strokeModifier: string;
   instructionModifiers: InstructionModifier[];
+  repetitionDescription?: string;
 }
 
 export interface SingleInstruction {

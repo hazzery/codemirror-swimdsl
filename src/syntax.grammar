@@ -58,7 +58,9 @@ instruction {
 SwimInstruction {
     (Number repititionOperator)?
     (SingleInstruction | BlockInstruction) StrokeModifier? instructionModifier*
+InstructionRepetitionDescription?
 }
+InstructionRepetitionDescription { repetitionDescriptionOperator Message }
 
 SingleInstruction {
     distance Stroke
@@ -110,6 +112,7 @@ messageSpecification {
     paceKeyword           { "pace" }
     restKeyword           { "rest" }
     onKeyword             { "on" }
+    repetitionDescriptionOperator { "~" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
@@ -126,6 +129,7 @@ messageSpecification {
     @precedence { onKeyword, identifier }
     @precedence { space, Message }
     @precedence { Comment, Message }
+    @precedence { repetitionDescriptionOperator, Message }
 }
 
 @skip { space | Comment }

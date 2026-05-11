@@ -345,6 +345,7 @@ function visitSwimInstruction(
   let repetitions = 1;
   let strokeModifier = "default";
   let instruction: SingleInstruction | BlockInstruction;
+  let repetitionDescription: string | undefined = undefined;
   const instructionModifiers: InstructionModifier[] = [];
 
   // Move into either Number (for repetitions) or SingleInstruction |
@@ -393,7 +394,14 @@ function visitSwimInstruction(
 
     if (hasModifiers) {
       do {
-        instructionModifiers.push(visitInstructionModifier(cursor, state));
+        if (cursor.name === "InstructionRepetitionDescription") {
+          cursor.firstChild();
+          cursor.nextSibling();
+          repetitionDescription = state.sliceDoc(cursor.from, cursor.to).trim();
+          cursor.parent();
+        } else {
+          instructionModifiers.push(visitInstructionModifier(cursor, state));
+        }
       } while (cursor.nextSibling());
     }
   }
@@ -407,6 +415,7 @@ function visitSwimInstruction(
     instruction,
     strokeModifier,
     instructionModifiers,
+    ...(repetitionDescription !== undefined && { repetitionDescription }),
   };
 }
 
