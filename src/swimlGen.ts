@@ -49,11 +49,10 @@ function xmlDuration(minutes: string, seconds: string): string {
 function writeInstruction(
   xmlParent: XMLBuilder,
   instruction: Instruction,
-  poolLength: number = 25,
 ): void {
   switch (instruction.statement) {
     case Statements.SWIM_INSTRUCTION:
-      writeSwimInstruction(xmlParent, instruction, poolLength);
+      writeSwimInstruction(xmlParent, instruction);
       break;
 
     case Statements.REST_INSTRUCTION:
@@ -126,7 +125,6 @@ function writeInstructionModifier(
 function writeSwimInstruction(
   xmlParent: XMLBuilder,
   instruction: SwimInstruction,
-  poolLength: number = 25,
 ): void {
   let parent = xmlParent.ele("instruction");
 
@@ -140,11 +138,11 @@ function writeSwimInstruction(
       writeInstruction(parent, subInstruction);
     }
   } else {
-    const distance = instruction.instruction.isLaps
-      ? String(Number(instruction.instruction.distance) * poolLength)
-      : instruction.instruction.distance;
-
-    parent.ele("length").ele("lengthAsDistance").txt(distance);
+    if (instruction.instruction.isLaps) {
+      parent.ele("length").ele("lengthAsLaps").txt(instruction.instruction.distance);
+    } else {
+      parent.ele("length").ele("lengthAsDistance").txt(instruction.instruction.distance);
+    }
     parent.ele("stroke").ele("standardStroke").txt(instruction.instruction.stroke);
   }
 
@@ -274,20 +272,10 @@ export default function emitXml(programme: Programme): string {
     "xsi:schemaLocation": SCHEMA_LOCATION,
   });
 
-  let poolLength = 25;
-  for (const statement of programme.statements) {
-    if (
-      statement.statement === Statements.CONSTANT_DEFINITION &&
-      statement.constantName === "PoolLength"
-    ) {
-      poolLength = Number(statement.value);
-    }
-  }
-
   for (const statement of programme.statements) {
     switch (statement.statement) {
       case Statements.SWIM_INSTRUCTION:
-        writeSwimInstruction(doc, statement, poolLength);
+        writeSwimInstruction(doc, statement);
         break;
 
       case Statements.REST_INSTRUCTION:
