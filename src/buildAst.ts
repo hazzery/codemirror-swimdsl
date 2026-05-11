@@ -370,9 +370,9 @@ function visitSwimInstruction(
 
     instruction = { isBlock: true, instructions };
   } else {
-    // cursor is on SingleInstruction
-    cursor.firstChild(); // into Number
-    const distanceNum = state.sliceDoc(cursor.from, cursor.to);
+    // Move into Number
+    cursor.firstChild();
+    const distance = state.sliceDoc(cursor.from, cursor.to);
 
     let isLaps = false;
     let stroke = "any";
@@ -390,11 +390,9 @@ function visitSwimInstruction(
         stroke = getStroke(nextText);
       }
     }
-
-    instruction = { isBlock: false, distance: distanceNum, stroke, isLaps };
-    cursor.parent(); // Move back up to SingleInstruction
+    instruction = { isBlock: false, distance: distance, stroke, isLaps };
   }
-  // Move back up to SwimInstruction
+  // Move back up to SingleInstruction | BlockInstruction
   cursor.parent();
 
   if (cursor.nextSibling()) {

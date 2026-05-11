@@ -45,12 +45,11 @@ function xmlDuration(minutes: string, seconds: string): string {
  *
  * @param xmlParent - The parent XML node to write the instruction inside of.
  * @param instruction - The AST instruction node to write as XML.
- * @param poolLength - The length of the pool in meters.
  */
 function writeInstruction(
   xmlParent: XMLBuilder,
   instruction: Instruction,
-  poolLength: number,
+  poolLength: number = 25,
 ): void {
   switch (instruction.statement) {
     case Statements.SWIM_INSTRUCTION:
@@ -79,6 +78,7 @@ function writeIntensity(xmlParent: XMLBuilder, intensity: Intensity): void {
     xmlParent.ele("percentageEffort").txt(intensity.value);
   }
 }
+
 
 /**
  * Write an AST InstructionModifier node into the XML document.
@@ -122,12 +122,11 @@ function writeInstructionModifier(
  *
  * @param xmlParent - The parent XML node to write the instruction inside of.
  * @param instruction - The AST swim instruction node to write as XML.
- * @param poolLength - The length of the pool in meters.
  */
 function writeSwimInstruction(
   xmlParent: XMLBuilder,
   instruction: SwimInstruction,
-  poolLength: number,
+  poolLength: number = 25,
 ): void {
   let parent = xmlParent.ele("instruction");
 
@@ -138,21 +137,15 @@ function writeSwimInstruction(
 
   if (instruction.instruction.isBlock) {
     for (const subInstruction of instruction.instruction.instructions) {
-      writeInstruction(parent, subInstruction, poolLength);
+      writeInstruction(parent, subInstruction);
     }
   } else {
     const distance = instruction.instruction.isLaps
       ? String(Number(instruction.instruction.distance) * poolLength)
       : instruction.instruction.distance;
 
-    parent
-      .ele("length")
-      .ele("lengthAsDistance")
-      .txt(distance);
-    parent
-      .ele("stroke")
-      .ele("standardStroke")
-      .txt(instruction.instruction.stroke);
+    parent.ele("length").ele("lengthAsDistance").txt(distance);
+    parent.ele("stroke").ele("standardStroke").txt(instruction.instruction.stroke);
   }
 
   if (instruction.instructionModifiers.length > 0) {
@@ -162,7 +155,7 @@ function writeSwimInstruction(
   }
 
   if (instruction.repetitionDescription) {
-    parent.ele("InstructionRepetitionDescription").txt(instruction.repetitionDescription);
+    parent.ele("instructionDescription").txt(instruction.repetitionDescription);
   }
 }
 
@@ -281,7 +274,7 @@ export default function emitXml(programme: Programme): string {
     "xsi:schemaLocation": SCHEMA_LOCATION,
   });
 
-  let poolLength = 25; // default
+  let poolLength = 25;
   for (const statement of programme.statements) {
     if (
       statement.statement === Statements.CONSTANT_DEFINITION &&

@@ -66,7 +66,7 @@ SingleInstruction {
     distance Stroke
 }
 
-distance { Number lapsKeyword? }
+distance[@inline] { Number lapsKeyword? }
 
 Stroke { identifier }
 
@@ -130,9 +130,9 @@ messageSpecification {
     @precedence { onKeyword, identifier }
     @precedence { space, Message }
     @precedence { Comment, Message }
+    @precedence { repetitionDescriptionOperator, Message }
     @precedence { lapsKeyword, identifier }
     @precedence { lapsKeyword, Message }
-    @precedence { repetitionDescriptionOperator, Message }
 }
 
 @skip { space | Comment }
