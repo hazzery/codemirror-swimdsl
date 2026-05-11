@@ -51,7 +51,6 @@ statement {
 
 instruction {
     SwimInstruction
-    | RestInstruction
     | messageSpecification
 }
 
@@ -111,10 +110,6 @@ timeSpecification {
 
 Duration {
     Number ":" Number    // minutes:seconds
-}
-
-RestInstruction {
-    Duration restKeyword
 }
 
 messageSpecification {

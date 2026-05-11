@@ -174,25 +174,13 @@ SwimProgramme(SwimInstruction(
 
 ## Rest instruction
 
-1:00 rest
+100 Freestyle rest 1:00
 
 ==>
 
-SwimProgramme(RestInstruction(Duration(Number, Number)))
-
-
-## Multiple rest instructions
-
-1:00 rest
-0:30 rest
-0:15 rest
-
-==>
-
-SwimProgramme(
-  RestInstruction(Duration(Number, Number)),
-  RestInstruction(Duration(Number, Number)),
-  RestInstruction(Duration(Number, Number)))
+SwimProgramme(SwimInstruction(
+  SingleInstruction(Number, Stroke),
+  Duration(Number, Number)))
 
 
 ## Repeated single instruction
@@ -310,8 +298,7 @@ SwimProgramme(SwimInstruction(
 
 2 x {
   50 Backstroke
-  100 Freestyle
-  0:30 rest
+  100 Freestyle rest 0:30
 } Pull + PullBuoy @ 70%
 
 ==>
@@ -320,8 +307,7 @@ SwimProgramme(SwimInstruction(
   Number,
   BlockInstruction(
     SwimInstruction(SingleInstruction(Number, Stroke)),
-    SwimInstruction(SingleInstruction(Number, Stroke)),
-    RestInstruction(Duration(Number, Number))),
+    SwimInstruction(SingleInstruction(Number, Stroke),Duration(Number,Number)),
   StrokeModifier,
   EquipmentSpecification(EquipmentName),
   Pace(Number)))
@@ -442,7 +428,6 @@ pace hard = 90%
 
 > Main Set
 4 x 100 Backstroke on 1:30
-0:30 rest
 
 ==>
 
@@ -459,8 +444,7 @@ SwimProgramme(
   SwimInstruction(
     Number,
     SingleInstruction(Number, Stroke),
-    Duration(Number, Number)),
-  RestInstruction(Duration(Number, Number)))
+    Duration(Number, Number)))
 
 
 ## Multiple Block instructions
@@ -485,7 +469,6 @@ SwimProgramme(
   > Round
   100 Freestyle @ 60%
   4 x 25 Backstroke Kick + Fins on 0:30
-  0:30 rest
 }
 
 ==>
@@ -502,5 +485,4 @@ SwimProgramme(SwimInstruction(
       SingleInstruction(Number, Stroke),
       StrokeModifier,
       EquipmentSpecification(EquipmentName),
-      Duration(Number, Number)),
-    RestInstruction(Duration(Number, Number)))))
+      Duration(Number, Number)))))

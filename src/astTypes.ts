@@ -1,6 +1,5 @@
 export const enum Statements {
   SWIM_INSTRUCTION,
-  REST_INSTRUCTION,
   MESSAGE,
   PACE_DEFINITION,
   CONSTANT_DEFINITION,
@@ -20,7 +19,7 @@ export interface Programme {
   statements: Statement[];
 }
 
-export type Instruction = SwimInstruction | RestInstruction | Message;
+export type Instruction = SwimInstruction | Message;
 
 export interface ConstantDefinition {
   statement: Statements.CONSTANT_DEFINITION;
@@ -83,12 +82,6 @@ export interface SingleInstruction {
 export interface BlockInstruction {
   isBlock: true;
   instructions: Instruction[];
-}
-
-export interface RestInstruction {
-  statement: Statements.REST_INSTRUCTION;
-  minutes: string;
-  seconds: string;
 }
 
 export interface Intensity {
