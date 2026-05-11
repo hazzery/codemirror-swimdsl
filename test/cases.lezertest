@@ -307,7 +307,7 @@ SwimProgramme(SwimInstruction(
   Number,
   BlockInstruction(
     SwimInstruction(SingleInstruction(Number, Stroke)),
-    SwimInstruction(SingleInstruction(Number, Stroke),Duration(Number,Number)),
+    SwimInstruction(SingleInstruction(Number, Stroke),Duration(Number,Number))),
   StrokeModifier,
   EquipmentSpecification(EquipmentName),
   Pace(Number)))
