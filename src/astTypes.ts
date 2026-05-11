@@ -47,6 +47,7 @@ export interface EquipmentSpecification {
 
 export interface Time {
   modifier: InstructionModifiers.TIME;
+  keyWord: string;
   minutes: string;
   seconds: string;
 }

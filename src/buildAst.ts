@@ -265,8 +265,12 @@ function visitInstructionModifier(
   }
 
   // We are in Duration
+  // Get the specified rest keyword
+  const getType = state.wordAt(cursor.from - 1);
+  const restType = getType ? state.sliceDoc(getType.from, getType.to) : "";
   return {
     modifier: InstructionModifiers.TIME,
+    keyWord: restType,
     ...visitDuration(cursor, state),
   };
 }

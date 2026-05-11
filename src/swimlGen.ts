@@ -111,10 +111,18 @@ function writeInstructionModifier(
       break;
 
     case InstructionModifiers.TIME:
-      xmlParent
-        .ele("rest")
-        .ele("sinceStart")
-        .txt(xmlDuration(modifier.minutes, modifier.seconds));
+      if (modifier.keyWord === "rest") {
+        xmlParent
+          .ele("rest")
+          .ele("afterStop")
+          .txt(xmlDuration(modifier.minutes, modifier.seconds));
+      } else {
+        // 'on' restType used
+        xmlParent
+          .ele("rest")
+          .ele("sinceStart")
+          .txt(xmlDuration(modifier.minutes, modifier.seconds));
+      }
       break;
 
     case InstructionModifiers.UNDERWATER:

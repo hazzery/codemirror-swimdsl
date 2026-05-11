@@ -101,7 +101,7 @@ paceSpecification {
 }
 
 timeSpecification {
-    onKeyword Duration
+    (onKeyword | restKeyword) Duration
 }
 
 Duration {
@@ -142,6 +142,7 @@ messageSpecification {
     @precedence { Comment, Message }
     @precedence { underwaterKeyword, identifier }
     @precedence { breatheKeyword, identifier }
+    @precedence { restKeyword, identifier }
 }
 
 @skip { space | Comment }
