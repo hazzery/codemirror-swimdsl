@@ -11,6 +11,11 @@ export const enum InstructionModifiers {
   EQUIPMENT_SPECIFICATION,
   PACE,
   TIME,
+  EXCLUDE_ALIGN,
+}
+
+export interface ExcludeAlign {
+  modifier: InstructionModifiers.EXCLUDE_ALIGN;
 }
 
 export interface Programme {
@@ -49,7 +54,7 @@ export interface Time {
   seconds: string;
 }
 
-export type InstructionModifier = EquipmentSpecification | Pace | Time;
+export type InstructionModifier = EquipmentSpecification | Pace | Time | ExcludeAlign;
 
 export interface SwimInstruction {
   statement: Statements.SWIM_INSTRUCTION;

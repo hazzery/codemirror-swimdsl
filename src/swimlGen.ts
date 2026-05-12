@@ -113,6 +113,10 @@ function writeInstructionModifier(
         .ele("sinceStart")
         .txt(xmlDuration(modifier.minutes, modifier.seconds));
       break;
+
+    case InstructionModifiers.EXCLUDE_ALIGN:
+      xmlParent.ele("excludeAlign").txt("true");
+      break;
   }
 }
 

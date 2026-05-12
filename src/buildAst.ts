@@ -226,6 +226,10 @@ function visitInstructionModifier(
     return visitPace(cursor, state);
   }
 
+  if (cursor.name === "ExcludeAlignSpecification") {
+    return { modifier: InstructionModifiers.EXCLUDE_ALIGN };
+  }
+
   // We are in Duration
   return {
     modifier: InstructionModifiers.TIME,

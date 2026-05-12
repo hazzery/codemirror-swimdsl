@@ -79,7 +79,11 @@ BlockInstruction {
 StrokeModifier { identifier }
 
 instructionModifier {
-  EquipmentSpecification | paceSpecification | timeSpecification
+  EquipmentSpecification | paceSpecification | timeSpecification | ExcludeAlignSpecification
+}
+
+ExcludeAlignSpecification {
+    excludeAlignKeyword
 }
 
 EquipmentSpecification {
@@ -123,6 +127,7 @@ messageSpecification {
     identifier  { @asciiLetter+ }
     repititionOperator { "x" }
     lapsKeyword { "laps" | "lap" }
+    excludeAlignKeyword { "noalign" }
     @precedence { StringContent, space }
     @precedence { StringContent, Comment }
     @precedence { repititionOperator, identifier }
@@ -135,6 +140,8 @@ messageSpecification {
     @precedence { repetitionDescriptionOperator, Message }
     @precedence { lapsKeyword, identifier }
     @precedence { lapsKeyword, Message }
+    @precedence { excludeAlignKeyword, identifier }
+    @precedence { excludeAlignKeyword, Message }
 }
 
 @skip { space | Comment }
