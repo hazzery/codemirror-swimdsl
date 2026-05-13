@@ -67,7 +67,7 @@ const nodeCompletions: Record<CompletableNodes, NodeCompletionSpec> = {
   },
   [CompletableNodes.STROKE_MODIFIER]: {
     priorNodeName: "",
-    nodeName: "StrokeType",
+    nodeName: "StrokeModifier",
     completions: strokeModifierCompletions,
   },
   [CompletableNodes.CONSTANT_NAME]: {

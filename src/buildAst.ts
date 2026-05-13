@@ -2,6 +2,7 @@ import { TreeCursor } from "@lezer/common";
 import {
   AuthorDefintion,
   BlockInstruction,
+  Breathe,
   ConstantDefinition,
   Instruction,
   InstructionModifier,
@@ -16,6 +17,7 @@ import {
   Statement,
   Statements,
   SwimInstruction,
+  LengthNode,
 } from "./astTypes";
 import { EditorState } from "@codemirror/state";
 
@@ -90,6 +92,32 @@ function visitPaceDefinition(
   cursor.parent();
 
   return { statement: Statements.PACE_DEFINITION, name, pace };
+}
+
+/**
+ * Creates an AST node for `Breathe` CST node
+ *
+ * Precondition: `cursor` points to a `Breathe`.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ *
+ * @returns A `Breathe` AST node
+ */
+function visitBreathe(cursor: TreeCursor, state: EditorState): Breathe {
+  // Move into the breatheStrokes value
+  cursor.firstChild();
+  const breatheStrokes = state.sliceDoc(cursor.from, cursor.to);
+
+  // Step back up to the Breathe
+  cursor.parent();
+  return {
+    modifier: InstructionModifiers.BREATHE,
+    breatheStrokes: breatheStrokes,
+  };
 }
 
 /**
@@ -226,6 +254,17 @@ function visitInstructionModifier(
     return visitPace(cursor, state);
   }
 
+  if (cursor.name === "Breathe") {
+    return visitBreathe(cursor, state);
+  }
+
+  if (cursor.name === "Underwater") {
+    return {
+      modifier: InstructionModifiers.UNDERWATER,
+      isTrue: true,
+    };
+  }
+
   // We are in Duration
   return {
     modifier: InstructionModifiers.TIME,
@@ -345,7 +384,6 @@ function visitSwimInstruction(
   let repetitions = 1;
   let strokeModifier = "default";
   let instruction: SingleInstruction | BlockInstruction;
-  let repetitionDescription: string | undefined = undefined;
   const instructionModifiers: InstructionModifier[] = [];
 
   // Move into either Number (for repetitions) or SingleInstruction |
@@ -371,35 +409,42 @@ function visitSwimInstruction(
     instruction = { isBlock: true, instructions };
   } else {
     // cursor is on SingleInstruction
-    cursor.firstChild(); // into Number
-    const distanceNum = state.sliceDoc(cursor.from, cursor.to);
+    debugCursor(cursor, state, "SingleInstruction");
+    cursor.firstChild();
+    debugCursor(cursor, state, "after firstChild (expect: length)");
+    cursor.firstChild();
+    debugCursor(cursor, state, "after firstChild (expect: lengthAsDistance|lengthAsLaps|lengthAsTime)");
 
-    let isLaps = false;
-    let stroke = "any";
-
-    if (cursor.nextSibling()) {
-      const nextText = state.sliceDoc(cursor.from, cursor.to);
-      const nextName = cursor.name;
-
-      if (nextName === "lapsKeyword") {
-        isLaps = true;
-        if (cursor.nextSibling()) {
-          stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
-        }
-      } else {
-        stroke = getStroke(nextText);
-      }
+    let length: LengthNode;
+    if (cursor.name === "LengthAsDistance") {
+      cursor.firstChild();
+      debugCursor(cursor, state, "lengthAsDistance child (expect: Number)");
+      length = { kind: "distance", value: state.sliceDoc(cursor.from, cursor.to) };
+      cursor.parent();
+    } else if (cursor.name === "LengthAsLaps") {
+      cursor.firstChild();
+      debugCursor(cursor, state, "lengthAsLaps child (expect: Number)");
+      length = { kind: "laps", value: state.sliceDoc(cursor.from, cursor.to) };
+      cursor.parent();
+    } else {
+      debugCursor(cursor, state, "lengthAsTime child (expect: Duration)");
+      throw new Error(`Unexpected length node: ${cursor.name}`);
     }
 
-    instruction = { isBlock: false, distance: distanceNum, stroke, isLaps };
-    cursor.parent(); // Move back up to SingleInstruction
+    cursor.parent();
+    cursor.nextSibling();
+    debugCursor(cursor, state, "after nextSibling (expect: Stroke)");
+    const stroke = (cursor.name as string) !== "Stroke" ? "any" : getStroke(state.sliceDoc(cursor.from, cursor.to));
+
+    instruction = { isBlock: false, length, stroke };
+    cursor.parent();
   }
   // Move back up to SwimInstruction
   cursor.parent();
 
   if (cursor.nextSibling()) {
     let hasModifiers = true;
-    if (cursor.name === "StrokeModifier") {
+    if ((cursor.name as string) === "StrokeModifier") {
       strokeModifier = state.sliceDoc(cursor.from, cursor.to);
 
       // Move away from the StrokeModifier to a potential instruction modifier.
@@ -408,14 +453,7 @@ function visitSwimInstruction(
 
     if (hasModifiers) {
       do {
-        if (cursor.name === "InstructionRepetitionDescription") {
-          cursor.firstChild();
-          cursor.nextSibling();
-          repetitionDescription = state.sliceDoc(cursor.from, cursor.to).trim();
-          cursor.parent();
-        } else {
-          instructionModifiers.push(visitInstructionModifier(cursor, state));
-        }
+        instructionModifiers.push(visitInstructionModifier(cursor, state));
       } while (cursor.nextSibling());
     }
   }
@@ -429,8 +467,11 @@ function visitSwimInstruction(
     instruction,
     strokeModifier,
     instructionModifiers,
-    ...(repetitionDescription !== undefined && { repetitionDescription }),
   };
+}
+
+function debugCursor(cursor: TreeCursor, state: EditorState, label: string): void {
+  console.log(`[${label}] name=${cursor.name} text="${state.sliceDoc(cursor.from, cursor.to)}"`);
 }
 
 /**

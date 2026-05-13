@@ -108,11 +108,19 @@ function writeInstructionModifier(
       }
       break;
 
+    case InstructionModifiers.BREATHE:
+      xmlParent.ele("breath").txt(modifier.breatheStrokes);
+      break;
+
     case InstructionModifiers.TIME:
       xmlParent
         .ele("rest")
         .ele("sinceStart")
         .txt(xmlDuration(modifier.minutes, modifier.seconds));
+      break;
+
+    case InstructionModifiers.UNDERWATER:
+      xmlParent.ele("underwater").txt(modifier.isTrue.toString());
       break;
   }
 }
@@ -141,14 +149,13 @@ function writeSwimInstruction(
       writeInstruction(parent, subInstruction, poolLength);
     }
   } else {
-    const distance = instruction.instruction.isLaps
-      ? String(Number(instruction.instruction.distance) * poolLength)
-      : instruction.instruction.distance;
-
-    parent
-      .ele("length")
-      .ele("lengthAsDistance")
-      .txt(distance);
+    const len = instruction.instruction.length;
+    const lengthNode = parent.ele("length");
+    if (len.kind === "distance") {
+      lengthNode.ele("lengthAsDistance").txt(len.value);
+    } else if (len.kind === "laps") {
+      lengthNode.ele("lengthAsLaps").txt(len.value);
+    }
     parent
       .ele("stroke")
       .ele("standardStroke")
@@ -159,10 +166,6 @@ function writeSwimInstruction(
     for (const modifier of instruction.instructionModifiers) {
       writeInstructionModifier(parent, modifier);
     }
-  }
-
-  if (instruction.repetitionDescription) {
-    parent.ele("InstructionRepetitionDescription").txt(instruction.repetitionDescription);
   }
 }
 

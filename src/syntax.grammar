@@ -58,15 +58,19 @@ instruction {
 SwimInstruction {
     (Number repititionOperator)?
     (SingleInstruction | BlockInstruction) StrokeModifier? instructionModifier*
-InstructionRepetitionDescription?
 }
-InstructionRepetitionDescription { repetitionDescriptionOperator Message }
 
 SingleInstruction {
-    distance Stroke
+    Length Stroke
 }
 
-distance { Number lapsKeyword? }
+Length {
+    LengthAsDistance
+  | LengthAsLaps
+}
+
+LengthAsDistance { Number }
+LengthAsLaps     { Number lapsKeyword }
 
 Stroke { identifier }
 
@@ -76,8 +80,20 @@ BlockInstruction {
 
 StrokeModifier { identifier }
 
+Underwater {
+    underwaterKeyword
+}
+
 instructionModifier {
-  EquipmentSpecification | paceSpecification | timeSpecification
+    EquipmentSpecification
+    | paceSpecification
+    | timeSpecification
+    | Underwater
+    | Breathe
+}
+
+Breathe {
+    breatheKeyword Number
 }
 
 EquipmentSpecification {
@@ -112,7 +128,8 @@ messageSpecification {
     paceKeyword           { "pace" }
     restKeyword           { "rest" }
     onKeyword             { "on" }
-    repetitionDescriptionOperator { "~" }
+    underwaterKeyword     { "Underwater" }
+    breatheKeyword        { "breathe" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
@@ -132,7 +149,9 @@ messageSpecification {
     @precedence { Comment, Message }
     @precedence { lapsKeyword, identifier }
     @precedence { lapsKeyword, Message }
-    @precedence { repetitionDescriptionOperator, Message }
+    @precedence { restKeyword, identifier }
+    @precedence { underwaterKeyword, identifier }
+    @precedence { breatheKeyword, identifier }
 }
 
 @skip { space | Comment }
