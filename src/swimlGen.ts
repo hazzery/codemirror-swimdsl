@@ -160,6 +160,10 @@ function writeSwimInstruction(
     } else if (len.kind === "time") {
       lengthNode.ele("lengthAsTime").txt(xmlDuration(len.minutes, len.seconds));
     }
+    parent
+      .ele("stroke")
+      .ele("standardStroke")
+      .txt(instruction.instruction.stroke);
   }
 
   if (instruction.instructionModifiers.length > 0) {
