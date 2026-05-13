@@ -142,22 +142,20 @@ function writeSwimInstruction(
       writeInstruction(parent, subInstruction);
     }
   } else {
-    if (instruction.instruction.isLaps) {
-      parent.ele("length").ele("lengthAsLaps").txt(instruction.instruction.distance);
-    } else {
-      parent.ele("length").ele("lengthAsDistance").txt(instruction.instruction.distance);
-    }
-    parent.ele("stroke").ele("standardStroke").txt(instruction.instruction.stroke);
+    parent
+      .ele("length")
+      .ele("lengthAsDistance")
+      .txt(instruction.instruction.distance);
+    parent
+      .ele("stroke")
+      .ele("standardStroke")
+      .txt(instruction.instruction.stroke);
   }
 
   if (instruction.instructionModifiers.length > 0) {
     for (const modifier of instruction.instructionModifiers) {
       writeInstructionModifier(parent, modifier);
     }
-  }
-
-  if (instruction.repetitionDescription) {
-    parent.ele("instructionDescription").txt(instruction.repetitionDescription);
   }
 }
 

@@ -62,14 +62,12 @@ export interface SwimInstruction {
   instruction: SingleInstruction | BlockInstruction;
   strokeModifier: string;
   instructionModifiers: InstructionModifier[];
-  repetitionDescription?: string;
 }
 
 export interface SingleInstruction {
   isBlock: false;
   distance: string;
   stroke: string;
-  isLaps: boolean;
 }
 
 export interface BlockInstruction {

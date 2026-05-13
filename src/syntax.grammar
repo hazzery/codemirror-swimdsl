@@ -58,17 +58,13 @@ instruction {
 SwimInstruction {
     (Number repititionOperator)?
     (SingleInstruction | BlockInstruction) StrokeModifier? instructionModifier*
-InstructionRepetitionDescription?
 }
-InstructionRepetitionDescription { repetitionDescriptionOperator Message }
 
 SingleInstruction {
     distance Stroke
 }
 
-distance { Number LapsKeyword? }
-
-LapsKeyword { lapsKeyword }
+distance { Number }
 
 Stroke { identifier }
 
@@ -118,7 +114,6 @@ messageSpecification {
     paceKeyword           { "pace" }
     restKeyword           { "rest" }
     onKeyword             { "on" }
-    repetitionDescriptionOperator { "~" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
@@ -126,7 +121,6 @@ messageSpecification {
     StringContent { (!["\\] | "\\" _)+ }
     identifier  { @asciiLetter+ }
     repititionOperator { "x" }
-    lapsKeyword { "laps" | "lap" }
     excludeAlignKeyword { "noalign" }
     @precedence { StringContent, space }
     @precedence { StringContent, Comment }
@@ -137,9 +131,6 @@ messageSpecification {
     @precedence { onKeyword, identifier }
     @precedence { space, Message }
     @precedence { Comment, Message }
-    @precedence { repetitionDescriptionOperator, Message }
-    @precedence { lapsKeyword, identifier }
-    @precedence { lapsKeyword, Message }
     @precedence { excludeAlignKeyword, identifier }
     @precedence { excludeAlignKeyword, Message }
 }

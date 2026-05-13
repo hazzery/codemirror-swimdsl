@@ -349,7 +349,6 @@ function visitSwimInstruction(
   let repetitions = 1;
   let strokeModifier = "default";
   let instruction: SingleInstruction | BlockInstruction;
-  let repetitionDescription: string | undefined = undefined;
   const instructionModifiers: InstructionModifier[] = [];
 
   // Move into either Number (for repetitions) or SingleInstruction |
@@ -374,25 +373,15 @@ function visitSwimInstruction(
 
     instruction = { isBlock: true, instructions };
   } else {
-    cursor.firstChild(); // Number
+    // Move into Number
+    cursor.firstChild();
     const distance = state.sliceDoc(cursor.from, cursor.to);
 
-    let isLaps = false;
-    let stroke = "any";
+    // Move into Stroke
+    cursor.nextSibling();
+    const stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
 
-    if (cursor.nextSibling()) {
-      if (cursor.name === "LapsKeyword") {
-        isLaps = true;
-        if (cursor.nextSibling()) {
-          stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
-        }
-      } else {
-        // No lapsKeyword, this sibling is Stroke directly
-        stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
-      }
-    }
-
-    instruction = { isBlock: false, distance, stroke, isLaps };
+    instruction = { isBlock: false, distance, stroke };
   }
   // Move back up to SingleInstruction | BlockInstruction
   cursor.parent();
@@ -408,14 +397,7 @@ function visitSwimInstruction(
 
     if (hasModifiers) {
       do {
-        if (cursor.name === "InstructionRepetitionDescription") {
-          cursor.firstChild();
-          cursor.nextSibling();
-          repetitionDescription = state.sliceDoc(cursor.from, cursor.to).trim();
-          cursor.parent();
-        } else {
-          instructionModifiers.push(visitInstructionModifier(cursor, state));
-        }
+        instructionModifiers.push(visitInstructionModifier(cursor, state));
       } while (cursor.nextSibling());
     }
   }
@@ -429,7 +411,6 @@ function visitSwimInstruction(
     instruction,
     strokeModifier,
     instructionModifiers,
-    ...(repetitionDescription !== undefined && { repetitionDescription }),
   };
 }
 
