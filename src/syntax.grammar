@@ -61,10 +61,16 @@ SwimInstruction {
 }
 
 SingleInstruction {
-    distance Stroke
+    Length Stroke
 }
 
-distance { Number }
+Length {
+    LengthAsDistance
+  | LengthAsTime
+}
+
+LengthAsDistance { Number }
+LengthAsTime     { Duration }
 
 Stroke { identifier }
 
@@ -145,6 +151,7 @@ messageSpecification {
     @precedence { onKeyword, identifier }
     @precedence { space, Message }
     @precedence { Comment, Message }
+    @precedence { restKeyword, identifier }
     @precedence { underwaterKeyword, identifier }
     @precedence { breatheKeyword, identifier }
 }

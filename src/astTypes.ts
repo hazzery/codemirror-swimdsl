@@ -78,9 +78,13 @@ export interface SwimInstruction {
   instructionModifiers: InstructionModifier[];
 }
 
+export type LengthNode =
+  | { kind: "distance"; value: string }
+  | { kind: "time"; minutes: string; seconds: string };
+
 export interface SingleInstruction {
   isBlock: false;
-  distance: string;
+  length: LengthNode;
   stroke: string;
 }
 
