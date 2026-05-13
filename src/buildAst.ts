@@ -2,8 +2,10 @@ import { TreeCursor } from "@lezer/common";
 import {
   AuthorDefintion,
   BlockInstruction,
+  Breathe,
   ConstantDefinition,
   Instruction,
+  InstructionDescription,
   InstructionModifier,
   InstructionModifiers,
   Intensity,
@@ -90,6 +92,32 @@ function visitPaceDefinition(
   cursor.parent();
 
   return { statement: Statements.PACE_DEFINITION, name, pace };
+}
+
+/**
+ * Creates an AST node for `Breathe` CST node
+ *
+ * Precondition: `cursor` points to a `Breathe`.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ *
+ * @returns A `Breathe` AST node
+ */
+function visitBreathe(cursor: TreeCursor, state: EditorState): Breathe {
+  // Move into the breatheStrokes value
+  cursor.firstChild();
+  const breatheStrokes = state.sliceDoc(cursor.from, cursor.to);
+
+  // Step back up to the Breathe
+  cursor.parent();
+  return {
+    modifier: InstructionModifiers.BREATHE,
+    breatheStrokes: breatheStrokes,
+  };
 }
 
 /**
@@ -187,8 +215,8 @@ function getEquipment(equipmentName: string | undefined): string {
 /**
  * Create an AST node for an `instructionModifier` CST node.
  *
- * Precondition: `cursor` points to one of `EquipmentSpecification`, `Pace`, or
- * `Duration`.
+ * Precondition: `cursor` points to one of `EquipmentSpecification`, `Pace`,
+ * `Duration`, `Breathe`, `Underwater`, or `InstructionDescription`.
  *
  * Postcondition: `cursor` will point to the same node it pointed to when
  * passed to this function.
@@ -228,6 +256,20 @@ function visitInstructionModifier(
 
   if (cursor.name === "ExcludeAlignSpecification") {
     return { modifier: InstructionModifiers.EXCLUDE_ALIGN };
+    
+  if (cursor.name === "Breathe") {
+    return visitBreathe(cursor, state);
+  }
+
+  if (cursor.name === "InstructionDescription") {
+    return visitInstructionDescription(cursor, state);
+  }
+
+  if (cursor.name === "Underwater") {
+    return {
+      modifier: InstructionModifiers.UNDERWATER,
+      isTrue: true,
+    };
   }
 
   // We are in Duration
@@ -537,6 +579,33 @@ function visitAuthorDefinition(
     firstName,
     lastName,
     emailAddress,
+  };
+}
+
+/**
+ * Create an AST node for a `InstructionDescription` CST node.
+ *
+ * Precondition: `cursor` points to an `InstructionDescription` node.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ */
+function visitInstructionDescription(
+  cursor: TreeCursor,
+  state: EditorState,
+): InstructionDescription {
+  // Move into the InstructionDescription description text.
+  cursor.firstChild();
+  const description = state.sliceDoc(cursor.from, cursor.to);
+
+  // Move back up to the InstructionDescription.
+  cursor.parent();
+  return {
+    modifier: InstructionModifiers.INSTRUCTION_DESCRIPTION,
+    description,
   };
 }
 

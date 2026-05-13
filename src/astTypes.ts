@@ -11,7 +11,10 @@ export const enum InstructionModifiers {
   EQUIPMENT_SPECIFICATION,
   PACE,
   TIME,
-  EXCLUDE_ALIGN,
+  EXCLUE_ALIGN,
+  BREATHE,
+  UNDERWATER,
+  INSTRUCTION_DESCRIPTION,
 }
 
 export interface ExcludeAlign {
@@ -48,13 +51,30 @@ export interface EquipmentSpecification {
   equipment: string[];
 }
 
+export interface InstructionDescription {
+  modifier: InstructionModifiers.INSTRUCTION_DESCRIPTION;
+  description: string;
+}
+
 export interface Time {
   modifier: InstructionModifiers.TIME;
   minutes: string;
   seconds: string;
 }
 
-export type InstructionModifier = EquipmentSpecification | Pace | Time | ExcludeAlign;
+export interface Underwater {
+  modifier: InstructionModifiers.UNDERWATER;
+  isTrue: boolean;
+}
+
+export type InstructionModifier =
+  | EquipmentSpecification
+  | Pace
+  | Time
+  | Underwater
+  | Breathe
+  | InstructionDescription
+  | ExcludeAlign;
 
 export interface SwimInstruction {
   statement: Statements.SWIM_INSTRUCTION;
@@ -101,4 +121,9 @@ export interface PaceDefinition {
 export interface Message {
   statement: Statements.MESSAGE;
   message: string;
+}
+
+export interface Breathe {
+  modifier: InstructionModifiers.BREATHE;
+  breatheStrokes: string;
 }

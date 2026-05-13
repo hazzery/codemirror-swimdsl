@@ -107,6 +107,10 @@ function writeInstructionModifier(
       }
       break;
 
+    case InstructionModifiers.BREATHE:
+      xmlParent.ele("breath").txt(modifier.breatheStrokes);
+      break;
+
     case InstructionModifiers.TIME:
       xmlParent
         .ele("rest")
@@ -116,6 +120,13 @@ function writeInstructionModifier(
 
     case InstructionModifiers.EXCLUDE_ALIGN:
       xmlParent.ele("excludeAlign").txt("true");
+      
+    case InstructionModifiers.UNDERWATER:
+      xmlParent.ele("underwater").txt(modifier.isTrue.toString());
+      break;
+
+    case InstructionModifiers.INSTRUCTION_DESCRIPTION:
+      xmlParent.ele("instructionDescription").txt(modifier.description);
       break;
   }
 }
@@ -242,7 +253,7 @@ function writeConstantDefinition(
  *
  * @param xmlParent - The parent XML node to write the author definition inside
  *    of.
- * @param instruction - The AST author definition node to write as XML.
+ * @param definition - The AST author definition node to write as XML.
  */
 function writeAuthorDefinition(
   xmlParent: XMLBuilder,
