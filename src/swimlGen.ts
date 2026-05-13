@@ -128,6 +128,10 @@ function writeInstructionModifier(
     case InstructionModifiers.UNDERWATER:
       xmlParent.ele("underwater").txt(modifier.isTrue.toString());
       break;
+
+    case InstructionModifiers.INSTRUCTION_DESCRIPTION:
+      xmlParent.ele("instructionDescription").txt(modifier.description);
+      break;
   }
 }
 
