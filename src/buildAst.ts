@@ -409,31 +409,24 @@ function visitSwimInstruction(
     instruction = { isBlock: true, instructions };
   } else {
     // cursor is on SingleInstruction
-    debugCursor(cursor, state, "SingleInstruction");
     cursor.firstChild();
-    debugCursor(cursor, state, "after firstChild (expect: length)");
     cursor.firstChild();
-    debugCursor(cursor, state, "after firstChild (expect: lengthAsDistance|lengthAsLaps|lengthAsTime)");
 
     let length: LengthNode;
     if (cursor.name === "LengthAsDistance") {
       cursor.firstChild();
-      debugCursor(cursor, state, "lengthAsDistance child (expect: Number)");
       length = { kind: "distance", value: state.sliceDoc(cursor.from, cursor.to) };
       cursor.parent();
     } else if (cursor.name === "LengthAsLaps") {
       cursor.firstChild();
-      debugCursor(cursor, state, "lengthAsLaps child (expect: Number)");
       length = { kind: "laps", value: state.sliceDoc(cursor.from, cursor.to) };
       cursor.parent();
     } else {
-      debugCursor(cursor, state, "lengthAsTime child (expect: Duration)");
       throw new Error(`Unexpected length node: ${cursor.name}`);
     }
 
     cursor.parent();
     cursor.nextSibling();
-    debugCursor(cursor, state, "after nextSibling (expect: Stroke)");
     const stroke = (cursor.name as string) !== "Stroke" ? "any" : getStroke(state.sliceDoc(cursor.from, cursor.to));
 
     instruction = { isBlock: false, length, stroke };
@@ -468,10 +461,6 @@ function visitSwimInstruction(
     strokeModifier,
     instructionModifiers,
   };
-}
-
-function debugCursor(cursor: TreeCursor, state: EditorState, label: string): void {
-  console.log(`[${label}] name=${cursor.name} text="${state.sliceDoc(cursor.from, cursor.to)}"`);
 }
 
 /**
