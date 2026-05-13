@@ -6,11 +6,14 @@ import {
 import { syntaxTree } from "@codemirror/language";
 
 import {
+  constantNameInfo,
   constantNames,
+  equipmentNameInfo,
   equipmentNames,
+  strokeNameInfo,
   strokeNames,
-  strokeTypes,
-} from "./enumerations";
+} from "./swimlSchema";
+import { strokeTypes } from "./enumerations";
 import { definedIdentifiersField } from "./definedIdentifiers";
 
 const enum CompletableNodes {
@@ -27,18 +30,43 @@ interface NodeCompletionSpec {
   completions: Completion[];
 }
 
+function completionWithOptionalText(
+  completion: Completion,
+  detail?: string,
+  info?: string,
+): Completion {
+  if (detail) {
+    completion.detail = detail;
+  }
+
+  if (info) {
+    completion.info = info;
+  }
+
+  return completion;
+}
+
 // Convert all stroke names to autocomplpetions.
-const strokeNameCompletions: Completion[] = strokeNames.map((strokeName) => ({
-  label: strokeName,
-  type: "constant",
-  boost: strokeName.length,
-}));
+const strokeNameCompletions: Completion[] = strokeNames.map((strokeName) =>
+  completionWithOptionalText(
+    {
+      label: strokeName,
+      type: "constant",
+      boost: strokeName.length,
+    },
+    strokeNameInfo[strokeName]?.displayLabel,
+  ),
+);
 
 const equipmentNameCompletions: Completion[] = equipmentNames.map(
-  (equipment) => ({
-    label: equipment,
-    type: "constant",
-  }),
+  (equipment) =>
+    completionWithOptionalText(
+      {
+        label: equipment,
+        type: "constant",
+      },
+      equipmentNameInfo[equipment]?.xmlValue,
+    ),
 );
 
 const strokeModifierCompletions: Completion[] = strokeTypes.map(
@@ -46,7 +74,15 @@ const strokeModifierCompletions: Completion[] = strokeTypes.map(
 );
 
 const constantNameCompletions: Completion[] = constantNames.map(
-  (constantName) => ({ label: constantName, type: "constant" }),
+  (constantName) =>
+    completionWithOptionalText(
+      {
+        label: constantName,
+        type: "constant",
+      },
+      constantNameInfo[constantName]?.xmlValue,
+      constantNameInfo[constantName]?.documentation,
+    ),
 );
 
 const nodeCompletions: Record<CompletableNodes, NodeCompletionSpec> = {

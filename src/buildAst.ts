@@ -20,6 +20,7 @@ import {
   SwimInstruction,
 } from "./astTypes";
 import { EditorState } from "@codemirror/state";
+import { resolveEquipmentName, resolveStrokeName } from "./swimlSchema";
 
 /**
  * Create an AST node for a `Pace` CST node.
@@ -178,41 +179,6 @@ function visitDuration(
 }
 
 /**
- * Convert the swimDSL equipment name to the swiML equipment name.
- *
- * @param equipmentName - The swimDSL name of an eqipment item.
- *
- * @returns The swiML name of the same item.
- */
-function getEquipment(equipmentName: string | undefined): string {
-  switch (equipmentName) {
-    case "Board":
-      return "board";
-
-    case "Pads":
-      return "pads";
-
-    case "PullBuoy":
-      return "pullBuoy";
-
-    case "Fins":
-      return "fins";
-
-    case "Snorkel":
-      return "snorkel";
-
-    case "Chute":
-      return "chute";
-
-    case "StretchCord":
-      return "stretchCord";
-
-    default:
-      return "";
-  }
-}
-
-/**
  * Create an AST node for an `instructionModifier` CST node.
  *
  * Precondition: `cursor` points to one of `EquipmentSpecification`, `Pace`,
@@ -238,7 +204,7 @@ function visitInstructionModifier(
 
     do {
       const equipmentName = state.sliceDoc(cursor.from, cursor.to);
-      equipment.push(getEquipment(equipmentName));
+      equipment.push(resolveEquipmentName(equipmentName));
     } while (cursor.nextSibling());
 
     // Step back up to the EquipmentSpecification
@@ -274,98 +240,6 @@ function visitInstructionModifier(
     modifier: InstructionModifiers.TIME,
     ...visitDuration(cursor, state),
   };
-}
-
-/**
- * Convert the swimDSL stroke name to the swiML stroke name.
- *
- * @param strokeName - The swimDSL name of stroke.
- *
- * @returns The swiML name of the same stroke.
- */
-function getStroke(strokeName: string): string {
-  switch (strokeName) {
-    case "Freestyle":
-    case "Free":
-    case "Fr":
-      return "freestyle";
-
-    case "Backstroke":
-    case "Back":
-    case "Bk":
-      return "backstroke";
-
-    case "Breaststroke":
-    case "Breast":
-    case "Br":
-      return "breaststroke";
-
-    case "Butterfly":
-    case "Fly":
-    case "Fl":
-      return "butterfly";
-
-    case "IndividualMedley":
-    case "Medley":
-    case "Im":
-      return "individualMedley";
-
-    case "ReverseIndividualMedley":
-    case "ReverseMedley":
-    case "ReverseIm":
-      return "reverseIndividualMedley";
-
-    case "IndividualMedleyOverlap":
-    case "MedleyOverlap":
-    case "ImOverlap":
-      return "individualMedleyOverlap";
-
-    case "IndividualMedleyOrder":
-    case "MedleyOrder":
-    case "ImOrder":
-      return "individualMedleyOrder";
-
-    case "ReverseIndividualMedleyOrder":
-    case "ReverseMedleyOrder":
-    case "ReverseImOrder":
-      return "reverseIndividualMedleyOrder";
-
-    case "NumberOne":
-      return "nr1";
-
-    case "NumberTwo":
-      return "nr2";
-
-    case "NumberThree":
-      return "nr3";
-
-    case "NumberFour":
-      return "nr4";
-
-    case "NotFreestyle":
-    case "NotFree":
-    case "NotFr":
-      return "notFreestyle";
-
-    case "NotBackstroke":
-    case "NotBack":
-    case "NotBk":
-      return "notBackstroke";
-
-    case "NotBreastroke":
-    case "NotBreast":
-    case "NotBr":
-      return "notBreastroke";
-
-    case "NotButterfly":
-    case "NotFly":
-    case "NotFl":
-      return "notButterfly";
-
-    case "Choice":
-    default:
-      return "any";
-  }
 }
 
 /**
@@ -418,7 +292,7 @@ function visitSwimInstruction(
 
     // Move into Stroke
     cursor.nextSibling();
-    const stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
+    const stroke = resolveStrokeName(state.sliceDoc(cursor.from, cursor.to));
 
     instruction = { isBlock: false, distance, stroke };
   }

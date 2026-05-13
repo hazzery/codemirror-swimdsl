@@ -13,8 +13,12 @@ import {
   SwimInstruction,
 } from "./astTypes";
 import { XMLBuilder } from "xmlbuilder2/lib/interfaces";
+import {
+  resolveConstantName,
+  serializeConstantValue,
+  swiMLNamespace,
+} from "./swimlSchema";
 
-const XML_NAMESPACE = "https://github.com/bartneck/swiML";
 const XSI_LINK = "http://www.w3.org/2001/XMLSchema-instance";
 const SCHEMA_LOCATION =
   "https://github.com/bartneck/swiML https://raw.githubusercontent.com/bartneck/swiML/main/version/latest/swiML.xsd";
@@ -205,42 +209,12 @@ function writeConstantDefinition(
   xmlParent: XMLBuilder,
   definition: ConstantDefinition,
 ): void {
-  switch (definition.constantName) {
-    case "Title":
-      xmlParent.ele("title").txt(definition.value);
-      break;
+  const elementName = resolveConstantName(definition.constantName);
 
-    case "Description":
-      xmlParent.ele("programDescription").txt(definition.value);
-      break;
-
-    case "Date":
-      xmlParent.ele("creationDate").txt(definition.value);
-      break;
-
-    case "PoolLength":
-      xmlParent.ele("poolLength").txt(definition.value);
-      break;
-
-    case "LengthUnit":
-      xmlParent.ele("lengthUnit").txt(definition.value);
-      break;
-
-    case "Align":
-      xmlParent.ele("programAlign").txt(definition.value.toLowerCase());
-      break;
-
-    case "NumeralSystem":
-      xmlParent.ele("numeralSystem").txt(definition.value);
-      break;
-
-    case "HideIntro":
-      xmlParent.ele("hideIntro").txt(definition.value.toLowerCase());
-      break;
-
-    case "LayoutWidth":
-      xmlParent.ele("layoutWidth").txt(definition.value);
-      break;
+  if (elementName) {
+    xmlParent
+      .ele(elementName)
+      .txt(serializeConstantValue(elementName, definition.value));
   }
 }
 
@@ -276,7 +250,7 @@ function writeAuthorDefinition(
  */
 export default function emitXml(programme: Programme): string {
   const doc = create({ version: "1.0", encoding: "UTF-8" }).ele("program", {
-    xmlns: XML_NAMESPACE,
+    xmlns: swiMLNamespace,
     "xmlns:xsi": XSI_LINK,
     "xsi:schemaLocation": SCHEMA_LOCATION,
   });

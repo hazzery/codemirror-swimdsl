@@ -44,3 +44,10 @@ const view = new EditorView({
   extensions: [basicSetup, swimdsl(), compileSwimDsl(console.log)],
 });
 ```
+
+## Keeping in sync with swiML
+
+The `swiML.xsd` and `swiML.xsl` files at the repository root are treated as the
+source of truth for canonical swiML values and metadata. Run
+`npm run generate:swiml` after updating either file to regenerate the typed
+metadata module consumed by the compiler, linter, and completions.

@@ -69,3 +69,20 @@ export function swimdsl(): LanguageSupport {
 
 export { swimdslLanguage };
 export { default as compileSwimDsl } from "./compiler";
+export {
+  constantNameInfo,
+  constantNames,
+  equipmentNameInfo,
+  equipmentNames,
+  resolveConstantName,
+  resolveEquipmentName,
+  resolveStrokeName,
+  strokeNameInfo,
+  strokeNames,
+  swiMLNamespace,
+} from "./swimlSchema";
+export {
+  programmeMetadataElements,
+  swiMLSchemaInfo,
+  xslDisplayNames,
+} from "./generatedSwimlModel";
