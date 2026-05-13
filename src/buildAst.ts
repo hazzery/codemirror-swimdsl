@@ -5,6 +5,7 @@ import {
   Breathe,
   ConstantDefinition,
   Instruction,
+  InstructionDescription,
   InstructionModifier,
   InstructionModifiers,
   Intensity,
@@ -215,8 +216,8 @@ function getEquipment(equipmentName: string | undefined): string {
 /**
  * Create an AST node for an `instructionModifier` CST node.
  *
- * Precondition: `cursor` points to one of `EquipmentSpecification`, `Pace`, or
- * `Duration`.
+ * Precondition: `cursor` points to one of `EquipmentSpecification`, `Pace`,
+ * `Duration`, `Breathe`, `Underwater`, or `InstructionDescription`.
  *
  * Postcondition: `cursor` will point to the same node it pointed to when
  * passed to this function.
@@ -256,6 +257,10 @@ function visitInstructionModifier(
 
   if (cursor.name === "Breathe") {
     return visitBreathe(cursor, state);
+  }
+
+  if (cursor.name === "InstructionDescription") {
+    return visitInstructionDescription(cursor, state);
   }
 
   if (cursor.name === "Underwater") {
@@ -586,6 +591,33 @@ function visitAuthorDefinition(
     firstName,
     lastName,
     emailAddress,
+  };
+}
+
+/**
+ * Create an AST node for a `InstructionDescription` CST node.
+ *
+ * Precondition: `cursor` points to an `InstructionDescription` node.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ */
+function visitInstructionDescription(
+  cursor: TreeCursor,
+  state: EditorState,
+): InstructionDescription {
+  // Move into the InstructionDescription description text.
+  cursor.firstChild();
+  const description = state.sliceDoc(cursor.from, cursor.to);
+
+  // Move back up to the InstructionDescription.
+  cursor.parent();
+  return {
+    modifier: InstructionModifiers.INSTRUCTION_DESCRIPTION,
+    description,
   };
 }
 
