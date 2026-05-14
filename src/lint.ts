@@ -187,7 +187,7 @@ function lintIncompatibleEquipment(
  * @param node - A reference to a syntax node to lint.
  * @param editorState - The current state of the CodeMirror code editor.
  * @param diagnostics - An array of diagnostics to append to if `node`
- *    specifies a combination of incompatible equipment items.
+ *    detects multiple rest specifications.
  */
 function lintMultipleRest(
   node: SyntaxNodeRef,

@@ -9,7 +9,7 @@ export const enum Statements {
 export const enum InstructionModifiers {
   EQUIPMENT_SPECIFICATION,
   PACE,
-  TIME,
+  REST,
   BREATHE,
   UNDERWATER,
   IN_OUT,
@@ -51,11 +51,12 @@ export interface InstructionDescription {
   description: string;
 }
 
-export interface Time {
-  modifier: InstructionModifiers.TIME;
+export interface Rest {
+  modifier: InstructionModifiers.REST;
   keyWord: string;
-  minutes: string;
-  seconds: string;
+  minutes?: string;
+  seconds?: string;
+  swimmersIn?: string;
 }
 
 export interface Underwater {
@@ -66,7 +67,7 @@ export interface Underwater {
 export type InstructionModifier =
   | EquipmentSpecification
   | Pace
-  | Time
+  | Rest
   | Underwater
   | Breathe
   | InstructionDescription

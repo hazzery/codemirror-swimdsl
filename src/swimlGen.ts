@@ -106,24 +106,28 @@ function writeInstructionModifier(
       xmlParent.ele("breath").txt(modifier.breatheStrokes);
       break;
 
-    case InstructionModifiers.TIME:
-      if (modifier.keyWord === "rest") {
-        xmlParent
-          .ele("rest")
-          .ele("afterStop")
-          .txt(xmlDuration(modifier.minutes, modifier.seconds));
-      } else {
-        // 'on' restType used
-        xmlParent
-          .ele("rest")
-          .ele("sinceStart")
-          .txt(xmlDuration(modifier.minutes, modifier.seconds));
+    case InstructionModifiers.REST:
+      if (modifier.minutes && modifier.seconds) {
+        if (modifier.keyWord === "rest") {
+          xmlParent
+            .ele("rest")
+            .ele("afterStop")
+            .txt(xmlDuration(modifier.minutes, modifier.seconds));
+        } else {
+          // 'on' restType used
+          xmlParent
+            .ele("rest")
+            .ele("sinceStart")
+            .txt(xmlDuration(modifier.minutes, modifier.seconds));
+        }
+      } else if (modifier.swimmersIn) {
+        xmlParent.ele("rest").ele("inOut").txt(modifier.swimmersIn);
       }
       break;
 
-    case InstructionModifiers.IN_OUT:
-      xmlParent.ele("rest").ele("inOut").txt(modifier.swimmersIn);
-      break;
+    // case InstructionModifiers.IN_OUT:
+    //   xmlParent.ele("rest").ele("inOut").txt(modifier.swimmersIn);
+    //   break;
 
     case InstructionModifiers.UNDERWATER:
       xmlParent.ele("underwater").txt(modifier.isTrue.toString());
