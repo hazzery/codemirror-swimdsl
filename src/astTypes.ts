@@ -5,6 +5,7 @@ export const enum Statements {
   PACE_DEFINITION,
   CONSTANT_DEFINITION,
   AUTHOR_DEFINITION,
+  CONTINUE_INSTRUCTION,
 }
 
 export const enum InstructionModifiers {
@@ -20,7 +21,7 @@ export interface Programme {
   statements: Statement[];
 }
 
-export type Instruction = SwimInstruction | RestInstruction | Message;
+export type Instruction = SwimInstruction | RestInstruction | Message | ContinueInstruction;
 
 export interface ConstantDefinition {
   statement: Statements.CONSTANT_DEFINITION;
@@ -39,7 +40,15 @@ export type Statement =
   | Instruction
   | PaceDefinition
   | ConstantDefinition
-  | AuthorDefintion;
+  | AuthorDefintion
+  | ContinueInstruction;
+
+export interface ContinueInstruction {
+  statement: Statements.CONTINUE_INSTRUCTION;
+  continueLength?: string | undefined;
+  instructionModifiers: InstructionModifier[];
+  instructions: Instruction[];
+}
 
 export interface EquipmentSpecification {
   modifier: InstructionModifiers.EQUIPMENT_SPECIFICATION;

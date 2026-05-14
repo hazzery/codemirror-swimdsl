@@ -53,6 +53,7 @@ instruction {
     SwimInstruction
     | RestInstruction
     | messageSpecification
+    | ContinueInstruction
 }
 
 SwimInstruction {
@@ -121,6 +122,10 @@ messageSpecification {
   ">" Message
 }
 
+ContinueInstruction {
+    continueKeyword distance? instructionModifier* "{" instruction+ "}"
+}
+
 @tokens {
     setKeyword            { "set" }
     authorKeyword         { "author" }
@@ -129,6 +134,7 @@ messageSpecification {
     onKeyword             { "on" }
     underwaterKeyword     { "Underwater" }
     breatheKeyword        { "breathe" }
+    continueKeyword { "continue" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
@@ -147,6 +153,7 @@ messageSpecification {
     @precedence { Comment, Message }
     @precedence { underwaterKeyword, identifier }
     @precedence { breatheKeyword, identifier }
+    @precedence { continueKeyword, identifier }
 }
 
 @skip { space | Comment }
