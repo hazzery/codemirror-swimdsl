@@ -78,7 +78,6 @@ function writeIntensity(xmlParent: XMLBuilder, intensity: Intensity): void {
   }
 }
 
-
 /**
  * Write an AST InstructionModifier node into the XML document.
  *
