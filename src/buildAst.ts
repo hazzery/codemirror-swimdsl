@@ -254,6 +254,10 @@ function visitInstructionModifier(
     return visitPace(cursor, state);
   }
 
+  if (cursor.name === "ExcludeAlignSpecification") {
+    return { modifier: InstructionModifiers.EXCLUDE_ALIGN };
+  }
+
   if (cursor.name === "Breathe") {
     return visitBreathe(cursor, state);
   }
