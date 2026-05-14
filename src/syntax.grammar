@@ -91,6 +91,11 @@ instructionModifier {
     | Underwater
     | Breathe
     | InstructionDescription
+    | ExcludeAlignSpecification
+}
+
+ExcludeAlignSpecification {
+    excludeAlignKeyword
 }
 
 InstructionDescription {
@@ -143,6 +148,7 @@ messageSpecification {
     identifier  { @asciiLetter+ }
     repititionOperator { "x" }
     lapsKeyword { "laps" | "lap" }
+    excludeAlignKeyword { "noalign" }
     @precedence { StringContent, space }
     @precedence { StringContent, Comment }
     @precedence { repititionOperator, identifier }
@@ -155,6 +161,8 @@ messageSpecification {
     @precedence { lapsKeyword, identifier }
     @precedence { lapsKeyword, Message }
     @precedence { restKeyword, identifier }
+    @precedence { excludeAlignKeyword, identifier }
+    @precedence { excludeAlignKeyword, Message }
     @precedence { underwaterKeyword, identifier }
     @precedence { breatheKeyword, identifier }
 }

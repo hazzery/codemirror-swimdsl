@@ -117,6 +117,10 @@ function writeInstructionModifier(
         .txt(xmlDuration(modifier.minutes, modifier.seconds));
       break;
 
+    case InstructionModifiers.EXCLUDE_ALIGN:
+      xmlParent.ele("excludeAlign").txt("true");
+      break;
+
     case InstructionModifiers.UNDERWATER:
       xmlParent.ele("underwater").txt(modifier.isTrue.toString());
       break;
