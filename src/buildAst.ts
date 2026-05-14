@@ -18,7 +18,7 @@ import {
   Statement,
   Statements,
   SwimInstruction,
-  LengthNode,
+  Length,
 } from "./astTypes";
 import { EditorState } from "@codemirror/state";
 
@@ -417,22 +417,29 @@ function visitSwimInstruction(
     cursor.firstChild();
     cursor.firstChild();
 
-    let length: LengthNode;
-    if (cursor.name === "LengthAsDistance") {
-      cursor.firstChild();
-      length = { kind: "distance", value: state.sliceDoc(cursor.from, cursor.to) };
-      cursor.parent();
-    } else if (cursor.name === "LengthAsLaps") {
-      cursor.firstChild();
-      length = { kind: "laps", value: state.sliceDoc(cursor.from, cursor.to) };
-      cursor.parent();
-    } else {
-      throw new Error(`Unexpected length node: ${cursor.name}`);
+    let kind: Length["kind"];
+
+    switch (cursor.name) {
+      case "LengthAsDistance":
+        kind = "distance";
+        break;
+
+      case "LengthAsLaps":
+        kind = "laps";
+        break;
+
+      default:
+        kind = "distance";
     }
+
+    cursor.firstChild();
+
+    const length: Length = { kind, value: state.sliceDoc(cursor.from, cursor.to) };
+    cursor.parent();
 
     cursor.parent();
     cursor.nextSibling();
-    const stroke = (cursor.name as string) !== "Stroke" ? "any" : getStroke(state.sliceDoc(cursor.from, cursor.to));
+    const stroke = cursor.name !== "Stroke" ? "any" : getStroke(state.sliceDoc(cursor.from, cursor.to));
 
     instruction = { isBlock: false, length, stroke };
     cursor.parent();
@@ -442,7 +449,7 @@ function visitSwimInstruction(
 
   if (cursor.nextSibling()) {
     let hasModifiers = true;
-    if ((cursor.name as string) === "StrokeModifier") {
+    if (cursor.name === "StrokeModifier") {
       strokeModifier = state.sliceDoc(cursor.from, cursor.to);
 
       // Move away from the StrokeModifier to a potential instruction modifier.
