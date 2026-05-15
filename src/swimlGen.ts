@@ -125,10 +125,6 @@ function writeInstructionModifier(
       }
       break;
 
-    // case InstructionModifiers.IN_OUT:
-    //   xmlParent.ele("rest").ele("inOut").txt(modifier.swimmersIn);
-    //   break;
-
     case InstructionModifiers.UNDERWATER:
       xmlParent.ele("underwater").txt(modifier.isTrue.toString());
       break;

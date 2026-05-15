@@ -274,28 +274,10 @@ function visitInstructionModifier(
     };
   }
 
-  // if (cursor.name === "InOut") {
-  //   cursor.firstChild();
-  //   const swimmersIn = state.sliceDoc(cursor.from, cursor.to);
-  //   cursor.parent();
-  //
-  //   return {
-  //     modifier: InstructionModifiers.IN_OUT,
-  //     swimmersIn,
-  //   };
-  // }
-
   // We are in Duration
   // Get the specified rest keyword
   const getType = state.wordAt(cursor.from - 1);
-  let restType = getType ? state.sliceDoc(getType.from, getType.to) : "";
-  if (restType === "in") restType = "in-out";
-  // // console.log(restType);
-  // const textBefore = state.sliceDoc(0, cursor.from).trimEnd();
-  // // const match = textBefore.match(/(\S+)\s*$/);
-  // const restType = /(\S+)\s*$/.exec(textBefore)?.[1] ?? "";
-  console.log(restType);
-
+  const restType = getType ? state.sliceDoc(getType.from, getType.to) : "";
   const isDuration = ["on", "rest"];
   const durationResult = isDuration.includes(restType)
     ? visitDuration(cursor, state)
@@ -305,7 +287,6 @@ function visitInstructionModifier(
     modifier: InstructionModifiers.REST,
     keyWord: restType,
     ...durationResult,
-
   };
 }
 
