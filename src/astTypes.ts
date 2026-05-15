@@ -1,5 +1,6 @@
 export const enum Statements {
   SWIM_INSTRUCTION,
+  REST_INSTRUCTION,
   MESSAGE,
   PACE_DEFINITION,
   CONSTANT_DEFINITION,
@@ -10,16 +11,21 @@ export const enum InstructionModifiers {
   EQUIPMENT_SPECIFICATION,
   PACE,
   REST,
+  EXCLUDE_ALIGN,
   BREATHE,
   UNDERWATER,
   INSTRUCTION_DESCRIPTION,
+}
+
+export interface ExcludeAlign {
+  modifier: InstructionModifiers.EXCLUDE_ALIGN;
 }
 
 export interface Programme {
   statements: Statement[];
 }
 
-export type Instruction = SwimInstruction | Message;
+export type Instruction = SwimInstruction | RestInstruction | Message;
 
 export interface ConstantDefinition {
   statement: Statements.CONSTANT_DEFINITION;
@@ -69,7 +75,8 @@ export type InstructionModifier =
   | Rest
   | Underwater
   | Breathe
-  | InstructionDescription;
+  | InstructionDescription
+  | ExcludeAlign;
 
 export interface SwimInstruction {
   statement: Statements.SWIM_INSTRUCTION;
