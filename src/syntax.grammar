@@ -53,6 +53,7 @@ instruction {
     SwimInstruction
     | RestInstruction
     | messageSpecification
+    | ContinueInstruction
 }
 
 SwimInstruction {
@@ -126,6 +127,10 @@ messageSpecification {
   ">" Message
 }
 
+ContinueInstruction {
+    (Number repititionOperator)? continueKeyword instructionModifier* "{" instruction+ "}"
+}
+
 @tokens {
     setKeyword            { "set" }
     authorKeyword         { "author" }
@@ -134,6 +139,7 @@ messageSpecification {
     onKeyword             { "on" }
     underwaterKeyword     { "Underwater" }
     breatheKeyword        { "breathe" }
+    continueKeyword { "continuous" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
@@ -155,6 +161,7 @@ messageSpecification {
     @precedence { excludeAlignKeyword, Message }
     @precedence { underwaterKeyword, identifier }
     @precedence { breatheKeyword, identifier }
+    @precedence { continueKeyword, identifier }
 }
 
 @skip { space | Comment }

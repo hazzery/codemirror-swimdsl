@@ -1,3 +1,31 @@
+## Continue instruction
+
+continuous {
+  50 Backstroke
+  50 Breaststroke
+}
+
+==>
+
+SwimProgramme(ContinueInstruction(
+  SwimInstruction(SingleInstruction(Number, Stroke)),
+  SwimInstruction(SingleInstruction(Number, Stroke))))
+
+
+## Repeated continue instruction
+
+2 x continuous {
+  25 Butterfly @ 90%
+  25 Freestyle @ 40%
+}
+
+==>
+
+SwimProgramme(ContinueInstruction(
+  Number,
+  SwimInstruction(SingleInstruction(Number, Stroke), Pace(Number)),
+  SwimInstruction(SingleInstruction(Number, Stroke), Pace(Number))))
+
 ## One single instruction
 
 200 Freestyle

@@ -11,6 +11,7 @@ import {
   RestInstruction,
   Statements,
   SwimInstruction,
+  ContinueInstruction
 } from "./astTypes";
 import { XMLBuilder } from "xmlbuilder2/lib/interfaces";
 
@@ -60,6 +61,9 @@ function writeInstruction(
       break;
     case Statements.MESSAGE:
       writeMessage(xmlParent, instruction);
+      break;
+    case Statements.CONTINUE_INSTRUCTION:
+      writeContinueInstruction(xmlParent, instruction);
       break;
   }
 }
@@ -269,6 +273,28 @@ function writeAuthorDefinition(
   }
 }
 
+function writeContinueInstruction(
+  xmlParent: XMLBuilder,
+  instruction: ContinueInstruction,
+): void {
+  let parent = xmlParent.ele("instruction");
+
+  if (instruction.repetitions > 1) {
+    parent = parent.ele("repetition");
+    parent.ele("repetitionCount").txt(String(instruction.repetitions));
+  }
+
+  const continueNode = xmlParent.ele("instruction").ele("continue");
+
+  for (const modifier of instruction.instructionModifiers) {
+    writeInstructionModifier(continueNode, modifier);
+  }
+
+  for (const subInstruction of instruction.instructions) {
+    writeInstruction(continueNode, subInstruction);
+  }
+}
+
 /**
  * Given a complete AST for a SwimDSL document, generate a valid swiML XML
  * document describing the same programme.
@@ -308,6 +334,10 @@ export default function emitXml(programme: Programme): string {
 
       case Statements.AUTHOR_DEFINITION:
         writeAuthorDefinition(doc, statement);
+        break;
+
+      case Statements.CONTINUE_INSTRUCTION:
+        writeContinueInstruction(doc, statement);
         break;
     }
   }
