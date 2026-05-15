@@ -50,7 +50,6 @@ export type Statement =
 
 export interface ContinueInstruction {
   statement: Statements.CONTINUE_INSTRUCTION;
-  continueLength?: string | undefined;
   instructionModifiers: InstructionModifier[];
   instructions: Instruction[];
 }

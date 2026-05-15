@@ -128,7 +128,7 @@ messageSpecification {
 }
 
 ContinueInstruction {
-    continueKeyword distance? instructionModifier* "{" instruction+ "}"
+    (Number repititionOperator)? continueKeyword instructionModifier* "{" instruction+ "}"
 }
 
 @tokens {
@@ -139,7 +139,7 @@ ContinueInstruction {
     onKeyword             { "on" }
     underwaterKeyword     { "Underwater" }
     breatheKeyword        { "breathe" }
-    continueKeyword { "continue" }
+    continueKeyword { "continuous" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
     Number      { @digit+ }

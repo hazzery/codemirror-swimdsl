@@ -1,347 +1,167 @@
-import { create } from "xmlbuilder2";
-import {
-  AuthorDefintion,
-  ConstantDefinition,
-  Instruction,
-  InstructionModifier,
-  InstructionModifiers,
-  Intensity,
-  Message,
-  Programme,
-  RestInstruction,
-  Statements,
-  SwimInstruction,
-  ContinueInstruction
-} from "./astTypes";
-import { XMLBuilder } from "xmlbuilder2/lib/interfaces";
+@top SwimProgramme { statement* }
 
-const XML_NAMESPACE = "https://github.com/bartneck/swiML";
-const XSI_LINK = "http://www.w3.org/2001/XMLSchema-instance";
-const SCHEMA_LOCATION =
-  "https://github.com/bartneck/swiML https://raw.githubusercontent.com/bartneck/swiML/main/version/latest/swiML.xsd";
-
-/**
- * Format the given duration value for use within XML.
- *
- * @param minutes - A string containing a number from 0 to 59.
- * @param seconds - A string containing a number from 0 to 59.
- *
- * @returns A correctly formatted XML duration string.
- */
-function xmlDuration(minutes: string, seconds: string): string {
-  let durationString = "PT";
-  if (Number(minutes) > 0) {
-    durationString += minutes;
-    durationString += "M";
-  }
-  if (Number(seconds) > 0) {
-    durationString += seconds;
-    durationString += "S";
-  }
-  return durationString;
+ConstantDefinition {
+    setKeyword ConstantName expression
 }
 
-/**
- * Write an AST Instruction node into the XML document.
- *
- * @param xmlParent - The parent XML node to write the instruction inside of.
- * @param instruction - The AST instruction node to write as XML.
- */
-function writeInstruction(
-  xmlParent: XMLBuilder,
-  instruction: Instruction,
-): void {
-  switch (instruction.statement) {
-    case Statements.SWIM_INSTRUCTION:
-      writeSwimInstruction(xmlParent, instruction);
-      break;
+ConstantName { identifier }
 
-    case Statements.REST_INSTRUCTION:
-      writeRestInstruction(xmlParent, instruction);
-      break;
-    case Statements.MESSAGE:
-      writeMessage(xmlParent, instruction);
-      break;
-    case Statements.CONTINUE_INSTRUCTION:
-      writeContinueInstruction(xmlParent, instruction);
-      break;
-  }
+expression {
+    Number | string | Boolean
 }
 
-/**
- * Write an AST Intensity node into the XML document.
- *
- * @param xmlParent - The parent XML node to write the intensity inside of.
- * @param intensity - The AST intensity node to write as XML.
- */
-function writeIntensity(xmlParent: XMLBuilder, intensity: Intensity): void {
-  if (intensity.isAlias) {
-    xmlParent.ele("zone").txt(intensity.value);
-  } else {
-    xmlParent.ele("percentageEffort").txt(intensity.value);
-  }
+string {
+    '"' StringContent '"'
 }
 
-/**
- * Write an AST InstructionModifier node into the XML document.
- *
- * @param xmlParent - The parent XML node to write the instruction modifier
- *    inside of.
- * @param modifier - The AST instruction modifier node to write as XML.
- */
-function writeInstructionModifier(
-  xmlParent: XMLBuilder,
-  modifier: InstructionModifier,
-): void {
-  switch (modifier.modifier) {
-    case InstructionModifiers.PACE: {
-      const intensity = xmlParent.ele("intensity");
-
-      writeIntensity(intensity.ele("startIntensity"), modifier.startIntensity);
-
-      if (modifier.stopIntensity) {
-        writeIntensity(intensity.ele("stopIntensity"), modifier.stopIntensity);
-      }
-      break;
-    }
-    case InstructionModifiers.EQUIPMENT_SPECIFICATION:
-      for (const equipment of modifier.equipment) {
-        xmlParent.ele("equipment").txt(equipment);
-      }
-      break;
-
-    case InstructionModifiers.BREATHE:
-      xmlParent.ele("breath").txt(modifier.breatheStrokes);
-      break;
-
-    case InstructionModifiers.TIME:
-      xmlParent
-        .ele("rest")
-        .ele("sinceStart")
-        .txt(xmlDuration(modifier.minutes, modifier.seconds));
-      break;
-
-    case InstructionModifiers.EXCLUDE_ALIGN:
-      xmlParent.ele("excludeAlign").txt("true");
-      break;
-
-    case InstructionModifiers.UNDERWATER:
-      xmlParent.ele("underwater").txt(modifier.isTrue.toString());
-      break;
-
-    case InstructionModifiers.INSTRUCTION_DESCRIPTION:
-      xmlParent.ele("instructionDescription").txt(modifier.description);
-      break;
-  }
+Boolean {
+  identifier
 }
 
-/**
- * Write an AST SwimInstruction node into the XML document.
- *
- * @param xmlParent - The parent XML node to write the instruction inside of.
- * @param instruction - The AST swim instruction node to write as XML.
- */
-function writeSwimInstruction(
-  xmlParent: XMLBuilder,
-  instruction: SwimInstruction,
-): void {
-  let parent = xmlParent.ele("instruction");
-
-  if (instruction.repetitions > 1) {
-    parent = parent.ele("repetition");
-    parent.ele("repetitionCount").txt(String(instruction.repetitions)).up();
-  }
-
-  if (instruction.instruction.isBlock) {
-    for (const subInstruction of instruction.instruction.instructions) {
-      writeInstruction(parent, subInstruction);
-    }
-  } else {
-    parent
-      .ele("length")
-      .ele("lengthAsDistance")
-      .txt(instruction.instruction.distance);
-    parent
-      .ele("stroke")
-      .ele("standardStroke")
-      .txt(instruction.instruction.stroke);
-  }
-
-  if (instruction.instructionModifiers.length > 0) {
-    for (const modifier of instruction.instructionModifiers) {
-      writeInstructionModifier(parent, modifier);
-    }
-  }
+AuthorDefinition {
+    authorKeyword string string string?
 }
 
-/**
- * Write an AST RestInstruction node into the XML document.
- *
- * @param xmlParent - The parent XML node to write the rest instruction inside
- *    of.
- * @param instruction - The AST rest instruction node to write as XML.
- */
-function writeRestInstruction(
-  xmlParent: XMLBuilder,
-  instruction: RestInstruction,
-): void {
-  xmlParent
-    .ele("instruction")
-    .ele("rest")
-    .ele("afterStop")
-    .txt(xmlDuration(instruction.minutes, instruction.seconds));
+PaceDefinition {
+    paceKeyword PaceDefinitionName "=" Pace
 }
 
-/**
- * Write an AST Message node into the XML document.
- *
- * @param xmlParent - The parent XML node to write the message inside of.
- * @param instruction - The AST message node to write as XML.
- */
-function writeMessage(xmlParent: XMLBuilder, instruction: Message): void {
-  xmlParent.ele("instruction").ele("segmentName").txt(instruction.message);
+PaceDefinitionName { identifier }
+
+intensity {
+    percentage | PaceAlias
 }
 
-/**
- * Write an AST ConstantDefinition node into the XML document.
- *
- * @param xmlParent - The parent XML node to write the constant definition
- *    inside of.
- * @param definition - The AST constant definition node to write as XML.
- */
-function writeConstantDefinition(
-  xmlParent: XMLBuilder,
-  definition: ConstantDefinition,
-): void {
-  switch (definition.constantName) {
-    case "Title":
-      xmlParent.ele("title").txt(definition.value);
-      break;
-
-    case "Description":
-      xmlParent.ele("programDescription").txt(definition.value);
-      break;
-
-    case "Date":
-      xmlParent.ele("creationDate").txt(definition.value);
-      break;
-
-    case "PoolLength":
-      xmlParent.ele("poolLength").txt(definition.value);
-      break;
-
-    case "LengthUnit":
-      xmlParent.ele("lengthUnit").txt(definition.value);
-      break;
-
-    case "Align":
-      xmlParent.ele("programAlign").txt(definition.value.toLowerCase());
-      break;
-
-    case "NumeralSystem":
-      xmlParent.ele("numeralSystem").txt(definition.value);
-      break;
-
-    case "HideIntro":
-      xmlParent.ele("hideIntro").txt(definition.value.toLowerCase());
-      break;
-
-    case "LayoutWidth":
-      xmlParent.ele("layoutWidth").txt(definition.value);
-      break;
-  }
+Pace {
+    intensity ("->" intensity)?
 }
 
-/**
- * Write an AST AuthorDefintion node into the XML document.
- *
- * @param xmlParent - The parent XML node to write the author definition inside
- *    of.
- * @param definition - The AST author definition node to write as XML.
- */
-function writeAuthorDefinition(
-  xmlParent: XMLBuilder,
-  definition: AuthorDefintion,
-): void {
-  const authorNode = xmlParent.ele("author");
-
-  authorNode.ele("firstName").txt(definition.firstName);
-  authorNode.ele("lastName").txt(definition.lastName);
-
-  if (definition.emailAddress) {
-    authorNode.ele("email").txt(definition.emailAddress);
-  }
+percentage {
+    Number "%"         // e.g., 60% or 5%
 }
 
-function writeContinueInstruction(
-  xmlParent: XMLBuilder,
-  instruction: ContinueInstruction,
-): void {
-  const continueNode = xmlParent.ele("instruction").ele("continue");
+PaceAlias { identifier }  // a named pace, e.g., easy or hard
 
-  // Optional Continue Length
-  if (instruction.continueLength !== undefined) {
-    continueNode
-      .ele("length")
-      .ele("lengthAsDistance")
-      .txt(instruction.continueLength);
-  }
-
-  for (const modifier of instruction.instructionModifiers) {
-    writeInstructionModifier(continueNode, modifier);
-  }
-
-  for (const subInstruction of instruction.instructions) {
-    writeInstruction(continueNode, subInstruction);
-  }
+statement {
+    instruction
+    | ConstantDefinition
+    | AuthorDefinition
+    | PaceDefinition
 }
 
-/**
- * Given a complete AST for a SwimDSL document, generate a valid swiML XML
- * document describing the same programme.
- *
- * @param programme - The AST of a SwimDSL programme.
- *
- * @returns A correctly formed swiML XML document exactly describing the
- *    content in `programme`.
- */
-export default function emitXml(programme: Programme): string {
-  const doc = create({ version: "1.0", encoding: "UTF-8" }).ele("program", {
-    xmlns: XML_NAMESPACE,
-    "xmlns:xsi": XSI_LINK,
-    "xsi:schemaLocation": SCHEMA_LOCATION,
-  });
-
-  for (const statement of programme.statements) {
-    switch (statement.statement) {
-      case Statements.SWIM_INSTRUCTION:
-        writeSwimInstruction(doc, statement);
-        break;
-
-      case Statements.REST_INSTRUCTION:
-        writeRestInstruction(doc, statement);
-        break;
-
-      case Statements.MESSAGE:
-        writeMessage(doc, statement);
-        break;
-
-      case Statements.PACE_DEFINITION:
-        break;
-
-      case Statements.CONSTANT_DEFINITION:
-        writeConstantDefinition(doc, statement);
-        break;
-
-      case Statements.AUTHOR_DEFINITION:
-        writeAuthorDefinition(doc, statement);
-        break;
-
-      case Statements.CONTINUE_INSTRUCTION:
-        writeContinueInstruction(doc, statement);
-        break;
-    }
-  }
-
-  return doc.end({ prettyPrint: true });
+instruction {
+    SwimInstruction
+    | RestInstruction
+    | messageSpecification
+    | ContinueInstruction
 }
+
+SwimInstruction {
+    (Number repititionOperator)?
+    (SingleInstruction | BlockInstruction) StrokeModifier? instructionModifier*
+}
+
+SingleInstruction {
+    distance Stroke
+}
+
+distance { Number }
+
+Stroke { identifier }
+
+BlockInstruction {
+    "{" instruction+ "}"
+}
+
+StrokeModifier { identifier }
+
+Underwater {
+    underwaterKeyword
+}
+
+instructionModifier {
+    EquipmentSpecification
+    | paceSpecification
+    | timeSpecification
+    | Underwater
+    | Breathe
+    | InstructionDescription
+    | ExcludeAlignSpecification
+}
+
+ExcludeAlignSpecification {
+    excludeAlignKeyword
+}
+
+InstructionDescription {
+    "--" string
+}
+
+Breathe {
+    breatheKeyword Number
+}
+
+EquipmentSpecification {
+    "+" EquipmentName+
+}
+
+EquipmentName { identifier }
+
+paceSpecification {
+    "@" Pace
+}
+
+timeSpecification {
+    onKeyword Duration
+}
+
+Duration {
+    Number ":" Number    // minutes:seconds
+}
+
+RestInstruction {
+    Duration restKeyword
+}
+
+messageSpecification {
+  ">" Message
+}
+
+ContinueInstruction {
+    (Number repititionOperator)? continueKeyword instructionModifier* "{" instruction+ "}"
+}
+
+@tokens {
+    setKeyword            { "set" }
+    authorKeyword         { "author" }
+    paceKeyword           { "pace" }
+    restKeyword           { "rest" }
+    onKeyword             { "on" }
+    underwaterKeyword     { "Underwater" }
+    breatheKeyword        { "breathe" }
+    continueKeyword { "continuous" }
+    space       { @whitespace+ }
+    Comment     { "#" ![\n]* }
+    Number      { @digit+ }
+    Message     { ![\n]+ }
+    StringContent { (!["\\] | "\\" _)+ }
+    identifier  { @asciiLetter+ }
+    repititionOperator { "x" }
+    excludeAlignKeyword { "noalign" }
+    @precedence { StringContent, space }
+    @precedence { StringContent, Comment }
+    @precedence { repititionOperator, identifier }
+    @precedence { paceKeyword, identifier }
+    @precedence { setKeyword, identifier }
+    @precedence { authorKeyword, identifier }
+    @precedence { onKeyword, identifier }
+    @precedence { space, Message }
+    @precedence { Comment, Message }
+    @precedence { excludeAlignKeyword, identifier }
+    @precedence { excludeAlignKeyword, Message }
+    @precedence { underwaterKeyword, identifier }
+    @precedence { breatheKeyword, identifier }
+    @precedence { continueKeyword, identifier }
+}
+
+@skip { space | Comment }
