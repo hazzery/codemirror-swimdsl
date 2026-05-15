@@ -50,6 +50,7 @@ export type Statement =
 
 export interface ContinueInstruction {
   statement: Statements.CONTINUE_INSTRUCTION;
+  repetitions: number;
   instructionModifiers: InstructionModifier[];
   instructions: Instruction[];
 }

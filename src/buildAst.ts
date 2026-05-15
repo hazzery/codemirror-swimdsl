@@ -632,6 +632,7 @@ function visitContinueInstruction(
   cursor: TreeCursor,
   state: EditorState,
 ): ContinueInstruction {
+  let repetitions = 1;
   const instructionModifiers: InstructionModifier[] = [];
   const instructions: Instruction[] = [];
 
@@ -654,13 +655,16 @@ function visitContinueInstruction(
   if (!cursor.firstChild()) {
     return {
       statement: Statements.CONTINUE_INSTRUCTION,
+      repetitions,
       instructionModifiers,
       instructions,
     };
   }
 
   do {
-    if (instructionNames.has(cursor.name)) {
+    if (cursor.name === "Number") {
+      repetitions = Number(state.sliceDoc(cursor.from, cursor.to));
+    } else if (instructionNames.has(cursor.name)) {
       instructions.push(visitInstruction(cursor, state));
     } else if (modifierNames.has(cursor.name)) {
       instructionModifiers.push(visitInstructionModifier(cursor, state));
@@ -672,6 +676,7 @@ function visitContinueInstruction(
 
   return {
     statement: Statements.CONTINUE_INSTRUCTION,
+    repetitions,
     instructionModifiers,
     instructions,
   };
