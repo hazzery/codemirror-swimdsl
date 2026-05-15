@@ -118,7 +118,7 @@ inOut {
 }
 
 timedRest {
-    (onKeyword | restKeyword) Duration
+    (onKeyword | withKeyword) Duration
 }
 
 Duration {
@@ -133,7 +133,7 @@ messageSpecification {
     setKeyword            { "set" }
     authorKeyword         { "author" }
     paceKeyword           { "pace" }
-    restKeyword           { "rest" }
+    withKeyword           { "with" }
     onKeyword             { "on" }
     underwaterKeyword     { "underwater" }
     breatheKeyword        { "breathe" }
@@ -159,7 +159,7 @@ messageSpecification {
     @precedence { excludeAlignKeyword, Message }
     @precedence { underwaterKeyword, identifier }
     @precedence { breatheKeyword, identifier }
-    @precedence { restKeyword, identifier }
+    @precedence { withKeyword, identifier }
     @precedence { inOutKeyword, identifier }
 }
 

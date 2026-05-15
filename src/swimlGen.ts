@@ -108,7 +108,7 @@ function writeInstructionModifier(
 
     case InstructionModifiers.REST:
       if (modifier.minutes && modifier.seconds) {
-        if (modifier.keyWord === "rest") {
+        if (modifier.keyWord === "with") {
           xmlParent
             .ele("rest")
             .ele("afterStop")
