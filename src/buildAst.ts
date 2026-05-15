@@ -172,16 +172,6 @@ function visitDuration(
   return { minutes, seconds };
 }
 
-function visitInOut(
-  cursor: TreeCursor,
-  state: EditorState,
-): { swimmersIn: string } {
-  cursor.firstChild();
-  const swimmersIn = state.sliceDoc(cursor.from, cursor.to);
-  cursor.parent();
-  return { swimmersIn };
-}
-
 /**
  * Convert the swimDSL equipment name to the swiML equipment name.
  *
@@ -274,15 +264,16 @@ function visitInstructionModifier(
     };
   }
 
-  // We are in Duration
-  // Get the specified rest keyword
-  const getType = state.wordAt(cursor.from - 1);
-  const restType = getType ? state.sliceDoc(getType.from, getType.to) : "";
-  const isDuration = ["on", "rest"];
-  const durationResult = isDuration.includes(restType)
-    ? visitDuration(cursor, state)
-    : visitInOut(cursor, state);
-
+  // We are in Rest
+  // Get rest type
+  const restType: string = state.sliceDoc(cursor.from, cursor.to).split(" ")[0] ?? "";
+  // Step into first child i.e. Duration(timedRest) or Number(inOut)
+  cursor.firstChild();
+  const durationResult = restType === "in-out"
+    ? { swimmersIn: state.sliceDoc(cursor.from, cursor.to) }
+    : visitDuration(cursor, state);
+  // Step back to Rest
+  cursor.parent();
   return {
     modifier: InstructionModifiers.REST,
     keyWord: restType,

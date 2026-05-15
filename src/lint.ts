@@ -185,39 +185,30 @@ function lintIncompatibleEquipment(
  * rest durations per instruction.
  *
  * @param node - A reference to a syntax node to lint.
- * @param editorState - The current state of the CodeMirror code editor.
  * @param diagnostics - An array of diagnostics to append to if `node`
  *    detects multiple rest specifications.
  */
 function lintMultipleRest(
   node: SyntaxNodeRef,
-  editorState: EditorState,
   diagnostics: Diagnostic[],
 ): void {
-  if (node.name !== "Duration" && node.name !== "InOut") return;
+  if (node.name !== "Rest") return;
 
   const parent = node.node.parent;
   if (!parent) return;
 
-  const durationNodes: SyntaxNode[] = parent.getChildren("Duration");
-  const inOutNodes: SyntaxNode[] = parent.getChildren("InOut");
-  const allSpecs = [...durationNodes, ...inOutNodes]
-    .sort((a, b) => a.from - b.from);
+  const restSpecifications: SyntaxNode[] = parent.getChildren("Rest");
+  if (restSpecifications.length <= 1) return;
 
-  if (allSpecs.length <= 1) return;
+  // Only push the diagnostic once, when visiting the first Duration
+  if (restSpecifications[0]?.from !== node.from) return;
 
-  // Only push the diagnostic once, when visiting the first node
-  if (allSpecs[0]?.from !== node.from) return;
+  const firstRest = restSpecifications[0];
+  const lastRest = restSpecifications[restSpecifications.length - 1];
 
-  const firstSpec = allSpecs[0];
-  const lastSpec = allSpecs[allSpecs.length - 1];
-
-  if (lastSpec !== undefined) {
-    const prevWord = editorState.wordAt(firstSpec.from - 1);
-    const fromPosition = prevWord ? prevWord.from : firstSpec.from;
-
+  if (lastRest !== undefined) {
     diagnostics.push(
-      multipleRestDiagnostic(fromPosition, lastSpec.to),
+      multipleRestDiagnostic(firstRest.from, lastRest.to),
     );
   }
 }
@@ -349,7 +340,7 @@ function swimdslLintSource(view: EditorView): Diagnostic[] {
       diagnostics,
     );
     lintInvalidDuration(treeCursor, editorState, diagnostics);
-    lintMultipleRest(treeCursor, editorState, diagnostics);
+    lintMultipleRest(treeCursor, diagnostics);
   } while (treeCursor.next());
 
   return diagnostics;

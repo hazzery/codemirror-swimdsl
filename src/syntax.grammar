@@ -80,11 +80,14 @@ Underwater {
 instructionModifier {
     EquipmentSpecification
     | paceSpecification
-    | timeSpecification
+    | Rest
     | Underwater
     | Breathe
-    | InOut
     | InstructionDescription
+}
+
+Rest {
+    timedRest | inOut
 }
 
 InstructionDescription {
@@ -105,11 +108,11 @@ paceSpecification {
     "@" Pace
 }
 
-InOut {
+inOut {
     inOutKeyword Number
 }
 
-timeSpecification {
+timedRest {
     (onKeyword | restKeyword) Duration
 }
 
@@ -127,7 +130,7 @@ messageSpecification {
     paceKeyword           { "pace" }
     restKeyword           { "rest" }
     onKeyword             { "on" }
-    underwaterKeyword     { "Underwater" }
+    underwaterKeyword     { "underwater" }
     breatheKeyword        { "breathe" }
     inOutKeyword          { "in-out" }
     space       { @whitespace+ }
