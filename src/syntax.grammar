@@ -86,6 +86,11 @@ instructionModifier {
     | Underwater
     | Breathe
     | InstructionDescription
+    | ExcludeAlignSpecification
+}
+
+ExcludeAlignSpecification {
+    excludeAlignKeyword
 }
 
 InstructionDescription {
@@ -142,6 +147,7 @@ ContinueInstruction {
     StringContent { (!["\\] | "\\" _)+ }
     identifier  { @asciiLetter+ }
     repititionOperator { "x" }
+    excludeAlignKeyword { "noalign" }
     @precedence { StringContent, space }
     @precedence { StringContent, Comment }
     @precedence { repititionOperator, identifier }
@@ -151,6 +157,8 @@ ContinueInstruction {
     @precedence { onKeyword, identifier }
     @precedence { space, Message }
     @precedence { Comment, Message }
+    @precedence { excludeAlignKeyword, identifier }
+    @precedence { excludeAlignKeyword, Message }
     @precedence { underwaterKeyword, identifier }
     @precedence { breatheKeyword, identifier }
     @precedence { continueKeyword, identifier }
