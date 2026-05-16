@@ -13,6 +13,7 @@ import {
   Pace,
   PaceDefinition,
   Programme,
+  Rest,
   SingleInstruction,
   Statement,
   Statements,
@@ -269,20 +270,61 @@ function visitInstructionModifier(
   }
 
   // We are in Rest
-  // Get rest type
-  const restType: string = state.sliceDoc(cursor.from, cursor.to).split(" ")[0] ?? "";
-  // Step into first child i.e. Duration(timedRest) or Number(inOut)
-  cursor.firstChild();
-  const durationResult = restType === "in-out"
-    ? { swimmersIn: state.sliceDoc(cursor.from, cursor.to) }
-    : visitDuration(cursor, state);
-  // Step back to Rest
-  cursor.parent();
-  return {
-    modifier: InstructionModifiers.REST,
-    keyWord: restType,
-    ...durationResult,
-  };
+  return visitRest(cursor, state);
+}
+
+/**
+ * Create an AST node for a `Rest` CST node.
+ *
+ * Precondition: `cursor` points to a `Rest` node.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ *
+ * @returns A `Rest` AST node.
+ */
+function visitRest(
+  cursor: TreeCursor,
+  state: EditorState,
+): Rest {
+  cursor.firstChild(); // Step into the RestType
+  let rest: Rest;
+
+  if (cursor.name === "RestInOut") {
+    cursor.firstChild(); // Step into Number
+    const swimmersIn = state.sliceDoc(cursor.from, cursor.to);
+    cursor.parent(); // Back to RestInOut
+    rest = {
+      modifier: InstructionModifiers.REST,
+      type: "InOut",
+      swimmersIn: swimmersIn,
+    }
+  } else if (cursor.name === "RestAfterStop") {
+    cursor.firstChild(); // Step into the Duration
+    const duration = visitDuration(cursor, state);
+    cursor.parent(); // Back to RestAfterStop
+    rest = {
+      modifier: InstructionModifiers.REST,
+      type: "AfterStop",
+      ...duration,
+    }
+  } else {
+    // RestSinceStart
+    cursor.firstChild(); // Step into the Duration
+    const duration = visitDuration(cursor, state);
+    cursor.parent(); // Back to RestSinceStart
+    rest = {
+      modifier: InstructionModifiers.REST,
+      type: "SinceStart",
+      ...duration,
+    }
+  }
+  cursor.parent(); // Back to Rest
+
+  return rest
 }
 
 /**

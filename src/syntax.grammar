@@ -92,7 +92,19 @@ ExcludeAlignSpecification {
 }
 
 Rest {
-    timedRest | inOut
+    RestSinceStart | RestAfterStop | RestInOut
+}
+
+RestSinceStart {
+    onKeyword Duration
+}
+
+RestAfterStop {
+    withKeyword Duration
+}
+
+RestInOut {
+    inOutKeyword Number
 }
 
 InstructionDescription {
@@ -111,14 +123,6 @@ EquipmentName { identifier }
 
 paceSpecification {
     "@" Pace
-}
-
-inOut {
-    inOutKeyword Number
-}
-
-timedRest {
-    (onKeyword | withKeyword) Duration
 }
 
 Duration {

@@ -169,7 +169,7 @@ SwimProgramme(PaceDefinition(PaceDefinitionName, Pace(Number, Number)))
 
 SwimProgramme(SwimInstruction(
   SingleInstruction(Number, Stroke),
-  Rest(Duration(Number, Number))))
+  Rest(RestSinceStart(Duration(Number, Number)))))
 
 
 ## Rest instruction
@@ -180,7 +180,7 @@ SwimProgramme(SwimInstruction(
 
 SwimProgramme(SwimInstruction(
   SingleInstruction(Number, Stroke),
-  Rest(Duration(Number, Number))))
+  Rest(RestAfterStop(Duration(Number, Number)))))
 
 
 ## Repeated single instruction
@@ -203,7 +203,7 @@ SwimProgramme(SwimInstruction(
 SwimProgramme(SwimInstruction(
   Number,
   SingleInstruction(Number, Stroke),
-  Rest(Duration(Number, Number))))
+  Rest(RestSinceStart(Duration(Number, Number)))))
 
 
 ## Repeated single instruction with intensity
@@ -275,7 +275,7 @@ SwimProgramme(SwimInstruction(
     SwimInstruction(SingleInstruction(Number, Stroke)),
     SwimInstruction(SingleInstruction(Number, Stroke)),
     SwimInstruction(SingleInstruction(Number, Stroke))),
-  Rest(Duration(Number, Number))))
+  Rest(RestSinceStart(Duration(Number, Number)))))
 
 
 ## Repeated block instruction
@@ -307,7 +307,7 @@ SwimProgramme(SwimInstruction(
   Number,
   BlockInstruction(
     SwimInstruction(SingleInstruction(Number, Stroke)),
-    SwimInstruction(SingleInstruction(Number, Stroke),Rest(Duration(Number,Number)))),
+    SwimInstruction(SingleInstruction(Number, Stroke),Rest(RestAfterStop(Duration(Number,Number))))),
   StrokeModifier,
   EquipmentSpecification(EquipmentName),
   Pace(Number)))
@@ -412,7 +412,7 @@ SwimProgramme(SwimInstruction(
   StrokeModifier,
   EquipmentSpecification(EquipmentName, EquipmentName),
   Pace(Number, Number),
-  Rest(Duration(Number, Number))))
+  Rest(RestSinceStart(Duration(Number, Number)))))
 
 
 ## Full Programme Structure
@@ -444,7 +444,7 @@ SwimProgramme(
   SwimInstruction(
     Number,
     SingleInstruction(Number, Stroke),
-    Rest(Duration(Number, Number))))
+    Rest(RestSinceStart(Duration(Number, Number)))))
 
 
 ## Multiple Block instructions
@@ -485,7 +485,7 @@ SwimProgramme(SwimInstruction(
       SingleInstruction(Number, Stroke),
       StrokeModifier,
       EquipmentSpecification(EquipmentName),
-      Rest(Duration(Number, Number))))))
+      Rest(RestSinceStart(Duration(Number, Number)))))))
 
 
 ## Instruction with in-out rest
@@ -497,4 +497,4 @@ SwimProgramme(SwimInstruction(
 SwimProgramme(
     SwimInstruction(
         SingleInstruction(Number, Stroke),
-        Rest(Number)))
+        Rest(RestInOut(Number))))

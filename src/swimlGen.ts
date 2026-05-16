@@ -107,21 +107,16 @@ function writeInstructionModifier(
       break;
 
     case InstructionModifiers.REST:
-      if (modifier.minutes && modifier.seconds) {
-        if (modifier.keyWord === "with") {
-          xmlParent
-            .ele("rest")
-            .ele("afterStop")
-            .txt(xmlDuration(modifier.minutes, modifier.seconds));
-        } else {
-          // 'on' restType used
-          xmlParent
-            .ele("rest")
-            .ele("sinceStart")
-            .txt(xmlDuration(modifier.minutes, modifier.seconds));
-        }
-      } else if (modifier.swimmersIn) {
-        xmlParent.ele("rest").ele("inOut").txt(modifier.swimmersIn);
+      switch (modifier.type) {
+        case "SinceStart":
+          xmlParent.ele("rest").ele("sinceStart").txt(xmlDuration(modifier.minutes, modifier.seconds));
+          break;
+        case "AfterStop":
+          xmlParent.ele("rest").ele("afterStop").txt(xmlDuration(modifier.minutes, modifier.seconds));
+          break;
+        case "InOut":
+          xmlParent.ele("rest").ele("inOut").txt(modifier.swimmersIn);
+          break;
       }
       break;
 

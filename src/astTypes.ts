@@ -55,12 +55,26 @@ export interface InstructionDescription {
   description: string;
 }
 
-export interface Rest {
+export type Rest = RestSinceStart | RestAfterStop | RestInOut;
+
+export interface RestSinceStart {
   modifier: InstructionModifiers.REST;
-  keyWord: string;
-  minutes?: string;
-  seconds?: string;
-  swimmersIn?: string;
+  type: "SinceStart";
+  minutes: string;
+  seconds: string
+}
+
+export interface RestAfterStop {
+  modifier: InstructionModifiers.REST;
+  type: "AfterStop";
+  minutes: string;
+  seconds: string;
+}
+
+export interface RestInOut {
+  modifier: InstructionModifiers.REST;
+  type: "InOut";
+  swimmersIn: string;
 }
 
 export interface Underwater {
