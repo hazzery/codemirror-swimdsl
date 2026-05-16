@@ -130,16 +130,14 @@ export function incompatibleEquipmentDiagnostic(
  *
  * @returns An editor diagnostic for incompatible equipment.
  */
-export function multipleRestDiagnostic(
-  from: number,
-  to: number,
-): Diagnostic {
+export function multipleRestDiagnostic(from: number, to: number): Diagnostic {
   return {
     from,
     to,
     severity: "error",
-    message: "Multiple rest times specified. Please only specify at most one rest time per instruction.",
-  }
+    message:
+      "Multiple rest times specified. Please only specify at most one rest time per instruction.",
+  };
 }
 
 /**

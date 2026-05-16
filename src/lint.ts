@@ -207,9 +207,7 @@ function lintMultipleRest(
   const lastRest = restSpecifications[restSpecifications.length - 1];
 
   if (lastRest !== undefined) {
-    diagnostics.push(
-      multipleRestDiagnostic(firstRest.from, lastRest.to),
-    );
+    diagnostics.push(multipleRestDiagnostic(firstRest.from, lastRest.to));
   }
 }
 
