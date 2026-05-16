@@ -631,9 +631,9 @@ export default function buildAst(
 
   function walk(): void {
     do {
-      let node: Statement;
+      let node: Statement | null = null;
 
-      switch (cursor.type.name as Statements) {
+      switch (cursor.type.name as Statements | "") {
         case Statements.SWIM_INSTRUCTION:
           node = visitSwimInstruction(cursor, state);
           break;
@@ -654,7 +654,9 @@ export default function buildAst(
           break;
       }
 
-      statements.push(node);
+      if (node !== null) {
+        statements.push(node);
+      }
     } while (cursor.nextSibling());
   }
 
