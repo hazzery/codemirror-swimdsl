@@ -51,7 +51,6 @@ statement {
 
 instruction {
     SwimInstruction
-    | RestInstruction
     | messageSpecification
 }
 
@@ -87,7 +86,7 @@ Underwater {
 instructionModifier {
     EquipmentSpecification
     | paceSpecification
-    | timeSpecification
+    | Rest
     | Underwater
     | Breathe
     | InstructionDescription
@@ -96,6 +95,22 @@ instructionModifier {
 
 ExcludeAlignSpecification {
     excludeAlignKeyword
+}
+
+Rest {
+    RestSinceStart | RestAfterStop | RestInOut
+}
+
+RestSinceStart {
+    onKeyword Duration
+}
+
+RestAfterStop {
+    withKeyword Duration
+}
+
+RestInOut {
+    inOutKeyword Number
 }
 
 InstructionDescription {
@@ -116,16 +131,8 @@ paceSpecification {
     "@" Pace
 }
 
-timeSpecification {
-    onKeyword Duration
-}
-
 Duration {
     Number ":" Number    // minutes:seconds
-}
-
-RestInstruction {
-    Duration restKeyword
 }
 
 messageSpecification {
@@ -136,10 +143,11 @@ messageSpecification {
     setKeyword            { "set" }
     authorKeyword         { "author" }
     paceKeyword           { "pace" }
-    restKeyword           { "rest" }
+    withKeyword           { "with" }
     onKeyword             { "on" }
-    underwaterKeyword     { "Underwater" }
+    underwaterKeyword     { "underwater" }
     breatheKeyword        { "breathe" }
+    inOutKeyword          { "in-out" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
@@ -165,6 +173,8 @@ messageSpecification {
     @precedence { excludeAlignKeyword, Message }
     @precedence { underwaterKeyword, identifier }
     @precedence { breatheKeyword, identifier }
+    @precedence { withKeyword, identifier }
+    @precedence { inOutKeyword, identifier }
 }
 
 @skip { space | Comment }

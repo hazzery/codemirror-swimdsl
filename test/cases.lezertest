@@ -190,6 +190,7 @@ SwimProgramme(PaceDefinition(PaceDefinitionName, Pace(Number, Number)))
 SwimProgramme(SwimInstruction(
   SingleInstruction(Length(LengthAsDistance(Number)), Stroke),
   Duration(Number, Number)))
+  Rest(RestSinceStart(Duration(Number, Number)))
 
 
 ## Rest instruction
@@ -235,7 +236,8 @@ SwimProgramme(SwimInstruction(
 SwimProgramme(SwimInstruction(
   Number,
   SingleInstruction(Length(LengthAsDistance(Number)), Stroke),
-  Duration(Number, Number)))
+  Duration(Number, Number))),
+  Rest(RestSinceStart(Duration(Number, Number)))
 
 
 ## Repeated single instruction with intensity
@@ -308,6 +310,7 @@ SwimProgramme(SwimInstruction(
     SwimInstruction(SingleInstruction(Length(LengthAsDistance(Number)), Stroke)),
     SwimInstruction(SingleInstruction(Length(LengthAsDistance(Number)), Stroke))),
   Duration(Number, Number)))
+  Rest(RestSinceStart(Duration(Number, Number)))
 
 
 ## Repeated block instruction
@@ -342,9 +345,10 @@ SwimProgramme(SwimInstruction(
     SwimInstruction(SingleInstruction(Length(LengthAsDistance(Number)), Stroke)),
     SwimInstruction(SingleInstruction(Length(LengthAsDistance(Number)), Stroke)),
     RestInstruction(Duration(Number, Number))),
+    Rest(RestAfterStop(Duration(Number,Number))))),
   StrokeModifier,
   EquipmentSpecification(EquipmentName),
-  Pace(Number)))
+  Pace(Number)
 
 
 ## Two levels of nested block instructions
@@ -481,6 +485,7 @@ SwimProgramme(
     SingleInstruction(Length(LengthAsDistance(Number)), Stroke),
     Duration(Number, Number)),
   RestInstruction(Duration(Number, Number)))
+    Rest(RestSinceStart(Duration(Number, Number)))
 
 
 ## Multiple Block instructions

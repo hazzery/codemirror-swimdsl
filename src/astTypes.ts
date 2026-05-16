@@ -1,6 +1,5 @@
 export const enum Statements {
   SWIM_INSTRUCTION,
-  REST_INSTRUCTION,
   MESSAGE,
   PACE_DEFINITION,
   CONSTANT_DEFINITION,
@@ -10,7 +9,7 @@ export const enum Statements {
 export const enum InstructionModifiers {
   EQUIPMENT_SPECIFICATION,
   PACE,
-  TIME,
+  REST,
   EXCLUDE_ALIGN,
   BREATHE,
   UNDERWATER,
@@ -25,7 +24,7 @@ export interface Programme {
   statements: Statement[];
 }
 
-export type Instruction = SwimInstruction | RestInstruction | Message;
+export type Instruction = SwimInstruction | Message;
 
 export interface ConstantDefinition {
   statement: Statements.CONSTANT_DEFINITION;
@@ -56,10 +55,26 @@ export interface InstructionDescription {
   description: string;
 }
 
-export interface Time {
-  modifier: InstructionModifiers.TIME;
+export type Rest = RestSinceStart | RestAfterStop | RestInOut;
+
+export interface RestSinceStart {
+  modifier: InstructionModifiers.REST;
+  type: "SinceStart";
+  minutes: string;
+  seconds: string
+}
+
+export interface RestAfterStop {
+  modifier: InstructionModifiers.REST;
+  type: "AfterStop";
   minutes: string;
   seconds: string;
+}
+
+export interface RestInOut {
+  modifier: InstructionModifiers.REST;
+  type: "InOut";
+  swimmersIn: string;
 }
 
 export interface Underwater {
@@ -70,7 +85,7 @@ export interface Underwater {
 export type InstructionModifier =
   | EquipmentSpecification
   | Pace
-  | Time
+  | Rest
   | Underwater
   | Breathe
   | InstructionDescription
@@ -97,12 +112,6 @@ export interface SingleInstruction {
 export interface BlockInstruction {
   isBlock: true;
   instructions: Instruction[];
-}
-
-export interface RestInstruction {
-  statement: Statements.REST_INSTRUCTION;
-  minutes: string;
-  seconds: string;
 }
 
 export interface Intensity {
