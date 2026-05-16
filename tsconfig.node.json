@@ -7,5 +7,5 @@
     "module": "preserve",
     "moduleResolution": "bundler"
   },
-  "include": ["eslint.config.ts", "rollup.config.ts", "test/*.ts"]
+  "include": ["eslint.config.ts", "rollup.config.ts"]
 }
