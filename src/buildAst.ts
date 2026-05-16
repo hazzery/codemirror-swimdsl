@@ -297,16 +297,14 @@ function visitRest(
     cursor.firstChild(); // Step into Number
     const swimmersIn = state.sliceDoc(cursor.from, cursor.to);
     cursor.parent(); // Back to RestInOut
+
     rest = {
       modifier: InstructionModifiers.REST,
       type: "InOut",
       swimmersIn: swimmersIn,
     }
   } else {
-    const type =
-      cursor.name === "RestAfterStop"
-        ? "AfterStop"
-        : "SinceStart";
+    const type = cursor.name === "RestAfterStop" ? "AfterStop" : "SinceStart";
 
     cursor.firstChild();
     const duration = visitDuration(cursor, state);
