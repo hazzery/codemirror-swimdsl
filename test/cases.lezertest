@@ -18,6 +18,26 @@ SwimProgramme(
   SwimInstruction(SingleInstruction(Length(LengthAsDistance(Number)), Stroke)),
   SwimInstruction(SingleInstruction(Length(LengthAsDistance(Number)), Stroke)))
 
+## Laps-based single instruction
+
+1 lap Back
+
+==>
+
+SwimProgramme(SwimInstruction(SingleInstruction(Length(LengthAsLaps(Number)), Stroke)))
+
+
+## Multiple laps-based instructions
+
+1 lap Back
+1 lap Free
+
+==>
+
+SwimProgramme(
+  SwimInstruction(SingleInstruction(Length(LengthAsLaps(Number)), Stroke)),
+  SwimInstruction(SingleInstruction(Length(LengthAsLaps(Number)), Stroke)))
+
 
 ## Single instruction with a stroke modifier
 

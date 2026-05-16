@@ -416,6 +416,7 @@ function visitSwimInstruction(
     } while (cursor.nextSibling());
 
     instruction = { isBlock: true, instructions };
+    // cursor is still on the last instruction of the block
   } else {
     // cursor is on SingleInstruction
     cursor.firstChild();
@@ -439,14 +440,14 @@ function visitSwimInstruction(
     cursor.firstChild();
 
     const length: Length = { kind, value: state.sliceDoc(cursor.from, cursor.to) };
-    cursor.parent();
+    cursor.parent(); // exits LengthAsDistance or LengthAsLaps
 
-    cursor.parent();
+    cursor.parent(); // exits length
     cursor.nextSibling();
     const stroke = cursor.name !== "Stroke" ? "any" : getStroke(state.sliceDoc(cursor.from, cursor.to));
 
     instruction = { isBlock: false, length, stroke };
-    cursor.parent();
+    // cursor is still on the Stroke
   }
   // Move back up to SwimInstruction
   cursor.parent();
