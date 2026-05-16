@@ -13,7 +13,7 @@ import {
   Pace,
   PaceDefinition,
   Programme,
-  RestInstruction,
+  Rest,
   SingleInstruction,
   Statement,
   Statements,
@@ -137,10 +137,6 @@ function visitBreathe(cursor: TreeCursor, state: EditorState): Breathe {
 function visitInstruction(cursor: TreeCursor, state: EditorState): Instruction {
   if (cursor.name === "SwimInstruction") {
     return visitSwimInstruction(cursor, state);
-  }
-
-  if (cursor.name === "RestInstruction") {
-    return visitRestInstruction(cursor, state);
   }
 
   return visitMessage(cursor, state);
@@ -273,11 +269,56 @@ function visitInstructionModifier(
     };
   }
 
-  // We are in Duration
-  return {
-    modifier: InstructionModifiers.TIME,
-    ...visitDuration(cursor, state),
-  };
+  // We are in Rest
+  return visitRest(cursor, state);
+}
+
+/**
+ * Create an AST node for a `Rest` CST node.
+ *
+ * Precondition: `cursor` points to a `Rest` node.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ *
+ * @returns A `Rest` AST node.
+ */
+function visitRest(
+  cursor: TreeCursor,
+  state: EditorState,
+): Rest {
+  cursor.firstChild(); // Step into the RestType
+  let rest: Rest;
+
+  if (cursor.name === "RestInOut") {
+    cursor.firstChild(); // Step into Number
+    const swimmersIn = state.sliceDoc(cursor.from, cursor.to);
+    cursor.parent(); // Back to RestInOut
+
+    rest = {
+      modifier: InstructionModifiers.REST,
+      type: "InOut",
+      swimmersIn: swimmersIn,
+    }
+  } else {
+    const type = cursor.name === "RestAfterStop" ? "AfterStop" : "SinceStart";
+
+    cursor.firstChild();
+    const duration = visitDuration(cursor, state);
+    cursor.parent();
+
+    rest = {
+      modifier: InstructionModifiers.REST,
+      type,
+      ...duration,
+    };
+  }
+  cursor.parent(); // Back to Rest
+
+  return rest
 }
 
 /**
@@ -458,37 +499,6 @@ function visitSwimInstruction(
 }
 
 /**
- * Create an AST node for a `RestInstruction` CST node.
- *
- * Precondition: `cursor` points to a `RestInstruction` node.
- *
- * Postcondition: `cursor` will point to the same node it pointed to when
- * passed to this function.
- *
- * @param cursor - A reference to a Lezer syntax tree node.
- * @param state - The state of the CodeMirror editor.
- *
- * @returns A `RestInstruction` AST node.
- */
-function visitRestInstruction(
-  cursor: TreeCursor,
-  state: EditorState,
-): RestInstruction {
-  // Move down to Duration
-  cursor.firstChild();
-
-  const duration = visitDuration(cursor, state);
-
-  // Move back up to RestInstruction
-  cursor.parent();
-
-  return {
-    statement: Statements.REST_INSTRUCTION,
-    ...duration,
-  };
-}
-
-/**
  * Create an AST node for a `Message` CST node.
  *
  * Precondition: `cursor` points to a `Message` node.
@@ -636,9 +646,6 @@ export default function buildAst(
       switch (cursor.type.name) {
         case "SwimInstruction":
           node = visitSwimInstruction(cursor, state);
-          break;
-        case "RestInstruction":
-          node = visitRestInstruction(cursor, state);
           break;
         case "Message":
           node = visitMessage(cursor, state);

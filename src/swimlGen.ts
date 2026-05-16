@@ -8,7 +8,6 @@ import {
   Intensity,
   Message,
   Programme,
-  RestInstruction,
   Statements,
   SwimInstruction,
 } from "./astTypes";
@@ -55,9 +54,6 @@ function writeInstruction(
       writeSwimInstruction(xmlParent, instruction);
       break;
 
-    case Statements.REST_INSTRUCTION:
-      writeRestInstruction(xmlParent, instruction);
-      break;
     case Statements.MESSAGE:
       writeMessage(xmlParent, instruction);
       break;
@@ -110,11 +106,18 @@ function writeInstructionModifier(
       xmlParent.ele("breath").txt(modifier.breatheStrokes);
       break;
 
-    case InstructionModifiers.TIME:
-      xmlParent
-        .ele("rest")
-        .ele("sinceStart")
-        .txt(xmlDuration(modifier.minutes, modifier.seconds));
+    case InstructionModifiers.REST:
+      switch (modifier.type) {
+        case "SinceStart":
+          xmlParent.ele("rest").ele("sinceStart").txt(xmlDuration(modifier.minutes, modifier.seconds));
+          break;
+        case "AfterStop":
+          xmlParent.ele("rest").ele("afterStop").txt(xmlDuration(modifier.minutes, modifier.seconds));
+          break;
+        case "InOut":
+          xmlParent.ele("rest").ele("inOut").txt(modifier.swimmersIn);
+          break;
+      }
       break;
 
     case InstructionModifiers.EXCLUDE_ALIGN:
@@ -168,24 +171,6 @@ function writeSwimInstruction(
       writeInstructionModifier(parent, modifier);
     }
   }
-}
-
-/**
- * Write an AST RestInstruction node into the XML document.
- *
- * @param xmlParent - The parent XML node to write the rest instruction inside
- *    of.
- * @param instruction - The AST rest instruction node to write as XML.
- */
-function writeRestInstruction(
-  xmlParent: XMLBuilder,
-  instruction: RestInstruction,
-): void {
-  xmlParent
-    .ele("instruction")
-    .ele("rest")
-    .ele("afterStop")
-    .txt(xmlDuration(instruction.minutes, instruction.seconds));
 }
 
 /**
@@ -289,10 +274,6 @@ export default function emitXml(programme: Programme): string {
     switch (statement.statement) {
       case Statements.SWIM_INSTRUCTION:
         writeSwimInstruction(doc, statement);
-        break;
-
-      case Statements.REST_INSTRUCTION:
-        writeRestInstruction(doc, statement);
         break;
 
       case Statements.MESSAGE:
