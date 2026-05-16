@@ -480,7 +480,10 @@ function visitSwimInstruction(
 
     cursor.firstChild();
 
-    const length: Length = { kind, value: state.sliceDoc(cursor.from, cursor.to) };
+    const length: Length = {
+      kind,
+      value: state.sliceDoc(cursor.from, cursor.to),
+    };
     cursor.parent(); // exits LengthAsDistance or LengthAsLaps
 
     cursor.parent(); // exits length

@@ -64,12 +64,14 @@ SingleInstruction {
 }
 
 Length {
-    LengthAsDistance
-  | LengthAsLaps
+    LengthAsDistance | LengthAsLaps
 }
 
 LengthAsDistance { Number }
-LengthAsLaps     { Number lapsKeyword }
+
+LengthAsLaps {
+    Number lapsKeyword
+}
 
 Stroke { identifier }
 
