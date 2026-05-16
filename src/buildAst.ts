@@ -302,25 +302,21 @@ function visitRest(
       type: "InOut",
       swimmersIn: swimmersIn,
     }
-  } else if (cursor.name === "RestAfterStop") {
-    cursor.firstChild(); // Step into the Duration
-    const duration = visitDuration(cursor, state);
-    cursor.parent(); // Back to RestAfterStop
-    rest = {
-      modifier: InstructionModifiers.REST,
-      type: "AfterStop",
-      ...duration,
-    }
   } else {
-    // RestSinceStart
-    cursor.firstChild(); // Step into the Duration
+    const type =
+      cursor.name === "RestAfterStop"
+        ? "AfterStop"
+        : "SinceStart";
+
+    cursor.firstChild();
     const duration = visitDuration(cursor, state);
-    cursor.parent(); // Back to RestSinceStart
+    cursor.parent();
+
     rest = {
       modifier: InstructionModifiers.REST,
-      type: "SinceStart",
+      type,
       ...duration,
-    }
+    };
   }
   cursor.parent(); // Back to Rest
 
