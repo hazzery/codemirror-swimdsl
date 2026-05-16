@@ -61,7 +61,7 @@ export interface RestSinceStart {
   modifier: InstructionModifiers.REST;
   type: "SinceStart";
   minutes: string;
-  seconds: string
+  seconds: string;
 }
 
 export interface RestAfterStop {

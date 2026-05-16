@@ -109,10 +109,16 @@ function writeInstructionModifier(
     case InstructionModifiers.REST:
       switch (modifier.type) {
         case "SinceStart":
-          xmlParent.ele("rest").ele("sinceStart").txt(xmlDuration(modifier.minutes, modifier.seconds));
+          xmlParent
+            .ele("rest")
+            .ele("sinceStart")
+            .txt(xmlDuration(modifier.minutes, modifier.seconds));
           break;
         case "AfterStop":
-          xmlParent.ele("rest").ele("afterStop").txt(xmlDuration(modifier.minutes, modifier.seconds));
+          xmlParent
+            .ele("rest")
+            .ele("afterStop")
+            .txt(xmlDuration(modifier.minutes, modifier.seconds));
           break;
         case "InOut":
           xmlParent.ele("rest").ele("inOut").txt(modifier.swimmersIn);

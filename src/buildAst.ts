@@ -287,10 +287,7 @@ function visitInstructionModifier(
  *
  * @returns A `Rest` AST node.
  */
-function visitRest(
-  cursor: TreeCursor,
-  state: EditorState,
-): Rest {
+function visitRest(cursor: TreeCursor, state: EditorState): Rest {
   cursor.firstChild(); // Step into the RestType
   let rest: Rest;
 
@@ -303,7 +300,7 @@ function visitRest(
       modifier: InstructionModifiers.REST,
       type: "InOut",
       swimmersIn: swimmersIn,
-    }
+    };
   } else {
     const type = cursor.name === "RestAfterStop" ? "AfterStop" : "SinceStart";
 
@@ -319,7 +316,7 @@ function visitRest(
   }
   cursor.parent(); // Back to Rest
 
-  return rest
+  return rest;
 }
 
 /**
