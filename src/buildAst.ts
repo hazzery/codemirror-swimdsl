@@ -631,34 +631,30 @@ export default function buildAst(
 
   function walk(): void {
     do {
-      let node: Statement | null = null;
+      let node: Statement;
 
-      switch (cursor.type.name) {
-        case "SwimInstruction":
+      switch (cursor.type.name as Statements) {
+        case Statements.SWIM_INSTRUCTION:
           node = visitSwimInstruction(cursor, state);
           break;
-        case "RestInstruction":
+        case Statements.REST_INSTRUCTION:
           node = visitRestInstruction(cursor, state);
           break;
-        case "Message":
+        case Statements.MESSAGE:
           node = visitMessage(cursor, state);
           break;
-        case "PaceDefinition":
+        case Statements.PACE_DEFINITION:
           node = visitPaceDefinition(cursor, state);
           break;
-        case "ConstantDefinition":
+        case Statements.CONSTANT_DEFINITION:
           node = visitConstantDefinition(cursor, state);
           break;
-        case "AuthorDefinition":
+        case Statements.AUTHOR_DEFINITION:
           node = visitAuthorDefinition(cursor, state);
-          break;
-        default:
           break;
       }
 
-      if (node !== null) {
-        statements.push(node);
-      }
+      statements.push(node);
     } while (cursor.nextSibling());
   }
 
