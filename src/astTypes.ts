@@ -1,20 +1,20 @@
 export const enum Statements {
-  SWIM_INSTRUCTION,
-  REST_INSTRUCTION,
-  MESSAGE,
-  PACE_DEFINITION,
-  CONSTANT_DEFINITION,
-  AUTHOR_DEFINITION,
+  SWIM_INSTRUCTION = "SwimInstruction",
+  REST_INSTRUCTION = "RestInstruction",
+  MESSAGE = "Message",
+  PACE_DEFINITION = "PaceDefinition",
+  CONSTANT_DEFINITION = "ConstantDefinition",
+  AUTHOR_DEFINITION = "AuthorDefintion",
 }
 
 export const enum InstructionModifiers {
-  EQUIPMENT_SPECIFICATION,
-  PACE,
-  TIME,
-  EXCLUDE_ALIGN,
-  BREATHE,
-  UNDERWATER,
-  INSTRUCTION_DESCRIPTION,
+  EQUIPMENT_SPECIFICATION = "EquipmentSpecification",
+  PACE = "Pace",
+  TIME = "Time",
+  EXCLUDE_ALIGN = "ExcludeAlignSpecification",
+  BREATHE = "Breathe",
+  UNDERWATER = "Underwater",
+  INSTRUCTION_DESCRIPTION = "InstructionDescription",
 }
 
 export interface ExcludeAlign {
