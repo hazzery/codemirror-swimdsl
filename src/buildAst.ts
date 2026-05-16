@@ -287,10 +287,7 @@ function visitInstructionModifier(
  *
  * @returns A `Rest` AST node.
  */
-function visitRest(
-  cursor: TreeCursor,
-  state: EditorState,
-): Rest {
+function visitRest(cursor: TreeCursor, state: EditorState): Rest {
   cursor.firstChild(); // Step into the RestType
   let rest: Rest;
 
@@ -303,7 +300,7 @@ function visitRest(
       modifier: InstructionModifiers.REST,
       type: "InOut",
       swimmersIn: swimmersIn,
-    }
+    };
   } else {
     const type = cursor.name === "RestAfterStop" ? "AfterStop" : "SinceStart";
 
@@ -319,7 +316,7 @@ function visitRest(
   }
   cursor.parent(); // Back to Rest
 
-  return rest
+  return rest;
 }
 
 /**
@@ -669,23 +666,21 @@ export default function buildAst(
     do {
       let node: Statement | null = null;
 
-      switch (cursor.type.name) {
-        case "SwimInstruction":
+      switch (cursor.type.name as Statements | "") {
+        case Statements.SWIM_INSTRUCTION:
           node = visitSwimInstruction(cursor, state);
           break;
-        case "Message":
+        case Statements.MESSAGE:
           node = visitMessage(cursor, state);
           break;
-        case "PaceDefinition":
+        case Statements.PACE_DEFINITION:
           node = visitPaceDefinition(cursor, state);
           break;
-        case "ConstantDefinition":
+        case Statements.CONSTANT_DEFINITION:
           node = visitConstantDefinition(cursor, state);
           break;
-        case "AuthorDefinition":
+        case Statements.AUTHOR_DEFINITION:
           node = visitAuthorDefinition(cursor, state);
-          break;
-        default:
           break;
       }
 
