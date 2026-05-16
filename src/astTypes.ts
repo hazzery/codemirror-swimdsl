@@ -99,9 +99,13 @@ export interface SwimInstruction {
   instructionModifiers: InstructionModifier[];
 }
 
+export type Length =
+  | { kind: "distance"; value: string }
+  | { kind: "laps"; value: string };
+
 export interface SingleInstruction {
   isBlock: false;
-  distance: string;
+  length: Length;
   stroke: string;
 }
 

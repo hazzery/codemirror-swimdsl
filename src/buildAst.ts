@@ -18,6 +18,7 @@ import {
   Statement,
   Statements,
   SwimInstruction,
+  Length,
 } from "./astTypes";
 import { EditorState } from "@codemirror/state";
 
@@ -456,18 +457,43 @@ function visitSwimInstruction(
     } while (cursor.nextSibling());
 
     instruction = { isBlock: true, instructions };
+    // cursor is still on the last instruction of the block
   } else {
-    // Move into Number
+    // cursor is on SingleInstruction
     cursor.firstChild();
-    const distance = state.sliceDoc(cursor.from, cursor.to);
+    cursor.firstChild();
 
-    // Move into Stroke
+    let kind: Length["kind"];
+
+    switch (cursor.name) {
+      case "LengthAsDistance":
+        kind = "distance";
+        break;
+
+      case "LengthAsLaps":
+        kind = "laps";
+        break;
+
+      default:
+        kind = "distance";
+    }
+
+    cursor.firstChild();
+
+    const length: Length = {
+      kind,
+      value: state.sliceDoc(cursor.from, cursor.to),
+    };
+    cursor.parent(); // exits LengthAsDistance or LengthAsLaps
+
+    cursor.parent(); // exits length
     cursor.nextSibling();
     const stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
 
-    instruction = { isBlock: false, distance, stroke };
+    instruction = { isBlock: false, length, stroke };
+    // cursor is still on the Stroke
   }
-  // Move back up to SingleInstruction | BlockInstruction
+  // Move back up to SwimInstruction
   cursor.parent();
 
   if (cursor.nextSibling()) {

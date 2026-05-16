@@ -156,10 +156,13 @@ function writeSwimInstruction(
       writeInstruction(parent, subInstruction);
     }
   } else {
-    parent
-      .ele("length")
-      .ele("lengthAsDistance")
-      .txt(instruction.instruction.distance);
+    const len = instruction.instruction.length;
+    const length = parent.ele("length");
+    if (len.kind === "distance") {
+      length.ele("lengthAsDistance").txt(len.value);
+    } else {
+      length.ele("lengthAsLaps").txt(len.value);
+    }
     parent
       .ele("stroke")
       .ele("standardStroke")
