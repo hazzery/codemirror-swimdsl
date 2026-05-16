@@ -444,7 +444,7 @@ function visitSwimInstruction(
 
     cursor.parent(); // exits length
     cursor.nextSibling();
-    const stroke = cursor.name !== "Stroke" ? "any" : getStroke(state.sliceDoc(cursor.from, cursor.to));
+    const stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
 
     instruction = { isBlock: false, length, stroke };
     // cursor is still on the Stroke
