@@ -91,6 +91,11 @@ export type InstructionModifier =
   | InstructionDescription
   | ExcludeAlign;
 
+export type Intensity =
+  | PercentageIntensity
+  | AliasIntensity
+  | HeartRateIntensity;
+
 export interface SwimInstruction {
   statement: Statements.SWIM_INSTRUCTION;
   repetitions: number;
@@ -114,8 +119,18 @@ export interface BlockInstruction {
   instructions: Instruction[];
 }
 
-export interface Intensity {
-  isAlias: boolean;
+export interface AliasIntensity {
+  kind: "alias";
+  value: string;
+}
+
+export interface PercentageIntensity {
+  kind: "percentage";
+  value: string;
+}
+
+export interface HeartRateIntensity {
+  kind: "heartRate";
   value: string;
 }
 

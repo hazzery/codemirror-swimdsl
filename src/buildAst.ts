@@ -39,19 +39,12 @@ function visitPace(cursor: TreeCursor, state: EditorState): Pace {
   // Move down into starting intensity
   cursor.firstChild();
 
-  const startIntensity: Intensity = {
-    isAlias: cursor.name === "PaceAlias",
-    value: state.sliceDoc(cursor.from, cursor.to),
-  };
+  const startIntensity: Intensity = visitIntensity(cursor, state)
 
   let stopIntensity: Intensity | undefined = undefined;
 
-  // Move to finishing Intensity if it exists
   if (cursor.nextSibling()) {
-    stopIntensity = {
-      isAlias: cursor.name === "PaceAlias",
-      value: state.sliceDoc(cursor.from, cursor.to),
-    };
+    stopIntensity = visitIntensity(cursor, state);
   }
 
   // Move back up to Pace
@@ -62,6 +55,18 @@ function visitPace(cursor: TreeCursor, state: EditorState): Pace {
     startIntensity,
     stopIntensity,
   };
+}
+
+function visitIntensity(cursor: TreeCursor, state: EditorState): Intensity {
+  if (cursor.name === "PaceAlias") {
+    return { kind: "alias", value: state.sliceDoc(cursor.from, cursor.to) };
+  }
+
+  const kind = cursor.name === "HeartRate" ? "heartRate" : "percentage";
+  cursor.firstChild();
+  const value = state.sliceDoc(cursor.from, cursor.to);
+  cursor.parent();
+  return { kind, value };
 }
 
 /**
