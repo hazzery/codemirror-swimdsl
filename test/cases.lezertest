@@ -82,6 +82,38 @@ SwimProgramme(SwimInstruction(
   StrokeModifier,
   EquipmentSpecification(EquipmentName, EquipmentName, EquipmentName)))
 
+## Single instruction with start intensity heart rate
+
+100 Backstroke @ 50heartrate
+
+==>
+
+SwimProgramme(SwimInstruction(
+  SingleInstruction(Length(LengthAsDistance(Number)), Stroke),
+  Pace(HeartRate(Number))))
+
+
+## Single instruction with start and stop intensity heart rates
+
+50 Butterfly @ 55heartrate -> 75heartrate
+
+==>
+
+SwimProgramme(SwimInstruction(
+  SingleInstruction(Length(LengthAsDistance(Number)), Stroke),
+  Pace(HeartRate(Number), HeartRate(Number))))
+
+
+## Repeated single instruction with heart rate intensity
+
+6 x 100 Freestyle @ 60heartrate -> 80heartrate
+
+==>
+
+SwimProgramme(SwimInstruction(
+  Number,
+  SingleInstruction(Length(LengthAsDistance(Number)), Stroke),
+  Pace(HeartRate(Number), HeartRate(Number))))
 
 ## Single instruction with start intensity percentage
 
