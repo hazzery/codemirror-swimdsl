@@ -165,7 +165,7 @@ messageSpecification {
     repititionOperator { "x" }
     lapsKeyword { "laps" | "lap" }
     excludeAlignKeyword { "noalign" }
-    heartRateKeyword { "heartrate" }
+    heartRateKeyword { "bpm" }
     @precedence { StringContent, space }
     @precedence { StringContent, Comment }
     @precedence { repititionOperator, identifier }
