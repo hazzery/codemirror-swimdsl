@@ -7,9 +7,9 @@ continuous {
 
 ==>
 
-SwimProgramme(ContinueInstruction(
+SwimProgramme(SwimInstruction(ContinueBlock(
   SwimInstruction(SingleInstruction(Length(LengthAsDistance(Number)), Stroke)),
-  SwimInstruction(SingleInstruction(Length(LengthAsDistance(Number)), Stroke))))
+  SwimInstruction(SingleInstruction(Length(LengthAsDistance(Number)), Stroke)))))
 
 
 ## Repeated continue instruction
@@ -21,10 +21,11 @@ SwimProgramme(ContinueInstruction(
 
 ==>
 
-SwimProgramme(ContinueInstruction(
+SwimProgramme(SwimInstruction(
   Number,
-  SwimInstruction(SingleInstruction(Length(LengthAsDistance(Number)), Stroke), Pace(Number)),
-  SwimInstruction(SingleInstruction(Length(LengthAsDistance(Number)), Stroke), Pace(Number))))
+  ContinueBlock(
+    SwimInstruction(SingleInstruction(Length(LengthAsDistance(Number)), Stroke), Pace(Number)),
+    SwimInstruction(SingleInstruction(Length(LengthAsDistance(Number)), Stroke), Pace(Number)))))
 
 ## One single instruction
 
