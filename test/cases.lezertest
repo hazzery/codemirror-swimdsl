@@ -489,6 +489,102 @@ SwimProgramme(
     BlockInstruction(SwimInstruction(SingleInstruction(Length(LengthAsDistance(Number)), Stroke))),
     Pace(Number)))
 
+## Basic pyramid
+
+pyramid 50 -> 200 Freestyle / 50
+
+==>
+
+SwimProgramme(
+  PyramidInstruction(
+    PyramidRange(Length(LengthAsDistance(Number)),
+    Length(LengthAsDistance(Number)), Stroke), Number))
+
+
+## Pointy pyramid
+
+pyramid 50 -> 200 Freestyle / 50 pointy
+
+==>
+
+SwimProgramme(
+  PyramidInstruction(
+    PyramidRange(Length(LengthAsDistance(Number)),
+    Length(LengthAsDistance(Number)), Stroke), Number, PyramidPointy))
+
+
+## Pyramid with rest after stop
+
+pyramid 50 -> 200 Freestyle / 50 with 0:15
+
+==>
+
+SwimProgramme(
+  PyramidInstruction(
+    PyramidRange(Length(LengthAsDistance(Number)),
+    Length(LengthAsDistance(Number)), Stroke), Number,
+    Rest(RestAfterStop(Duration(Number, Number)))))
+
+
+## Pointy pyramid with rest after stop
+
+pyramid 50 -> 200 Freestyle / 50 pointy with 0:15
+
+==>
+
+SwimProgramme(
+  PyramidInstruction(
+    PyramidRange(Length(LengthAsDistance(Number)),
+    Length(LengthAsDistance(Number)), Stroke), Number, PyramidPointy,
+    Rest(RestAfterStop(Duration(Number, Number)))))
+
+
+## Pyramid with pace alias
+
+pyramid 50 -> 200 Freestyle / 50 @ easy
+
+==>
+
+SwimProgramme(
+  PyramidInstruction(
+    PyramidRange(Length(LengthAsDistance(Number)), Length(LengthAsDistance(Number)), Stroke),
+    Number, Pace(PaceAlias)))
+
+
+## Pointy pyramid with pace alias and rest
+
+pyramid 50 -> 200 Freestyle / 50 pointy @ easy with 0:15
+
+==>
+
+SwimProgramme(
+  PyramidInstruction(
+    PyramidRange(Length(LengthAsDistance(Number)), Length(LengthAsDistance(Number)), Stroke),
+    Number, PyramidPointy, Pace(PaceAlias), Rest(RestAfterStop(Duration(Number, Number)))))
+
+
+## Pyramid with percentage pace
+
+pyramid 50 -> 200 Freestyle / 50 @ 70%
+
+==>
+
+SwimProgramme(
+  PyramidInstruction(
+    PyramidRange(Length(LengthAsDistance(Number)), Length(LengthAsDistance(Number)), Stroke),
+    Number, Pace(Number)))
+
+
+## Pyramid with stroke modifier
+
+pyramid 50 -> 200 Freestyle Kick / 50
+
+==>
+
+SwimProgramme(
+  PyramidInstruction(
+    PyramidRange(Length(LengthAsDistance(Number)), Length(LengthAsDistance(Number)), Stroke, StrokeModifier),
+    Number))
 
 ## Complex Nested Structure
 

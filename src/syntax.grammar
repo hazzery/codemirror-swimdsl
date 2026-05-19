@@ -204,7 +204,7 @@ messageSpecification {
     @precedence { inOutKeyword, identifier }
     @precedence { pyramidKeyword, identifier }
     @precedence { pointyKeyword, identifier }
-    @precedence { lengthUnitKeyword, identifier }
+    @precedence { identifier, lengthUnitKeyword }
 }
 
 @skip { space | Comment }
