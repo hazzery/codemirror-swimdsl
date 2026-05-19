@@ -9,9 +9,11 @@ import {
   Intensity,
   Message,
   Programme,
+  PyramidInstruction,
   Statements,
   StrokeModifiers,
   SwimInstruction,
+  Length,
 } from "./astTypes";
 
 const XML_NAMESPACE = "https://github.com/bartneck/swiML";
@@ -275,6 +277,61 @@ function writeAuthorDefinition(
   }
 }
 
+function writePyramidInstruction(
+  xmlParent: XMLBuilder,
+  instruction: PyramidInstruction,
+): void {
+  let parent = xmlParent.ele("instruction");
+
+  if (instruction.repetitions > 1) {
+    parent = parent.ele("repetition");
+    parent.ele("repetitionCount").txt(String(instruction.repetitions)).up();
+  }
+
+  const pyramid = parent.ele("pyramid");
+
+  // Start length
+  const startLength = pyramid.ele("startLength");
+  writeLengthContent(startLength, instruction.startLength);
+
+  // Stop length
+  const stopLength = pyramid.ele("stopLength");
+  writeLengthContent(stopLength, instruction.stopLength);
+
+  pyramid.ele("increment").txt(String(instruction.increment));
+
+  if (instruction.incrementLengthUnit) {
+    pyramid.ele("incremenentLengthUnit").txt(instruction.incrementLengthUnit);
+  }
+
+  pyramid.ele("isPointy").txt(String(instruction.isPointy));
+
+  if (instruction.stroke) {
+    if (instruction.strokeModifier === StrokeModifiers.KICK) {
+      pyramid.ele("stroke").ele("kicking").ele("standardKick").txt(instruction.stroke);
+    } else {
+      pyramid.ele("stroke").ele("standardStroke").txt(instruction.stroke);
+    }
+  }
+
+  for (const modifier of instruction.instructionModifiers) {
+    writeInstructionModifier(pyramid, modifier);
+  }
+}
+
+function writeLengthContent(
+  xmlParent: XMLBuilder,
+  length: Length
+): void {
+  if (length.kind === "distance") {
+    xmlParent.ele("lengthAsDistance").txt(length.value);
+  } else if (length.kind === "laps") {
+    xmlParent.ele("lengthAsLaps").txt(length.value);
+  } else {
+    xmlParent.ele("lengthAsTime").txt(xmlDuration(length.minutes, length.seconds));
+  }
+}
+
 /**
  * Given a complete AST for a SwimDSL document, generate a valid swiML XML
  * document describing the same programme.
@@ -310,6 +367,10 @@ export default function emitXml(programme: Programme): string {
 
       case Statements.AUTHOR_DEFINITION:
         writeAuthorDefinition(doc, statement);
+        break;
+
+      case Statements.PYRAMID_INSTRUCTION:
+        writePyramidInstruction(doc, statement);
         break;
     }
   }

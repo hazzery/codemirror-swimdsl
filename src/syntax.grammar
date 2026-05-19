@@ -52,6 +52,7 @@ statement {
 instruction {
     SwimInstruction
     | messageSpecification
+    | PyramidInstruction
 }
 
 SwimInstruction {
@@ -82,6 +83,26 @@ BlockInstruction {
 }
 
 StrokeModifier { identifier }
+
+PyramidRange {
+    Length "->" Length Stroke StrokeModifier?
+}
+
+PyramidInstruction {
+    pyramidKeyword
+    PyramidRange
+    "/" Number LengthUnit?
+    PyramidPointy?
+    instructionModifier*
+}
+
+LengthUnit {
+    lengthUnitKeyword
+}
+
+PyramidPointy {
+    pointyKeyword
+}
 
 Underwater {
     underwaterKeyword
@@ -152,6 +173,11 @@ messageSpecification {
     underwaterKeyword     { "underwater" }
     breatheKeyword        { "breathe" }
     inOutKeyword          { "in-out" }
+    lengthUnitKeyword { "m" | "yards" | "metres" | "meters" }
+    lapsKeyword { "laps" | "lap" }
+    excludeAlignKeyword { "noalign" }
+    pyramidKeyword { "pyramid" }
+    pointyKeyword  { "pointy" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
     Number      { @digit+ }
@@ -159,8 +185,6 @@ messageSpecification {
     StringContent { (!["\\] | "\\" _)+ }
     identifier  { @asciiLetter+ }
     repititionOperator { "x" }
-    lapsKeyword { "laps" | "lap" }
-    excludeAlignKeyword { "noalign" }
     @precedence { StringContent, space }
     @precedence { StringContent, Comment }
     @precedence { repititionOperator, identifier }
@@ -178,6 +202,9 @@ messageSpecification {
     @precedence { breatheKeyword, identifier }
     @precedence { withKeyword, identifier }
     @precedence { inOutKeyword, identifier }
+    @precedence { pyramidKeyword, identifier }
+    @precedence { pointyKeyword, identifier }
+    @precedence { lengthUnitKeyword, identifier }
 }
 
 @skip { space | Comment }

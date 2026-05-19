@@ -4,6 +4,7 @@ export const enum Statements {
   PACE_DEFINITION,
   CONSTANT_DEFINITION,
   AUTHOR_DEFINITION,
+  PYRAMID_INSTRUCTION,
 }
 
 export const enum InstructionModifiers {
@@ -31,7 +32,7 @@ export interface Programme {
   statements: Statement[];
 }
 
-export type Instruction = SwimInstruction | Message;
+export type Instruction = SwimInstruction | Message | PyramidInstruction;
 
 export interface ConstantDefinition {
   statement: Statements.CONSTANT_DEFINITION;
@@ -147,4 +148,17 @@ export interface Message {
 export interface Breathe {
   modifier: InstructionModifiers.BREATHE;
   breatheStrokes: string;
+}
+
+export interface PyramidInstruction {
+  statement: Statements.PYRAMID_INSTRUCTION;
+  repetitions: number;
+  startLength: Length;
+  stopLength: Length;
+  increment: number;
+  incrementLengthUnit?: string;
+  isPointy: boolean;
+  stroke?: string;
+  strokeModifier?: StrokeModifiers;
+  instructionModifiers: InstructionModifier[];
 }

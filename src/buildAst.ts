@@ -15,6 +15,7 @@ import {
   Pace,
   PaceDefinition,
   Programme,
+  PyramidInstruction,
   Rest,
   SingleInstruction,
   Statement,
@@ -139,6 +140,10 @@ function visitBreathe(cursor: TreeCursor, state: EditorState): Breathe {
 function visitInstruction(cursor: TreeCursor, state: EditorState): Instruction {
   if (cursor.name === "SwimInstruction") {
     return visitSwimInstruction(cursor, state);
+  }
+
+  if (cursor.name === "PyramidInstruction") {
+    return visitPyramidInstruction(cursor, state);
   }
 
   return visitMessage(cursor, state);
@@ -472,37 +477,7 @@ function visitSwimInstruction(
   } else {
     // cursor is on SingleInstruction
     cursor.firstChild();
-    cursor.firstChild();
-
-    let kind: Length["kind"];
-
-    switch (cursor.name) {
-      case "LengthAsDistance":
-        kind = "distance";
-        break;
-
-      case "LengthAsLaps":
-        kind = "laps";
-        break;
-
-      case "LengthAsTime":
-        kind = "time";
-        break;
-
-      default:
-        kind = "distance";
-    }
-
-    cursor.firstChild();
-    let length: Length;
-    if (kind === "time") {
-      length = { kind, ...visitDuration(cursor, state) };
-    } else {
-      length = { kind, value: state.sliceDoc(cursor.from, cursor.to) };
-    }
-    cursor.parent(); // exits LengthAsDistance or LengthAsLaps or LengthAsTime
-
-    cursor.parent(); // exits length
+    const length = visitLength(cursor, state);
     cursor.nextSibling();
     const stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
 
@@ -540,6 +515,43 @@ function visitSwimInstruction(
     strokeModifier,
     instructionModifiers,
   };
+}
+
+function visitLength(
+  cursor: TreeCursor, state: EditorState
+): Length {
+  cursor.firstChild();
+
+  let kind: Length["kind"];
+
+  switch (cursor.name) {
+    case "LengthAsDistance":
+      kind = "distance";
+      break;
+
+    case "LengthAsLaps":
+      kind = "laps";
+      break;
+
+    case "LengthAsTime":
+      kind = "time";
+      break;
+
+    default:
+      kind = "distance";
+  }
+
+  cursor.firstChild();
+  let length: Length;
+  if (kind === "time") {
+    length = { kind, ...visitDuration(cursor, state) };
+  } else {
+    length = { kind, value: state.sliceDoc(cursor.from, cursor.to) };
+  }
+
+  cursor.parent(); // exits LengthAsDistance or LengthAsLaps or LengthAsTime
+  cursor.parent(); // exits length
+  return length;
 }
 
 /**
@@ -665,6 +677,91 @@ function visitInstructionDescription(
 }
 
 /**
+ * Create an AST node for a `PyramidInstruction` CST node.
+ *
+ * Precondition: `cursor` points to a `PyramidInstruction` node.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ *
+ * @returns A `PyramidInstruction` AST node.
+ */
+function visitPyramidInstruction(
+  cursor: TreeCursor,
+  state: EditorState,
+): PyramidInstruction {
+  let repetitions = 1;
+  let strokeModifier: StrokeModifiers = StrokeModifiers.STANDARD;
+  const instructionModifiers: InstructionModifier[] = [];
+
+  cursor.firstChild(); // either number or pyramid keyword
+
+  if (cursor.name === "Number") {
+    repetitions = Number(state.sliceDoc(cursor.from, cursor.to));
+    cursor.nextSibling();
+  }
+
+  // pyramid range
+  cursor.firstChild(); // start length
+  const startLength = visitLength(cursor, state);
+
+  cursor.nextSibling(); // stop length
+  const stopLength = visitLength(cursor, state);
+
+  cursor.nextSibling(); // stroke
+  const stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
+
+  if (cursor.nextSibling() && cursor.name === "StrokeModifier") {
+    strokeModifier = getStrokeModifier(state.sliceDoc(cursor.from, cursor.to));
+  }
+
+  cursor.parent();
+
+  cursor.nextSibling();
+  const increment = Number(state.sliceDoc(cursor.from, cursor.to));
+
+  // Optional increment length unit
+  let incrementLengthUnit: string | undefined;
+  if (cursor.nextSibling() && cursor.name === "LengthUnit") {
+    cursor.firstChild();
+    incrementLengthUnit = state.sliceDoc(cursor.from, cursor.to);
+    cursor.parent();
+    cursor.nextSibling();
+  }
+
+  // Optional pointy keyword
+  let isPointy = false;
+  if (cursor.name === "PyramidPointy") {
+    isPointy = true;
+    cursor.nextSibling();
+  }
+
+  // Remaining instruction modifiers
+  do {
+    if (cursor.name === "") break;
+    instructionModifiers.push(visitInstructionModifier(cursor, state));
+  } while (cursor.nextSibling());
+
+  cursor.parent();
+
+  return {
+    statement: Statements.PYRAMID_INSTRUCTION,
+    repetitions,
+    startLength,
+    stopLength,
+    increment,
+    ...(incrementLengthUnit !== undefined && { incrementLengthUnit }),
+    isPointy,
+    stroke,
+    strokeModifier,
+    instructionModifiers,
+  };
+}
+
+/**
  * Create an AST for the current program in `state`.
  *
  * Precondition: `cursor` points to the topmost node (`SwimProgramme`).
@@ -702,6 +799,9 @@ export default function buildAst(
           break;
         case "AuthorDefinition":
           node = visitAuthorDefinition(cursor, state);
+          break;
+        case "PyramidInstruction":
+          node = visitPyramidInstruction(cursor, state);
           break;
         default:
           break;
