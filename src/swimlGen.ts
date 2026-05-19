@@ -11,8 +11,9 @@ import {
   Programme,
   Statements,
   StrokeModifiers,
+  SingleInstruction,
   SwimInstruction,
-  ContinueInstruction
+  ContinueBlock,
 } from "./astTypes";
 
 const XML_NAMESPACE = "https://github.com/bartneck/swiML";
@@ -58,9 +59,6 @@ function writeInstruction(
 
     case Statements.MESSAGE:
       writeMessage(xmlParent, instruction);
-      break;
-    case Statements.CONTINUE_INSTRUCTION:
-      writeContinueInstruction(xmlParent, instruction);
       break;
   }
 }
@@ -146,6 +144,74 @@ function writeInstructionModifier(
 }
 
 /**
+ * Writes a repetition wrapper node into the XML document.
+ *
+ * @param xmlParent - The parent XML node to write the repetition wrapper inside of.
+ * @param repetitions - The number of repetitions.
+ * @returns The XML node representing the repetition wrapper.
+ */
+function writeRepetitionWrapper(
+  xmlParent: XMLBuilder,
+  repetitions: number,
+): XMLBuilder {
+  if (repetitions <= 1) return xmlParent;
+
+  const repetitionNode = xmlParent.ele("repetition");
+  repetitionNode.ele("repetitionCount").txt(String(repetitions));
+  return repetitionNode;
+}
+
+/**
+ * Writes a continue block node into the XML document.
+ *
+ * @param xmlParent - The parent XML node to write the continue block inside of.
+ * @param instruction - The continue block instruction to write as XML.
+ */
+function writeContinueBlock (
+  xmlParent: XMLBuilder,
+  instruction: ContinueBlock,
+): void {
+  const continueNode = xmlParent.ele("continue");
+
+  for (const modifier of instruction.instructionModifiers) {
+    writeInstructionModifier(continueNode, modifier);
+  }
+
+  for (const subInstruction of instruction.instructions) {
+    writeInstruction(continueNode, subInstruction);
+  }
+}
+
+/**
+ * Writes a single instruction node into the XML document.
+ *
+ * @param xmlParent - The parent XML node to write the instruction inside of.
+ * @param instruction - The single instruction to write as XML.
+ * @param strokeModifier - The stroke modifier for the instruction.
+ */
+function writeSingleInstruction(
+  xmlParent: XMLBuilder,
+  instruction: SingleInstruction,
+  strokeModifier: StrokeModifiers,
+): void {
+  const len = instruction.length;
+  const length = xmlParent.ele("length");
+  if (len.kind === "distance") {
+    length.ele("lengthAsDistance").txt(len.value);
+  } else if (len.kind == "laps") {
+    length.ele("lengthAsLaps").txt(len.value);
+  } else {
+    length.ele("lengthAsTime").txt(xmlDuration(len.minutes, len.seconds));
+  }
+
+  if (strokeModifier === StrokeModifiers.KICK) {
+    xmlParent.ele("stroke").ele("kicking").ele("standardKick").txt(instruction.stroke);
+  } else {
+    xmlParent.ele("stroke").ele("standardStroke").txt(instruction.stroke);
+  }
+}
+
+/**
  * Write an AST SwimInstruction node into the XML document.
  *
  * @param xmlParent - The parent XML node to write the instruction inside of.
@@ -155,46 +221,28 @@ function writeSwimInstruction(
   xmlParent: XMLBuilder,
   instruction: SwimInstruction,
 ): void {
-  let parent = xmlParent.ele("instruction");
+  const instructionNode = xmlParent.ele("instruction");
+  const { instruction: inner, repetitions, strokeModifier, instructionModifiers } = instruction;
 
-  if (instruction.repetitions > 1) {
-    parent = parent.ele("repetition");
-    parent.ele("repetitionCount").txt(String(instruction.repetitions)).up();
-  }
+  if (inner.isBlock) {
+    const parent = writeRepetitionWrapper(instructionNode, repetitions);
 
-  if (instruction.instruction.isBlock) {
-    for (const subInstruction of instruction.instruction.instructions) {
+    for (const subInstruction of inner.instructions) {
       writeInstruction(parent, subInstruction);
     }
-  } else {
-    const len = instruction.instruction.length;
-    const length = parent.ele("length");
-    if (len.kind === "distance") {
-      length.ele("lengthAsDistance").txt(len.value);
-    } else if (len.kind == "laps") {
-      length.ele("lengthAsLaps").txt(len.value);
-    } else {
-      length.ele("lengthAsTime").txt(xmlDuration(len.minutes, len.seconds));
-    }
+  } else if (inner.isContinue) {
+    const parent = repetitions > 1
+      ? writeRepetitionWrapper(instructionNode, repetitions).ele("instruction")
+      : instructionNode;
 
-    if (instruction.strokeModifier === StrokeModifiers.KICK) {
-      parent
-        .ele("stroke")
-        .ele("kicking")
-        .ele("standardKick")
-        .txt(instruction.instruction.stroke);
-    } else {
-      parent
-        .ele("stroke")
-        .ele("standardStroke")
-        .txt(instruction.instruction.stroke);
-    }
+      writeContinueBlock(parent, inner);
+  } else {
+    const parent = writeRepetitionWrapper(instructionNode, repetitions);
+    writeSingleInstruction(parent, inner, strokeModifier ?? StrokeModifiers.STANDARD);
   }
 
-  if (instruction.instructionModifiers.length > 0) {
-    for (const modifier of instruction.instructionModifiers) {
-      writeInstructionModifier(parent, modifier);
-    }
+  for (const modifier of instructionModifiers) {
+    writeInstructionModifier(instructionNode, modifier);
   }
 }
 
@@ -279,28 +327,6 @@ function writeAuthorDefinition(
   }
 }
 
-function writeContinueInstruction(
-  xmlParent: XMLBuilder,
-  instruction: ContinueInstruction,
-): void {
-  let parent = xmlParent.ele("instruction");
-
-  if (instruction.repetitions > 1) {
-    parent = parent.ele("repetition");
-    parent.ele("repetitionCount").txt(String(instruction.repetitions));
-  }
-
-  const continueNode = xmlParent.ele("instruction").ele("continue");
-
-  for (const modifier of instruction.instructionModifiers) {
-    writeInstructionModifier(continueNode, modifier);
-  }
-
-  for (const subInstruction of instruction.instructions) {
-    writeInstruction(continueNode, subInstruction);
-  }
-}
-
 /**
  * Given a complete AST for a SwimDSL document, generate a valid swiML XML
  * document describing the same programme.
@@ -336,10 +362,6 @@ export default function emitXml(programme: Programme): string {
 
       case Statements.AUTHOR_DEFINITION:
         writeAuthorDefinition(doc, statement);
-        break;
-
-      case Statements.CONTINUE_INSTRUCTION:
-        writeContinueInstruction(doc, statement);
         break;
     }
   }

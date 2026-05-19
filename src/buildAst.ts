@@ -5,7 +5,7 @@ import {
   BlockInstruction,
   Breathe,
   ConstantDefinition,
-  ContinueInstruction,
+  ContinueBlock,
   Instruction,
   InstructionDescription,
   InstructionModifier,
@@ -139,11 +139,9 @@ function visitBreathe(cursor: TreeCursor, state: EditorState): Breathe {
  */
 function visitInstruction(cursor: TreeCursor, state: EditorState): Instruction {
   if (cursor.name === "SwimInstruction") {
-    return visitSwimInstruction(cursor, state);
-  }
-
-  if (cursor.name === "ContinueInstruction") {
-    return visitContinueInstruction(cursor, state);
+    const result = visitSwimInstruction(cursor, state);
+    cursor.parent();
+    return result;
   }
 
   return visitMessage(cursor, state);
@@ -449,8 +447,22 @@ function visitSwimInstruction(
 ): SwimInstruction {
   let repetitions = 1;
   let strokeModifier: StrokeModifiers = StrokeModifiers.STANDARD;
-  let instruction: SingleInstruction | BlockInstruction;
+  let instruction: SingleInstruction | BlockInstruction | ContinueBlock;
   const instructionModifiers: InstructionModifier[] = [];
+  const instructionNames = new Set([
+    "SwimInstruction",
+    "Message",
+  ]);
+
+  const modifierNames = new Set([
+    "EquipmentSpecification",
+    "Pace",
+    "Rest",
+    "Breathe",
+    "Underwater",
+    "InstructionDescription",
+    "ExcludeAlignSpecification",
+  ]);
 
   // Move into either Number (for repetitions) or SingleInstruction |
   // BlockInstruction
@@ -474,6 +486,26 @@ function visitSwimInstruction(
 
     instruction = { isBlock: true, instructions };
     // cursor is still on the last instruction of the block
+  } else if (cursor.name === "ContinueBlock") {
+    const continueModifiers: InstructionModifier[] = [];
+    const continueInstructions: Instruction[] = [];
+
+    cursor.firstChild();
+
+    do {
+      if (modifierNames.has(cursor.name)) {
+        continueModifiers.push(visitInstructionModifier(cursor, state));
+      } else if (instructionNames.has(cursor.name)) {
+        continueInstructions.push(visitInstruction(cursor, state));
+      }
+    } while (cursor.nextSibling());
+
+    instruction = {
+      isBlock: false,
+      isContinue: true,
+      instructionModifiers: continueModifiers,
+      instructions: continueInstructions,
+    }
   } else {
     // cursor is on SingleInstruction
     cursor.firstChild();
@@ -534,9 +566,6 @@ function visitSwimInstruction(
       } while (cursor.nextSibling());
     }
   }
-
-  // Move up out of the SwimInstruction
-  cursor.parent();
 
   return {
     statement: Statements.SWIM_INSTRUCTION,
@@ -670,73 +699,6 @@ function visitInstructionDescription(
 }
 
 /**
- * Create an AST node for a `ContinueInstruction` CST node.
- *
- * Precondition: `cursor` points to a `ContinueInstruction` node.
- *
- * Postcondition: `cursor` will point to the same node it pointed to when
- * passed to this function.
- *
- * @param cursor - A reference to a Lezer syntax tree node.
- * @param state - The state of the CodeMirror editor.
- *
- * @returns A `ContinueInstruction` AST node.
- */
-function visitContinueInstruction(
-  cursor: TreeCursor,
-  state: EditorState,
-): ContinueInstruction {
-  let repetitions = 1;
-  const instructionModifiers: InstructionModifier[] = [];
-  const instructions: Instruction[] = [];
-
-  const instructionNames = new Set([
-    "SwimInstruction",
-    "RestInstruction",
-    "Message",
-    "ContinueInstruction",
-  ])
-
-  const modifierNames = new Set([
-    "EquipmentSpecification",
-    "Pace",
-    "Time",
-    "Breathe",
-    "Underwater",
-    "InstructionDescription",
-  ]);
-
-  if (!cursor.firstChild()) {
-    return {
-      statement: Statements.CONTINUE_INSTRUCTION,
-      repetitions,
-      instructionModifiers,
-      instructions,
-    };
-  }
-
-  do {
-    if (cursor.name === "Number") {
-      repetitions = Number(state.sliceDoc(cursor.from, cursor.to));
-    } else if (instructionNames.has(cursor.name)) {
-      instructions.push(visitInstruction(cursor, state));
-    } else if (modifierNames.has(cursor.name)) {
-      instructionModifiers.push(visitInstructionModifier(cursor, state));
-    }
-  } while (cursor.nextSibling());
-
-  // Move back up to the ContinueInstruction
-  cursor.parent();
-
-  return {
-    statement: Statements.CONTINUE_INSTRUCTION,
-    repetitions,
-    instructionModifiers,
-    instructions,
-  };
-}
-
-/**
  * Create an AST for the current program in `state`.
  *
  * Precondition: `cursor` points to the topmost node (`SwimProgramme`).
@@ -762,6 +724,7 @@ export default function buildAst(
       switch (cursor.type.name) {
         case "SwimInstruction":
           node = visitSwimInstruction(cursor, state);
+          cursor.parent();
           break;
         case "Message":
           node = visitMessage(cursor, state);
@@ -774,9 +737,6 @@ export default function buildAst(
           break;
         case "AuthorDefinition":
           node = visitAuthorDefinition(cursor, state);
-          break;
-        case "ContinueInstruction":
-          node = visitContinueInstruction(cursor, state);
           break;
         default:
           break;

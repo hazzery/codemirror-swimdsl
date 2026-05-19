@@ -52,12 +52,15 @@ statement {
 instruction {
     SwimInstruction
     | messageSpecification
-    | ContinueInstruction
 }
 
 SwimInstruction {
     (Number repititionOperator)?
-    (SingleInstruction | BlockInstruction) StrokeModifier? instructionModifier*
+    (SingleInstruction | BlockInstruction | ContinueBlock) StrokeModifier? instructionModifier*
+}
+
+ContinueBlock {
+    continueKeyword instructionModifier* "{" instruction+ "}"
 }
 
 SingleInstruction {
@@ -142,10 +145,6 @@ Duration {
 
 messageSpecification {
   ">" Message
-}
-
-ContinueInstruction {
-    (Number repititionOperator)? continueKeyword instructionModifier* "{" instruction+ "}"
 }
 
 @tokens {
