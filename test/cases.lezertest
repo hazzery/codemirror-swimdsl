@@ -91,7 +91,7 @@ SwimProgramme(SwimInstruction(
 
 ## Single instruction with start intensity heart rate
 
-100 Backstroke @ 50heartrate
+100 Backstroke @ 50bpm
 
 ==>
 
@@ -102,7 +102,7 @@ SwimProgramme(SwimInstruction(
 
 ## Single instruction with start and stop intensity heart rates
 
-50 Butterfly @ 55heartrate -> 75heartrate
+50 Butterfly @ 55bpm -> 75bpm
 
 ==>
 
@@ -113,7 +113,7 @@ SwimProgramme(SwimInstruction(
 
 ## Repeated single instruction with heart rate intensity
 
-6 x 100 Freestyle @ 60heartrate -> 80heartrate
+6 x 100 Freestyle @ 60bpm -> 80bpm
 
 ==>
 
