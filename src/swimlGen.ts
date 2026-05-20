@@ -141,6 +141,13 @@ function writeInstructionModifier(
   }
 }
 
+/**
+ * Write an AST SwimInstruction node in the form of the simplified
+ * repetitions to the XML document.
+ *
+ * @param xmlParent - The parent XML node to write the instruction inside.
+ * @param instruction - The AST swim instruction node to write as XML.
+ */
 function writeSimpleInstruction(
   xmlParent: XMLBuilder,
   instruction: SwimInstruction,
@@ -150,10 +157,13 @@ function writeSimpleInstruction(
   parent = parent.ele("instruction");
 
   if (!instruction.instruction.isBlock) {
-    if (instruction.instruction.length.kind === "distance")
-    {
-      parent.ele("length").ele("lengthAsDistance").txt(instruction.instruction.length.value);
+    if (instruction.instruction.length.kind === "distance") {
+      parent
+        .ele("length")
+        .ele("lengthAsDistance")
+        .txt(instruction.instruction.length.value);
     }
+
     if (instruction.strokeModifier === StrokeModifiers.KICK) {
       parent
         .ele("stroke")
@@ -174,7 +184,6 @@ function writeSimpleInstruction(
     }
   }
 }
-
 
 /**
  * Write an AST SwimInstruction node into the XML document.
@@ -208,8 +217,8 @@ function writeSwimInstruction(
         writeSimpleInstruction(parent, subInstructiuon);
       }
     }
-
   } else {
+    parent = parent.ele("instruction");
     const len = instruction.instruction.length;
     const length = parent.ele("length");
     if (len.kind === "distance") {

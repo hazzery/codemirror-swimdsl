@@ -130,17 +130,6 @@ export interface SimplificationBlock {
   instructions: SwimInstruction[];
 }
 
-export interface SimpleRepetitionInstruction {
-  instruction: SimpleRepetition;
-  strokeModifier?: StrokeModifiers | undefined;
-  instructionModifiers: InstructionModifier[];
-}
-
-export interface SimpleRepetition {
-  repetitions: number;
-  stroke: string;
-}
-
 export interface Intensity {
   isAlias: boolean;
   value: string;

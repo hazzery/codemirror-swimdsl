@@ -1,5 +1,5 @@
-import {EditorState} from "@codemirror/state";
-import {TreeCursor} from "@lezer/common";
+import { EditorState } from "@codemirror/state";
+import { TreeCursor } from "@lezer/common";
 import {
   AuthorDefintion,
   BlockInstruction,
@@ -426,6 +426,19 @@ function getStrokeModifier(strokeModifierName: string): StrokeModifiers {
   }
 }
 
+/**
+ * Create an AST node for a `SimplificationBlock` CST node.
+ * Precondition: `cursor` points to a `SimplificationBlock` node.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ * @param distance - The distance of the repetitions in the block.
+ *
+ * @returns A `SwimInstruction` AST node.
+ */
 function visitSimpleRepetition(
   cursor: TreeCursor,
   state: EditorState,
@@ -465,7 +478,7 @@ function visitSimpleRepetition(
     instruction: {isBlock: false, length: { kind: "distance", value: distance}, stroke},
     strokeModifier,
     instructionModifiers,
-  }
+  };
 }
 
 /**
@@ -510,7 +523,7 @@ function visitSwimInstruction(
       instructions.push(visitSimpleRepetition(cursor, state, distance));
     } while (cursor.nextSibling());
 
-    instruction = {isBlock:true, isSimplification:true, distance, instructions}
+    instruction = {isBlock:true, isSimplification:true, distance, instructions};
   }
   else if (cursor.name === "BlockInstruction") {
     // Move into first Instruction of the block
