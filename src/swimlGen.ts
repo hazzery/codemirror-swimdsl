@@ -186,11 +186,12 @@ function writeSwimInstruction(
   xmlParent: XMLBuilder,
   instruction: SwimInstruction,
 ): void {
-  let parent = xmlParent.ele("instruction");
+  let parent = xmlParent;
 
   if (instruction.repetitions > 1) {
+    parent = xmlParent.ele("instruction");
     parent = parent.ele("repetition");
-    parent.ele("repetitionCount").txt(String(instruction.repetitions)).up();
+    parent.ele("repetitionCount").txt(String(instruction.repetitions));
   }
 
   if (instruction.instruction.isBlock) {
@@ -199,6 +200,7 @@ function writeSwimInstruction(
         writeInstruction(parent, subInstruction);
       }
     } else {
+      parent = parent.ele("instruction");
       parent = parent.ele("repetition");
       parent.ele("repetitionCount").txt("1").up();
       parent.ele("simplify").txt("true").up();
