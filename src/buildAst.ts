@@ -1,5 +1,5 @@
-import { EditorState } from "@codemirror/state";
-import { TreeCursor } from "@lezer/common";
+import {EditorState} from "@codemirror/state";
+import {TreeCursor} from "@lezer/common";
 import {
   AuthorDefintion,
   BlockInstruction,
@@ -16,6 +16,7 @@ import {
   PaceDefinition,
   Programme,
   Rest,
+  SimplificationBlock,
   SingleInstruction,
   Statement,
   Statements,
@@ -425,6 +426,48 @@ function getStrokeModifier(strokeModifierName: string): StrokeModifiers {
   }
 }
 
+function visitSimpleRepetition(
+  cursor: TreeCursor,
+  state: EditorState,
+  distance: string,
+): SwimInstruction {
+  let strokeModifier: StrokeModifiers = StrokeModifiers.STANDARD;
+  const instructionModifiers: InstructionModifier[] = [];
+
+  cursor.firstChild();
+  const repetitions = Number(state.sliceDoc(cursor.from, cursor.to));
+  cursor.nextSibling();
+  const stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
+
+  if (cursor.nextSibling()) {
+    let hasModifiers = true;
+    if (cursor.name === "StrokeModifier") {
+      strokeModifier = getStrokeModifier(
+        state.sliceDoc(cursor.from, cursor.to),
+      );
+
+      // Move away from the StrokeModifier to a potential instruction modifier.
+      hasModifiers = cursor.nextSibling();
+    }
+
+    if (hasModifiers) {
+      do {
+        instructionModifiers.push(visitInstructionModifier(cursor, state));
+      } while (cursor.nextSibling());
+    }
+  }
+
+  // Move up out of the SwimInstruction
+  cursor.parent();
+  return {
+    statement: Statements.SWIM_INSTRUCTION,
+    repetitions,
+    instruction: {isBlock: false, length: { kind: "distance", value: distance}, stroke},
+    strokeModifier,
+    instructionModifiers,
+  }
+}
+
 /**
  * Create an AST node for a `SwimInstruction` CST node.
  *
@@ -444,7 +487,7 @@ function visitSwimInstruction(
 ): SwimInstruction {
   let repetitions = 1;
   let strokeModifier: StrokeModifiers = StrokeModifiers.STANDARD;
-  let instruction: SingleInstruction | BlockInstruction;
+  let instruction: SingleInstruction | BlockInstruction | SimplificationBlock;
   const instructionModifiers: InstructionModifier[] = [];
 
   // Move into either Number (for repetitions) or SingleInstruction |
@@ -458,7 +501,18 @@ function visitSwimInstruction(
     cursor.nextSibling();
   }
 
-  if (cursor.name === "BlockInstruction") {
+  if (cursor.name === "SimplificationBlock") {
+    cursor.firstChild(); // Number
+    const distance = state.sliceDoc(cursor.from, cursor.to);
+    const instructions: SwimInstruction[] = [];
+    cursor.nextSibling();
+    do {
+      instructions.push(visitSimpleRepetition(cursor, state, distance));
+    } while (cursor.nextSibling());
+
+    instruction = {isBlock:true, isSimplification:true, distance, instructions}
+  }
+  else if (cursor.name === "BlockInstruction") {
     // Move into first Instruction of the block
     cursor.firstChild();
 
@@ -467,7 +521,7 @@ function visitSwimInstruction(
       instructions.push(visitInstruction(cursor, state));
     } while (cursor.nextSibling());
 
-    instruction = { isBlock: true, instructions };
+    instruction = { isBlock: true, isSimplification: false, instructions };
     // cursor is still on the last instruction of the block
   } else {
     // cursor is on SingleInstruction

@@ -56,11 +56,20 @@ instruction {
 
 SwimInstruction {
     (Number repititionOperator)?
-    (SingleInstruction | BlockInstruction) StrokeModifier? instructionModifier*
+    (SingleInstruction | BlockInstruction | SimplificationBlock) StrokeModifier? instructionModifier*
 }
 
 SingleInstruction {
     Length Stroke
+}
+
+SimplificationBlock {
+    LengthAsDistance "{" SimpleRepetition+ "}"
+}
+
+SimpleRepetition {
+    Number
+    Stroke StrokeModifier? instructionModifier*
 }
 
 Length {
