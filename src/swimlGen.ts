@@ -151,18 +151,25 @@ function writeSwimInstruction(
   xmlParent: XMLBuilder,
   instruction: SwimInstruction,
 ): void {
-  let parent = xmlParent.ele("instruction");
+  let parent = xmlParent;
 
   if (instruction.repetitions > 1) {
+    parent = xmlParent.ele("instruction");
     parent = parent.ele("repetition");
-    parent.ele("repetitionCount").txt(String(instruction.repetitions)).up();
+    parent.ele("repetitionCount").txt(String(instruction.repetitions));
   }
 
   if (instruction.instruction.isBlock) {
+    if (instruction.repetitions <= 1) {
+      parent = xmlParent.ele("instruction");
+      parent = parent.ele("repetition");
+      parent.ele("repetitionCount").txt("1");
+    }
     for (const subInstruction of instruction.instruction.instructions) {
       writeInstruction(parent, subInstruction);
     }
   } else {
+    parent = parent.ele("instruction");
     const len = instruction.instruction.length;
     const length = parent.ele("length");
     if (len.kind === "distance") {
