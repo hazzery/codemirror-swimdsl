@@ -5,6 +5,7 @@ import {
   BlockInstruction,
   Breathe,
   ConstantDefinition,
+  ContinueBlock,
   Instruction,
   InstructionDescription,
   InstructionModifier,
@@ -143,7 +144,9 @@ function visitBreathe(cursor: TreeCursor, state: EditorState): Breathe {
  */
 function visitInstruction(cursor: TreeCursor, state: EditorState): Instruction {
   if (cursor.name === "SwimInstruction") {
-    return visitSwimInstruction(cursor, state);
+    const result = visitSwimInstruction(cursor, state);
+    cursor.parent();
+    return result;
   }
 
   return visitMessage(cursor, state);
@@ -449,8 +452,22 @@ function visitSwimInstruction(
 ): SwimInstruction {
   let repetitions = 1;
   let strokeModifier: StrokeModifiers = StrokeModifiers.STANDARD;
-  let instruction: SingleInstruction | BlockInstruction;
+  let instruction: SingleInstruction | BlockInstruction | ContinueBlock;
   const instructionModifiers: InstructionModifier[] = [];
+  const instructionNames = new Set([
+    "SwimInstruction",
+    "Message",
+  ]);
+
+  const modifierNames = new Set([
+    "EquipmentSpecification",
+    "Pace",
+    "Rest",
+    "Breathe",
+    "Underwater",
+    "InstructionDescription",
+    "ExcludeAlignSpecification",
+  ]);
 
   // Move into either Number (for repetitions) or SingleInstruction |
   // BlockInstruction
@@ -474,6 +491,26 @@ function visitSwimInstruction(
 
     instruction = { isBlock: true, instructions };
     // cursor is still on the last instruction of the block
+  } else if (cursor.name === "ContinueBlock") {
+    const continueModifiers: InstructionModifier[] = [];
+    const continueInstructions: Instruction[] = [];
+
+    cursor.firstChild();
+
+    do {
+      if (modifierNames.has(cursor.name)) {
+        continueModifiers.push(visitInstructionModifier(cursor, state));
+      } else if (instructionNames.has(cursor.name)) {
+        continueInstructions.push(visitInstruction(cursor, state));
+      }
+    } while (cursor.nextSibling());
+
+    instruction = {
+      isBlock: false,
+      isContinue: true,
+      instructionModifiers: continueModifiers,
+      instructions: continueInstructions,
+    }
   } else {
     // cursor is on SingleInstruction
     cursor.firstChild();
@@ -534,9 +571,6 @@ function visitSwimInstruction(
       } while (cursor.nextSibling());
     }
   }
-
-  // Move up out of the SwimInstruction
-  cursor.parent();
 
   return {
     statement: Statements.SWIM_INSTRUCTION,
@@ -695,6 +729,7 @@ export default function buildAst(
       switch (cursor.type.name) {
         case "SwimInstruction":
           node = visitSwimInstruction(cursor, state);
+          cursor.parent();
           break;
         case "Message":
           node = visitMessage(cursor, state);

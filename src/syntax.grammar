@@ -60,7 +60,11 @@ instruction {
 
 SwimInstruction {
     (Number repititionOperator)?
-    (SingleInstruction | BlockInstruction) StrokeModifier? instructionModifier*
+    (SingleInstruction | BlockInstruction | ContinueBlock) StrokeModifier? instructionModifier*
+}
+
+ContinueBlock {
+    continueKeyword instructionModifier* "{" instruction+ "}"
 }
 
 SingleInstruction {
@@ -155,6 +159,7 @@ messageSpecification {
     onKeyword             { "on" }
     underwaterKeyword     { "underwater" }
     breatheKeyword        { "breathe" }
+    continueKeyword { "continuous" }
     inOutKeyword          { "in-out" }
     space       { @whitespace+ }
     Comment     { "#" ![\n]* }
@@ -181,6 +186,7 @@ messageSpecification {
     @precedence { excludeAlignKeyword, Message }
     @precedence { underwaterKeyword, identifier }
     @precedence { breatheKeyword, identifier }
+    @precedence { continueKeyword, identifier }
     @precedence { withKeyword, identifier }
     @precedence { inOutKeyword, identifier }
     @precedence { heartRateKeyword, identifier }
