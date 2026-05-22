@@ -64,11 +64,12 @@ SingleInstruction {
 }
 
 SimplificationBlock {
-    LengthAsDistance "{" SimpleRepetition+ "}"
+    (LengthAsDistance simpleRepetitionOperator)
+     "{" SimpleRepetition+ "}"
 }
 
 SimpleRepetition {
-    Number
+    (Number)
     Stroke StrokeModifier? instructionModifier*
 }
 
@@ -168,11 +169,13 @@ messageSpecification {
     StringContent { (!["\\] | "\\" _)+ }
     identifier  { @asciiLetter+ }
     repititionOperator { "x" }
+    simpleRepetitionOperator { "s" }
     lapsKeyword { "laps" | "lap" }
     excludeAlignKeyword { "noalign" }
     @precedence { StringContent, space }
     @precedence { StringContent, Comment }
     @precedence { repititionOperator, identifier }
+        @precedence { simpleRepetitionOperator, identifier }
     @precedence { paceKeyword, identifier }
     @precedence { setKeyword, identifier }
     @precedence { authorKeyword, identifier }
