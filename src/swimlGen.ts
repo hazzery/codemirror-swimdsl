@@ -68,10 +68,19 @@ function writeInstruction(
  * @param intensity - The AST intensity node to write as XML.
  */
 function writeIntensity(xmlParent: XMLBuilder, intensity: Intensity): void {
-  if (intensity.isAlias) {
-    xmlParent.ele("zone").txt(intensity.value);
-  } else {
-    xmlParent.ele("percentageEffort").txt(intensity.value);
+  switch (intensity.kind) {
+    case "alias":
+      xmlParent.ele("zone").txt(intensity.value);
+      break;
+
+    case "heartRate":
+      xmlParent.ele("percentageHeartRate").txt(intensity.value);
+      break;
+
+    case "percentage":
+    default:
+      xmlParent.ele("percentageEffort").txt(intensity.value);
+      break;
   }
 }
 
