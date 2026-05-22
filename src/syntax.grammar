@@ -29,7 +29,11 @@ PaceDefinition {
 PaceDefinitionName { identifier }
 
 intensity {
-    percentage | PaceAlias
+    percentage | HeartRate | PaceAlias
+}
+
+HeartRate {
+    Number heartRateKeyword
 }
 
 Pace {
@@ -185,6 +189,9 @@ messageSpecification {
     StringContent { (!["\\] | "\\" _)+ }
     identifier  { @asciiLetter+ }
     repititionOperator { "x" }
+    lapsKeyword { "laps" | "lap" }
+    excludeAlignKeyword { "noalign" }
+    heartRateKeyword { "bpm" }
     @precedence { StringContent, space }
     @precedence { StringContent, Comment }
     @precedence { repititionOperator, identifier }
@@ -205,6 +212,8 @@ messageSpecification {
     @precedence { pyramidKeyword, identifier }
     @precedence { pointyKeyword, identifier }
     @precedence { identifier, lengthUnitKeyword }
+    @precedence { heartRateKeyword, identifier }
+    @precedence { heartRateKeyword, Message }
 }
 
 @skip { space | Comment }
