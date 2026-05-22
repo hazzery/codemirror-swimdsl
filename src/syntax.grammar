@@ -69,7 +69,7 @@ SimplificationBlock {
 }
 
 SimpleRepetition {
-    (Number)
+    Number
     Stroke StrokeModifier? instructionModifier*
 }
 
