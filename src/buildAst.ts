@@ -40,7 +40,7 @@ function visitPace(cursor: TreeCursor, state: EditorState): Pace {
   // Move down into starting intensity
   cursor.firstChild();
 
-  const startIntensity: Intensity = visitIntensity(cursor, state)
+  const startIntensity: Intensity = visitIntensity(cursor, state);
 
   let stopIntensity: Intensity | undefined = undefined;
 
@@ -430,6 +430,80 @@ function getStrokeModifier(strokeModifierName: string): StrokeModifiers {
   }
 }
 
+function visitLength(cursor: TreeCursor, state: EditorState): Length {
+  // Move down to LengthAsDistance | LengthAsLaps | LengthAsTime
+  cursor.firstChild();
+
+  let kind: Length["kind"];
+
+  switch (cursor.name) {
+    case "LengthAsLaps":
+      kind = "laps";
+      break;
+
+    case "LengthAsTime":
+      kind = "time";
+      break;
+
+    case "LengthAsDistance":
+    default:
+      kind = "distance";
+      break;
+  }
+
+  // Move down to Number | Duration
+  cursor.firstChild();
+
+  const length =
+    kind === "time"
+      ? { kind, ...visitDuration(cursor, state) }
+      : { kind, value: state.sliceDoc(cursor.from, cursor.to) };
+
+  // Move back up to LengthAsDistance | LengthAsLaps | LengthAsTime
+  cursor.parent();
+
+  // Move back up to Length
+  cursor.parent();
+
+  return length;
+}
+
+function visitSingleInstruction(
+  cursor: TreeCursor,
+  state: EditorState,
+): SingleInstruction {
+  // Move down to Length
+  cursor.firstChild();
+  const length = visitLength(cursor, state);
+
+  // Move across to Stroke
+  cursor.nextSibling();
+  const stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
+
+  // Move back up to SingleInstruction
+  cursor.parent();
+
+  return { isBlock: false, length, stroke };
+}
+
+function visitBlockInstruction(
+  cursor: TreeCursor,
+  state: EditorState,
+): BlockInstruction {
+  // Move into first Instruction of the block
+  cursor.firstChild();
+
+  const instructions: Instruction[] = [];
+  do {
+    instructions.push(visitInstruction(cursor, state));
+  } while (cursor.nextSibling());
+
+  // Move back up to BlockInstruction
+  cursor.parent();
+
+  return { isBlock: true, instructions };
+}
+
 /**
  * Create an AST node for a `SwimInstruction` CST node.
  *
@@ -449,7 +523,6 @@ function visitSwimInstruction(
 ): SwimInstruction {
   let repetitions = 1;
   let strokeModifier: StrokeModifiers = StrokeModifiers.STANDARD;
-  let instruction: SingleInstruction | BlockInstruction;
   const instructionModifiers: InstructionModifier[] = [];
 
   // Move into either Number (for repetitions) or SingleInstruction |
@@ -463,72 +536,24 @@ function visitSwimInstruction(
     cursor.nextSibling();
   }
 
-  if (cursor.name === "BlockInstruction") {
-    // Move into first Instruction of the block
-    cursor.firstChild();
-
-    const instructions: Instruction[] = [];
-    do {
-      instructions.push(visitInstruction(cursor, state));
-    } while (cursor.nextSibling());
-
-    instruction = { isBlock: true, instructions };
-    // cursor is still on the last instruction of the block
-  } else {
-    // cursor is on SingleInstruction
-    cursor.firstChild();
-    cursor.firstChild();
-
-    let kind: Length["kind"];
-
-    switch (cursor.name) {
-      case "LengthAsDistance":
-        kind = "distance";
-        break;
-
-      case "LengthAsLaps":
-        kind = "laps";
-        break;
-
-      case "LengthAsTime":
-        kind = "time";
-        break;
-
-      default:
-        kind = "distance";
-    }
-
-    cursor.firstChild();
-    let length: Length;
-    if (kind === "time") {
-      length = { kind, ...visitDuration(cursor, state) };
-    } else {
-      length = { kind, value: state.sliceDoc(cursor.from, cursor.to) };
-    }
-    cursor.parent(); // exits LengthAsDistance or LengthAsLaps or LengthAsTime
-
-    cursor.parent(); // exits length
-    cursor.nextSibling();
-    const stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
-
-    instruction = { isBlock: false, length, stroke };
-    // cursor is still on the Stroke
-  }
-  // Move back up to SwimInstruction
-  cursor.parent();
+  const instruction =
+    cursor.name === "BlockInstruction"
+      ? visitBlockInstruction(cursor, state)
+      : visitSingleInstruction(cursor, state);
 
   if (cursor.nextSibling()) {
-    let hasModifiers = true;
+    let hasInstructionModifiers = true;
+
     if (cursor.name === "StrokeModifier") {
       strokeModifier = getStrokeModifier(
         state.sliceDoc(cursor.from, cursor.to),
       );
 
       // Move away from the StrokeModifier to a potential instruction modifier.
-      hasModifiers = cursor.nextSibling();
+      hasInstructionModifiers = cursor.nextSibling();
     }
 
-    if (hasModifiers) {
+    if (hasInstructionModifiers) {
       do {
         instructionModifiers.push(visitInstructionModifier(cursor, state));
       } while (cursor.nextSibling());
