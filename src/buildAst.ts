@@ -58,6 +58,19 @@ function visitPace(cursor: TreeCursor, state: EditorState): Pace {
   };
 }
 
+/**
+ * Create an AST node for an `intensity` CST node.
+ *
+ * Precondition: `cursor` points to a `PaceAlias | HeartRate | Number`.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ *
+ * @returns An `Intensity` AST node.
+ */
 function visitIntensity(cursor: TreeCursor, state: EditorState): Intensity {
   if (cursor.name === "PaceAlias") {
     return { kind: "alias", value: state.sliceDoc(cursor.from, cursor.to) };
@@ -328,7 +341,7 @@ function visitRest(cursor: TreeCursor, state: EditorState): Rest {
 /**
  * Convert the swimDSL stroke name to the swiML stroke name.
  *
- * @param strokeName - The swimDSL name of stroke.
+ * @param strokeName - The swimDSL name of the stroke.
  *
  * @returns The swiML name of the same stroke.
  */
@@ -417,6 +430,13 @@ function getStroke(strokeName: string): string {
   }
 }
 
+/**
+ * Convert the swimDSL stroke modifier name to the swiML stroke type.
+ *
+ * @param strokeModifierName - The swimDSL name of the stroke modifier.
+ *
+ * @returns The namee of the coresponding swiML stroke type.
+ */
 function getStrokeModifier(strokeModifierName: string): StrokeModifiers {
   switch (strokeModifierName) {
     case "Kick":
@@ -430,6 +450,19 @@ function getStrokeModifier(strokeModifierName: string): StrokeModifiers {
   }
 }
 
+/**
+ * Create an AST node for a `Length` CST node.
+ *
+ * Precondition: `cursor` points to a `Lenth`.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ *
+ * @returns A `Length` AST node.
+ */
 function visitLength(cursor: TreeCursor, state: EditorState): Length {
   // Move down to LengthAsDistance | LengthAsLaps | LengthAsTime
   cursor.firstChild();
@@ -468,6 +501,19 @@ function visitLength(cursor: TreeCursor, state: EditorState): Length {
   return length;
 }
 
+/**
+ * Create an AST node for a `SingleInsstruction` CST node.
+ *
+ * Precondition: `cursor` points to a `SingleInstruction`.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ *
+ * @returns A `SingleInstruction` AST node.
+ */
 function visitSingleInstruction(
   cursor: TreeCursor,
   state: EditorState,
@@ -486,6 +532,19 @@ function visitSingleInstruction(
   return { isBlock: false, length, stroke };
 }
 
+/**
+ * Create an AST node for a `BlockInsstruction` CST node.
+ *
+ * Precondition: `cursor` points to a `BlockInstruction`.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ *
+ * @returns A `BlockInstruction` AST node.
+ */
 function visitBlockInstruction(
   cursor: TreeCursor,
   state: EditorState,
