@@ -154,9 +154,15 @@ function writeSwimInstruction(
   let parent = xmlParent.ele("instruction");
 
   if (instruction.repetitions > 1) {
-    parent = parent.ele("repetition");
-    parent.ele("repetitionCount").txt(String(instruction.repetitions)).up();
+  const repetition = parent.ele("repetition");
+  repetition.ele("repetitionCount").txt(String(instruction.repetitions));
+
+  if (instruction.instruction.isBlock) {
+    parent = repetition;
+  } else {
+    parent = repetition.ele("instruction");
   }
+}
 
   if (instruction.instruction.isBlock) {
     for (const subInstruction of instruction.instruction.instructions) {
