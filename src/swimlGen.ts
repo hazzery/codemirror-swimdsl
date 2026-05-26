@@ -169,13 +169,23 @@ function writeSwimInstruction(
   }
 
   if (instruction.instruction.isBlock) {
-    if (instruction.repetitions <= 1) {
-      parent = xmlParent.ele("instruction");
+    if (!instruction.instruction.isSimplification) {
+      if (instruction.repetitions <= 1) {
+        parent = xmlParent.ele("instruction");
+        parent = parent.ele("repetition");
+        parent.ele("repetitionCount").txt("1");
+      }
+      for (const subInstruction of instruction.instruction.instructions) {
+        writeInstruction(parent, subInstruction);
+        }
+    } else {
+      parent = parent.ele("instruction");
       parent = parent.ele("repetition");
-      parent.ele("repetitionCount").txt("1");
-    }
-    for (const subInstruction of instruction.instruction.instructions) {
-      writeInstruction(parent, subInstruction);
+      parent.ele("repetitionCount").txt("1").up();
+      parent.ele("simplify").txt("true").up();
+      for (const subInstruction of instruction.instruction.instructions) {
+        writeSwimInstruction(parent, subInstruction);
+      }
     }
   } else {
     parent = parent.ele("instruction");

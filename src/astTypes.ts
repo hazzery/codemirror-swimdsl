@@ -106,7 +106,7 @@ export type Intensity =
 export interface SwimInstruction {
   statement: Statements.SWIM_INSTRUCTION;
   repetitions: number;
-  instruction: SingleInstruction | BlockInstruction;
+  instruction: SingleInstruction | BlockInstruction | SimplificationBlock;
   strokeModifier?: StrokeModifiers | undefined;
   instructionModifiers: InstructionModifier[];
 }
@@ -124,6 +124,7 @@ export interface SingleInstruction {
 
 export interface BlockInstruction {
   isBlock: true;
+  isSimplification: false;
   instructions: Instruction[];
 }
 
@@ -140,6 +141,13 @@ export interface PercentageIntensity {
 export interface HeartRateIntensity {
   kind: "heartRate";
   value: string;
+}
+
+export interface SimplificationBlock {
+  isBlock: true;
+  isSimplification: true;
+  distance: string;
+  instructions: SwimInstruction[];
 }
 
 export interface Pace {

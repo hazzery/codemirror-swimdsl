@@ -60,11 +60,21 @@ instruction {
 
 SwimInstruction {
     (Number repititionOperator)?
-    (SingleInstruction | BlockInstruction) StrokeModifier? instructionModifier*
+    (SingleInstruction | BlockInstruction | SimplificationBlock) StrokeModifier? instructionModifier*
 }
 
 SingleInstruction {
     Length Stroke
+}
+
+SimplificationBlock {
+    (LengthAsDistance simpleRepetitionOperator)
+     "{" SimpleRepetition+ "}"
+}
+
+SimpleRepetition {
+    Number
+    Stroke StrokeModifier? instructionModifier*
 }
 
 Length {
@@ -163,12 +173,14 @@ messageSpecification {
     StringContent { (!["\\] | "\\" _)+ }
     identifier  { @asciiLetter+ }
     repititionOperator { "x" }
+    simpleRepetitionOperator { "s" }
     lapsKeyword { "laps" | "lap" }
     excludeAlignKeyword { "noalign" }
     heartRateKeyword { "bpm" }
     @precedence { StringContent, space }
     @precedence { StringContent, Comment }
     @precedence { repititionOperator, identifier }
+        @precedence { simpleRepetitionOperator, identifier }
     @precedence { paceKeyword, identifier }
     @precedence { setKeyword, identifier }
     @precedence { authorKeyword, identifier }
