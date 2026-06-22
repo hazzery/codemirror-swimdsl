@@ -40,7 +40,7 @@ function visitPace(cursor: TreeCursor, state: EditorState): Pace {
   // Move down into starting intensity
   cursor.firstChild();
 
-  const startIntensity: Intensity = visitIntensity(cursor, state)
+  const startIntensity: Intensity = visitIntensity(cursor, state);
 
   let stopIntensity: Intensity | undefined = undefined;
 
@@ -58,6 +58,19 @@ function visitPace(cursor: TreeCursor, state: EditorState): Pace {
   };
 }
 
+/**
+ * Create an AST node for an `intensity` CST node.
+ *
+ * Precondition: `cursor` points to a `PaceAlias | HeartRate | Number`.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ *
+ * @returns An `Intensity` AST node.
+ */
 function visitIntensity(cursor: TreeCursor, state: EditorState): Intensity {
   if (cursor.name === "PaceAlias") {
     return { kind: "alias", value: state.sliceDoc(cursor.from, cursor.to) };
@@ -328,7 +341,7 @@ function visitRest(cursor: TreeCursor, state: EditorState): Rest {
 /**
  * Convert the swimDSL stroke name to the swiML stroke name.
  *
- * @param strokeName - The swimDSL name of stroke.
+ * @param strokeName - The swimDSL name of the stroke.
  *
  * @returns The swiML name of the same stroke.
  */
@@ -417,6 +430,13 @@ function getStroke(strokeName: string): string {
   }
 }
 
+/**
+ * Convert the swimDSL stroke modifier name to the swiML stroke type.
+ *
+ * @param strokeModifierName - The swimDSL name of the stroke modifier.
+ *
+ * @returns The namee of the coresponding swiML stroke type.
+ */
 function getStrokeModifier(strokeModifierName: string): StrokeModifiers {
   switch (strokeModifierName) {
     case "Kick":
@@ -428,6 +448,119 @@ function getStrokeModifier(strokeModifierName: string): StrokeModifiers {
     default:
       return StrokeModifiers.STANDARD;
   }
+}
+
+/**
+ * Create an AST node for a `Length` CST node.
+ *
+ * Precondition: `cursor` points to a `Lenth`.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ *
+ * @returns A `Length` AST node.
+ */
+function visitLength(cursor: TreeCursor, state: EditorState): Length {
+  // Move down to LengthAsDistance | LengthAsLaps | LengthAsTime
+  cursor.firstChild();
+
+  let kind: Length["kind"];
+
+  switch (cursor.name) {
+    case "LengthAsLaps":
+      kind = "laps";
+      break;
+
+    case "LengthAsTime":
+      kind = "time";
+      break;
+
+    case "LengthAsDistance":
+    default:
+      kind = "distance";
+      break;
+  }
+
+  // Move down to Number | Duration
+  cursor.firstChild();
+
+  const length =
+    kind === "time"
+      ? { kind, ...visitDuration(cursor, state) }
+      : { kind, value: state.sliceDoc(cursor.from, cursor.to) };
+
+  // Move back up to LengthAsDistance | LengthAsLaps | LengthAsTime
+  cursor.parent();
+
+  // Move back up to Length
+  cursor.parent();
+
+  return length;
+}
+
+/**
+ * Create an AST node for a `SingleInsstruction` CST node.
+ *
+ * Precondition: `cursor` points to a `SingleInstruction`.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ *
+ * @returns A `SingleInstruction` AST node.
+ */
+function visitSingleInstruction(
+  cursor: TreeCursor,
+  state: EditorState,
+): SingleInstruction {
+  // Move down to Length
+  cursor.firstChild();
+  const length = visitLength(cursor, state);
+
+  // Move across to Stroke
+  cursor.nextSibling();
+  const stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
+
+  // Move back up to SingleInstruction
+  cursor.parent();
+
+  return { isBlock: false, length, stroke };
+}
+
+/**
+ * Create an AST node for a `BlockInsstruction` CST node.
+ *
+ * Precondition: `cursor` points to a `BlockInstruction`.
+ *
+ * Postcondition: `cursor` will point to the same node it pointed to when
+ * passed to this function.
+ *
+ * @param cursor - A reference to a Lezer syntax tree node.
+ * @param state - The state of the CodeMirror editor.
+ *
+ * @returns A `BlockInstruction` AST node.
+ */
+function visitBlockInstruction(
+  cursor: TreeCursor,
+  state: EditorState,
+): BlockInstruction {
+  // Move into first Instruction of the block
+  cursor.firstChild();
+
+  const instructions: Instruction[] = [];
+  do {
+    instructions.push(visitInstruction(cursor, state));
+  } while (cursor.nextSibling());
+
+  // Move back up to BlockInstruction
+  cursor.parent();
+
+  return { isBlock: true, instructions };
 }
 
 /**
@@ -449,7 +582,6 @@ function visitSwimInstruction(
 ): SwimInstruction {
   let repetitions = 1;
   let strokeModifier: StrokeModifiers = StrokeModifiers.STANDARD;
-  let instruction: SingleInstruction | BlockInstruction;
   const instructionModifiers: InstructionModifier[] = [];
 
   // Move into either Number (for repetitions) or SingleInstruction |
@@ -463,72 +595,24 @@ function visitSwimInstruction(
     cursor.nextSibling();
   }
 
-  if (cursor.name === "BlockInstruction") {
-    // Move into first Instruction of the block
-    cursor.firstChild();
-
-    const instructions: Instruction[] = [];
-    do {
-      instructions.push(visitInstruction(cursor, state));
-    } while (cursor.nextSibling());
-
-    instruction = { isBlock: true, instructions };
-    // cursor is still on the last instruction of the block
-  } else {
-    // cursor is on SingleInstruction
-    cursor.firstChild();
-    cursor.firstChild();
-
-    let kind: Length["kind"];
-
-    switch (cursor.name) {
-      case "LengthAsDistance":
-        kind = "distance";
-        break;
-
-      case "LengthAsLaps":
-        kind = "laps";
-        break;
-
-      case "LengthAsTime":
-        kind = "time";
-        break;
-
-      default:
-        kind = "distance";
-    }
-
-    cursor.firstChild();
-    let length: Length;
-    if (kind === "time") {
-      length = { kind, ...visitDuration(cursor, state) };
-    } else {
-      length = { kind, value: state.sliceDoc(cursor.from, cursor.to) };
-    }
-    cursor.parent(); // exits LengthAsDistance or LengthAsLaps or LengthAsTime
-
-    cursor.parent(); // exits length
-    cursor.nextSibling();
-    const stroke = getStroke(state.sliceDoc(cursor.from, cursor.to));
-
-    instruction = { isBlock: false, length, stroke };
-    // cursor is still on the Stroke
-  }
-  // Move back up to SwimInstruction
-  cursor.parent();
+  const instruction =
+    cursor.name === "BlockInstruction"
+      ? visitBlockInstruction(cursor, state)
+      : visitSingleInstruction(cursor, state);
 
   if (cursor.nextSibling()) {
-    let hasModifiers = true;
+    let hasInstructionModifiers = true;
+
     if (cursor.name === "StrokeModifier") {
       strokeModifier = getStrokeModifier(
         state.sliceDoc(cursor.from, cursor.to),
       );
 
       // Move away from the StrokeModifier to a potential instruction modifier.
-      hasModifiers = cursor.nextSibling();
+      hasInstructionModifiers = cursor.nextSibling();
     }
 
-    if (hasModifiers) {
+    if (hasInstructionModifiers) {
       do {
         instructionModifiers.push(visitInstructionModifier(cursor, state));
       } while (cursor.nextSibling());
