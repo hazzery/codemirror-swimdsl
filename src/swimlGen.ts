@@ -68,10 +68,19 @@ function writeInstruction(
  * @param intensity - The AST intensity node to write as XML.
  */
 function writeIntensity(xmlParent: XMLBuilder, intensity: Intensity): void {
-  if (intensity.isAlias) {
-    xmlParent.ele("zone").txt(intensity.value);
-  } else {
-    xmlParent.ele("percentageEffort").txt(intensity.value);
+  switch (intensity.kind) {
+    case "alias":
+      xmlParent.ele("zone").txt(intensity.value);
+      break;
+
+    case "heartRate":
+      xmlParent.ele("percentageHeartRate").txt(intensity.value);
+      break;
+
+    case "percentage":
+    default:
+      xmlParent.ele("percentageEffort").txt(intensity.value);
+      break;
   }
 }
 
@@ -151,7 +160,7 @@ function writeSwimInstruction(
   xmlParent: XMLBuilder,
   instruction: SwimInstruction,
 ): void {
-  let parent = xmlParent.ele("instruction");
+  let parent = xmlParent;
 
   if (instruction.repetitions > 1) {
   const repetition = parent.ele("repetition");
@@ -165,10 +174,16 @@ function writeSwimInstruction(
 }
 
   if (instruction.instruction.isBlock) {
+    if (instruction.repetitions <= 1) {
+      parent = xmlParent.ele("instruction");
+      parent = parent.ele("repetition");
+      parent.ele("repetitionCount").txt("1");
+    }
     for (const subInstruction of instruction.instruction.instructions) {
       writeInstruction(parent, subInstruction);
     }
   } else {
+    parent = parent.ele("instruction");
     const len = instruction.instruction.length;
     const length = parent.ele("length");
     if (len.kind === "distance") {
