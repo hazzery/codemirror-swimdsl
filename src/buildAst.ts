@@ -249,6 +249,12 @@ function visitInstructionModifier(
   cursor: TreeCursor,
   state: EditorState,
 ): InstructionModifier {
+  console.log(
+    "Modifier node:",
+    cursor.name,
+    "| text:",
+    state.sliceDoc(cursor.from, cursor.to)
+  );
   if (cursor.name === "EquipmentSpecification") {
     const equipment: string[] = [];
 
@@ -585,12 +591,20 @@ function visitContinueBlock(
       cursor.name === "InstructionDescription" ||
       cursor.name === "ExcludeAlignSpecification"
     ) {
-      continueModifiers.push(visitInstructionModifier(cursor, state));
+      continueModifiers.push(
+        visitInstructionModifier(cursor, state),
+      );
     } else if (
       cursor.name === "SwimInstruction" ||
       cursor.name === "Message"
     ) {
-      continueInstructions.push(visitInstruction(cursor, state));
+      // Create a separate cursor so visitInstruction()
+      // cannot move the main cursor.
+      const instructionCursor = cursor.node.cursor();
+
+      continueInstructions.push(
+        visitInstruction(instructionCursor, state),
+      );
     }
   } while (cursor.nextSibling());
 
@@ -650,23 +664,30 @@ function visitSwimInstruction(
 
   // Move to the first modifier after the instruction
   if (cursor.nextSibling()) {
-    let hasInstructionModifiers = true;
-
     if (cursor.name === "StrokeModifier") {
       strokeModifier = getStrokeModifier(
         state.sliceDoc(cursor.from, cursor.to),
       );
 
-      // Move away from StrokeModifier to a potential instruction modifier
-      hasInstructionModifiers = cursor.nextSibling();
+      cursor.nextSibling();
     }
 
-    if (hasInstructionModifiers) {
-      do {
-        instructionModifiers.push(
-          visitInstructionModifier(cursor, state),
-        );
-      } while (cursor.nextSibling());
+    while (
+      cursor.name === "EquipmentSpecification" ||
+      cursor.name === "Pace" ||
+      cursor.name === "Rest" ||
+      cursor.name === "Breathe" ||
+      cursor.name === "Underwater" ||
+      cursor.name === "InstructionDescription" ||
+      cursor.name === "ExcludeAlignSpecification"
+    ) {
+      instructionModifiers.push(
+        visitInstructionModifier(cursor, state),
+      );
+
+      if (!cursor.nextSibling()) {
+        break;
+      }
     }
   }
 
