@@ -179,17 +179,21 @@ function writeRepetitionWrapper(
 function writeContinueBlock (
   xmlParent: XMLBuilder,
   instruction: ContinueBlock,
+  outerModifiers: InstructionModifier[] = [],
 ): void {
   const continueNode = xmlParent.ele("continue");
 
+  for (const modifier of outerModifiers) {
+    writeInstructionModifier(continueNode, modifier);
+  }
   for (const modifier of instruction.instructionModifiers) {
     writeInstructionModifier(continueNode, modifier);
   }
-
   for (const subInstruction of instruction.instructions) {
     writeInstruction(continueNode, subInstruction);
   }
 }
+
 
 /**
  * Writes a single instruction node into the XML document.
@@ -231,43 +235,36 @@ function writeSwimInstruction(
   instruction: SwimInstruction,
 ): void {
   const instructionNode = xmlParent.ele("instruction");
-  const {
-    instruction: inner,
-    repetitions,
-    strokeModifier,
-    instructionModifiers,
-  } = instruction;
+  const { instruction: inner, repetitions, strokeModifier, instructionModifiers } = instruction;
 
   if (inner.isBlock) {
     const parent = writeRepetitionWrapper(instructionNode, repetitions);
-
+    for (const modifier of instructionModifiers) {
+      writeInstructionModifier(parent, modifier); // into <repetition> when wrapped
+    }
     for (const subInstruction of inner.instructions) {
       writeInstruction(parent, subInstruction);
     }
   } else if (inner.isContinue) {
-    const parent =
-      repetitions > 1
-        ? writeRepetitionWrapper(instructionNode, repetitions).ele(
-            "instruction",
-          )
-        : instructionNode;
+    const parent = writeRepetitionWrapper(instructionNode, repetitions);
 
-    writeContinueBlock(parent, inner);
+    if (parent === instructionNode) {
+      // no repetition: modifiers belong inside <continue> itself
+      writeContinueBlock(parent, inner, instructionModifiers);
+    } else {
+      // wrapped in <repetition>: modifiers belong inside <repetition> itself
+      for (const modifier of instructionModifiers) {
+        writeInstructionModifier(parent, modifier);
+      }
+      const innerInstructionNode = parent.ele("instruction");
+      writeContinueBlock(innerInstructionNode, inner);
+    }
   } else {
-    const parent = writeRepetitionWrapper(
-      instructionNode,
-      repetitions,
-    );
-
-    writeSingleInstruction(
-      parent,
-      inner,
-      strokeModifier ?? StrokeModifiers.STANDARD,
-    );
-  }
-
-  for (const modifier of instructionModifiers) {
-    writeInstructionModifier(instructionNode, modifier);
+    const parent = writeRepetitionWrapper(instructionNode, repetitions);
+    writeSingleInstruction(parent, inner, strokeModifier ?? StrokeModifiers.STANDARD);
+    for (const modifier of instructionModifiers) {
+      writeInstructionModifier(parent, modifier); // <repetition> if wrapped, else <instruction>
+    }
   }
 }
 

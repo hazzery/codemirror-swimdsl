@@ -60,11 +60,13 @@ instruction {
 
 SwimInstruction {
     (Number repititionOperator)?
-    (SingleInstruction | BlockInstruction | ContinueBlock) StrokeModifier? instructionModifier*
+    (SingleInstruction | BlockInstruction | ContinueBlock)
+    StrokeModifier?
+    instructionModifier*
 }
 
 ContinueBlock {
-    continueKeyword instructionModifier* "{" instruction+ "}"
+    continueKeyword BlockInstruction
 }
 
 SingleInstruction {

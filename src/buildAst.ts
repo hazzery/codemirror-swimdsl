@@ -77,11 +77,15 @@ function visitIntensity(cursor: TreeCursor, state: EditorState): Intensity {
     return { kind: "alias", value: state.sliceDoc(cursor.from, cursor.to) };
   }
 
-  const kind = cursor.name === "HeartRate" ? "heartRate" : "percentage";
-  cursor.firstChild();
-  const value = state.sliceDoc(cursor.from, cursor.to);
-  cursor.parent();
-  return { kind, value };
+  if (cursor.name === "HeartRate") {
+    cursor.firstChild();
+    const value = state.sliceDoc(cursor.from, cursor.to);
+    cursor.parent();
+    return { kind: "heartRate", value };
+  }
+
+  // percentage is inlined by the grammar — cursor is already on the bare Number
+  return { kind: "percentage", value: state.sliceDoc(cursor.from, cursor.to) };
 }
 
 /**
@@ -157,9 +161,7 @@ function visitBreathe(cursor: TreeCursor, state: EditorState): Breathe {
  */
 function visitInstruction(cursor: TreeCursor, state: EditorState): Instruction {
   if (cursor.name === "SwimInstruction") {
-    const result = visitSwimInstruction(cursor, state);
-    cursor.parent();
-    return result;
+    return visitSwimInstruction(cursor, state);
   }
 
   return visitMessage(cursor, state);
@@ -249,12 +251,6 @@ function visitInstructionModifier(
   cursor: TreeCursor,
   state: EditorState,
 ): InstructionModifier {
-  console.log(
-    "Modifier node:",
-    cursor.name,
-    "| text:",
-    state.sliceDoc(cursor.from, cursor.to)
-  );
   if (cursor.name === "EquipmentSpecification") {
     const equipment: string[] = [];
 
@@ -558,63 +554,45 @@ function visitBlockInstruction(
   cursor: TreeCursor,
   state: EditorState,
 ): BlockInstruction {
-  // Move into first Instruction of the block
+  const instructions: Instruction[] = [];
+
   cursor.firstChild();
 
-  const instructions: Instruction[] = [];
   do {
     instructions.push(visitInstruction(cursor, state));
   } while (cursor.nextSibling());
 
-  // Move back up to BlockInstruction
   cursor.parent();
 
-  return { isBlock: true, instructions };
+  return {
+    isBlock: true,
+    instructions,
+  };
 }
 
 function visitContinueBlock(
   cursor: TreeCursor,
   state: EditorState,
 ): ContinueBlock {
-  const continueModifiers: InstructionModifier[] = [];
-  const continueInstructions: Instruction[] = [];
+  const instructionModifiers: InstructionModifier[] = [];
 
+  // Move into BlockInstruction
   cursor.firstChild();
+  const block = visitBlockInstruction(cursor, state);
 
-  do {
-    if (
-      cursor.name === "EquipmentSpecification" ||
-      cursor.name === "Pace" ||
-      cursor.name === "Rest" ||
-      cursor.name === "Breathe" ||
-      cursor.name === "Underwater" ||
-      cursor.name === "InstructionDescription" ||
-      cursor.name === "ExcludeAlignSpecification"
-    ) {
-      continueModifiers.push(
-        visitInstructionModifier(cursor, state),
-      );
-    } else if (
-      cursor.name === "SwimInstruction" ||
-      cursor.name === "Message"
-    ) {
-      // Create a separate cursor so visitInstruction()
-      // cannot move the main cursor.
-      const instructionCursor = cursor.node.cursor();
+  // Collect any trailing instruction modifiers
+  while (cursor.nextSibling()) {
+    instructionModifiers.push(visitInstructionModifier(cursor, state));
+  }
 
-      continueInstructions.push(
-        visitInstruction(instructionCursor, state),
-      );
-    }
-  } while (cursor.nextSibling());
-
+  // Restore cursor to ContinueBlock
   cursor.parent();
 
   return {
     isBlock: false,
     isContinue: true,
-    instructionModifiers: continueModifiers,
-    instructions: continueInstructions,
+    instructions: block.instructions,
+    instructionModifiers,
   };
 }
 
@@ -690,6 +668,9 @@ function visitSwimInstruction(
       }
     }
   }
+
+  // Return cursor to SwimInstruction
+  cursor.parent();
 
   return {
     statement: Statements.SWIM_INSTRUCTION,
@@ -848,7 +829,6 @@ export default function buildAst(
       switch (cursor.type.name) {
         case "SwimInstruction":
           node = visitSwimInstruction(cursor, state);
-          cursor.parent();
           break;
         case "Message":
           node = visitMessage(cursor, state);
