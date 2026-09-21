@@ -5,6 +5,7 @@ import {
   BlockInstruction,
   Breathe,
   ConstantDefinition,
+  ContinueBlock,
   Instruction,
   InstructionDescription,
   InstructionModifier,
@@ -76,11 +77,15 @@ function visitIntensity(cursor: TreeCursor, state: EditorState): Intensity {
     return { kind: "alias", value: state.sliceDoc(cursor.from, cursor.to) };
   }
 
-  const kind = cursor.name === "HeartRate" ? "heartRate" : "percentage";
-  cursor.firstChild();
-  const value = state.sliceDoc(cursor.from, cursor.to);
-  cursor.parent();
-  return { kind, value };
+  if (cursor.name === "HeartRate") {
+    cursor.firstChild();
+    const value = state.sliceDoc(cursor.from, cursor.to);
+    cursor.parent();
+    return { kind: "heartRate", value };
+  }
+
+  // percentage is inlined by the grammar — cursor is already on the bare Number
+  return { kind: "percentage", value: state.sliceDoc(cursor.from, cursor.to) };
 }
 
 /**
@@ -549,18 +554,46 @@ function visitBlockInstruction(
   cursor: TreeCursor,
   state: EditorState,
 ): BlockInstruction {
-  // Move into first Instruction of the block
+  const instructions: Instruction[] = [];
+
   cursor.firstChild();
 
-  const instructions: Instruction[] = [];
   do {
     instructions.push(visitInstruction(cursor, state));
   } while (cursor.nextSibling());
 
-  // Move back up to BlockInstruction
   cursor.parent();
 
-  return { isBlock: true, instructions };
+  return {
+    isBlock: true,
+    instructions,
+  };
+}
+
+function visitContinueBlock(
+  cursor: TreeCursor,
+  state: EditorState,
+): ContinueBlock {
+  const instructionModifiers: InstructionModifier[] = [];
+
+  // Move into BlockInstruction
+  cursor.firstChild();
+  const block = visitBlockInstruction(cursor, state);
+
+  // Collect any trailing instruction modifiers
+  while (cursor.nextSibling()) {
+    instructionModifiers.push(visitInstructionModifier(cursor, state));
+  }
+
+  // Restore cursor to ContinueBlock
+  cursor.parent();
+
+  return {
+    isBlock: false,
+    isContinue: true,
+    instructions: block.instructions,
+    instructionModifiers,
+  };
 }
 
 /**
@@ -582,44 +615,61 @@ function visitSwimInstruction(
 ): SwimInstruction {
   let repetitions = 1;
   let strokeModifier: StrokeModifiers = StrokeModifiers.STANDARD;
+  let instruction: SingleInstruction | BlockInstruction | ContinueBlock;
+
   const instructionModifiers: InstructionModifier[] = [];
 
-  // Move into either Number (for repetitions) or SingleInstruction |
-  // BlockInstruction
+  // Move into either Number (for repetitions) or
+  // SingleInstruction | BlockInstruction | ContinueBlock
   cursor.firstChild();
 
   if (cursor.name === "Number") {
     repetitions = Number(state.sliceDoc(cursor.from, cursor.to));
 
-    // Move into SingleInstruction | BlockInstruction
+    // Move into SingleInstruction | BlockInstruction | ContinueBlock
     cursor.nextSibling();
   }
 
-  const instruction =
-    cursor.name === "BlockInstruction"
-      ? visitBlockInstruction(cursor, state)
-      : visitSingleInstruction(cursor, state);
+  // Visit the actual instruction
+  if (cursor.name === "BlockInstruction") {
+    instruction = visitBlockInstruction(cursor, state);
+  } else if (cursor.name === "ContinueBlock") {
+    instruction = visitContinueBlock(cursor, state);
+  } else {
+    // cursor is on SingleInstruction
+    instruction = visitSingleInstruction(cursor, state);
+  }
 
+  // Move to the first modifier after the instruction
   if (cursor.nextSibling()) {
-    let hasInstructionModifiers = true;
-
     if (cursor.name === "StrokeModifier") {
       strokeModifier = getStrokeModifier(
         state.sliceDoc(cursor.from, cursor.to),
       );
 
-      // Move away from the StrokeModifier to a potential instruction modifier.
-      hasInstructionModifiers = cursor.nextSibling();
+      cursor.nextSibling();
     }
 
-    if (hasInstructionModifiers) {
-      do {
-        instructionModifiers.push(visitInstructionModifier(cursor, state));
-      } while (cursor.nextSibling());
+    while (
+      cursor.name === "EquipmentSpecification" ||
+      cursor.name === "Pace" ||
+      cursor.name === "Rest" ||
+      cursor.name === "Breathe" ||
+      cursor.name === "Underwater" ||
+      cursor.name === "InstructionDescription" ||
+      cursor.name === "ExcludeAlignSpecification"
+    ) {
+      instructionModifiers.push(
+        visitInstructionModifier(cursor, state),
+      );
+
+      if (!cursor.nextSibling()) {
+        break;
+      }
     }
   }
 
-  // Move up out of the SwimInstruction
+  // Return cursor to SwimInstruction
   cursor.parent();
 
   return {

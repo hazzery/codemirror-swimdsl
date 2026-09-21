@@ -52,6 +52,13 @@ export type Statement =
   | ConstantDefinition
   | AuthorDefintion;
 
+export interface ContinueBlock {
+  isBlock: false;
+  isContinue: true;
+  instructionModifiers: InstructionModifier[];
+  instructions: Instruction[];
+}
+
 export interface EquipmentSpecification {
   modifier: InstructionModifiers.EQUIPMENT_SPECIFICATION;
   equipment: string[];
@@ -106,7 +113,7 @@ export type Intensity =
 export interface SwimInstruction {
   statement: Statements.SWIM_INSTRUCTION;
   repetitions: number;
-  instruction: SingleInstruction | BlockInstruction;
+  instruction: SingleInstruction | BlockInstruction | ContinueBlock;
   strokeModifier?: StrokeModifiers | undefined;
   instructionModifiers: InstructionModifier[];
 }
@@ -118,6 +125,7 @@ export type Length =
 
 export interface SingleInstruction {
   isBlock: false;
+  isContinue?: false;
   length: Length;
   stroke: string;
 }

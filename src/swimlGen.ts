@@ -11,7 +11,9 @@ import {
   Programme,
   Statements,
   StrokeModifiers,
+  SingleInstruction,
   SwimInstruction,
+  ContinueBlock,
 } from "./astTypes";
 
 const XML_NAMESPACE = "https://github.com/bartneck/swiML";
@@ -151,6 +153,78 @@ function writeInstructionModifier(
 }
 
 /**
+ * Writes a repetition wrapper node into the XML document.
+ *
+ * @param xmlParent - The parent XML node to write the repetition wrapper inside of.
+ * @param repetitions - The number of repetitions.
+ * @returns The XML node representing the repetition wrapper.
+ */
+function writeRepetitionWrapper(
+  xmlParent: XMLBuilder,
+  repetitions: number,
+): XMLBuilder {
+  if (repetitions <= 1) return xmlParent;
+
+  const repetitionNode = xmlParent.ele("repetition");
+  repetitionNode.ele("repetitionCount").txt(String(repetitions));
+  return repetitionNode;
+}
+
+/**
+ * Writes a continue block node into the XML document.
+ *
+ * @param xmlParent - The parent XML node to write the continue block inside of.
+ * @param instruction - The continue block instruction to write as XML.
+ */
+function writeContinueBlock (
+  xmlParent: XMLBuilder,
+  instruction: ContinueBlock,
+  outerModifiers: InstructionModifier[] = [],
+): void {
+  const continueNode = xmlParent.ele("continue");
+
+  for (const modifier of outerModifiers) {
+    writeInstructionModifier(continueNode, modifier);
+  }
+  for (const modifier of instruction.instructionModifiers) {
+    writeInstructionModifier(continueNode, modifier);
+  }
+  for (const subInstruction of instruction.instructions) {
+    writeInstruction(continueNode, subInstruction);
+  }
+}
+
+
+/**
+ * Writes a single instruction node into the XML document.
+ *
+ * @param xmlParent - The parent XML node to write the instruction inside of.
+ * @param instruction - The single instruction to write as XML.
+ * @param strokeModifier - The stroke modifier for the instruction.
+ */
+function writeSingleInstruction(
+  xmlParent: XMLBuilder,
+  instruction: SingleInstruction,
+  strokeModifier: StrokeModifiers,
+): void {
+  const len = instruction.length;
+  const length = xmlParent.ele("length");
+  if (len.kind === "distance") {
+    length.ele("lengthAsDistance").txt(len.value);
+  } else if (len.kind == "laps") {
+    length.ele("lengthAsLaps").txt(len.value);
+  } else {
+    length.ele("lengthAsTime").txt(xmlDuration(len.minutes, len.seconds));
+  }
+
+  if (strokeModifier === StrokeModifiers.KICK) {
+    xmlParent.ele("stroke").ele("kicking").ele("standardKick").txt(instruction.stroke);
+  } else {
+    xmlParent.ele("stroke").ele("standardStroke").txt(instruction.stroke);
+  }
+}
+
+/**
  * Write an AST SwimInstruction node into the XML document.
  *
  * @param xmlParent - The parent XML node to write the instruction inside of.
@@ -160,52 +234,36 @@ function writeSwimInstruction(
   xmlParent: XMLBuilder,
   instruction: SwimInstruction,
 ): void {
-  let parent = xmlParent;
+  const instructionNode = xmlParent.ele("instruction");
+  const { instruction: inner, repetitions, strokeModifier, instructionModifiers } = instruction;
 
-  if (instruction.repetitions > 1) {
-    parent = xmlParent.ele("instruction");
-    parent = parent.ele("repetition");
-    parent.ele("repetitionCount").txt(String(instruction.repetitions));
-  }
-
-  if (instruction.instruction.isBlock) {
-    if (instruction.repetitions <= 1) {
-      parent = xmlParent.ele("instruction");
-      parent = parent.ele("repetition");
-      parent.ele("repetitionCount").txt("1");
+  if (inner.isBlock) {
+    const parent = writeRepetitionWrapper(instructionNode, repetitions);
+    for (const modifier of instructionModifiers) {
+      writeInstructionModifier(parent, modifier); // into <repetition> when wrapped
     }
-    for (const subInstruction of instruction.instruction.instructions) {
+    for (const subInstruction of inner.instructions) {
       writeInstruction(parent, subInstruction);
     }
+  } else if (inner.isContinue) {
+    const parent = writeRepetitionWrapper(instructionNode, repetitions);
+
+    if (parent === instructionNode) {
+      // no repetition: modifiers belong inside <continue> itself
+      writeContinueBlock(parent, inner, instructionModifiers);
+    } else {
+      // wrapped in <repetition>: modifiers belong inside <repetition> itself
+      for (const modifier of instructionModifiers) {
+        writeInstructionModifier(parent, modifier);
+      }
+      const innerInstructionNode = parent.ele("instruction");
+      writeContinueBlock(innerInstructionNode, inner);
+    }
   } else {
-    parent = parent.ele("instruction");
-    const len = instruction.instruction.length;
-    const length = parent.ele("length");
-    if (len.kind === "distance") {
-      length.ele("lengthAsDistance").txt(len.value);
-    } else if (len.kind == "laps") {
-      length.ele("lengthAsLaps").txt(len.value);
-    } else {
-      length.ele("lengthAsTime").txt(xmlDuration(len.minutes, len.seconds));
-    }
-
-    if (instruction.strokeModifier === StrokeModifiers.KICK) {
-      parent
-        .ele("stroke")
-        .ele("kicking")
-        .ele("standardKick")
-        .txt(instruction.instruction.stroke);
-    } else {
-      parent
-        .ele("stroke")
-        .ele("standardStroke")
-        .txt(instruction.instruction.stroke);
-    }
-  }
-
-  if (instruction.instructionModifiers.length > 0) {
-    for (const modifier of instruction.instructionModifiers) {
-      writeInstructionModifier(parent, modifier);
+    const parent = writeRepetitionWrapper(instructionNode, repetitions);
+    writeSingleInstruction(parent, inner, strokeModifier ?? StrokeModifiers.STANDARD);
+    for (const modifier of instructionModifiers) {
+      writeInstructionModifier(parent, modifier); // <repetition> if wrapped, else <instruction>
     }
   }
 }
