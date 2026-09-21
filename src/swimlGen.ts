@@ -231,7 +231,12 @@ function writeSwimInstruction(
   instruction: SwimInstruction,
 ): void {
   const instructionNode = xmlParent.ele("instruction");
-  const { instruction: inner, repetitions, strokeModifier, instructionModifiers } = instruction;
+  const {
+    instruction: inner,
+    repetitions,
+    strokeModifier,
+    instructionModifiers,
+  } = instruction;
 
   if (inner.isBlock) {
     const parent = writeRepetitionWrapper(instructionNode, repetitions);
@@ -240,14 +245,25 @@ function writeSwimInstruction(
       writeInstruction(parent, subInstruction);
     }
   } else if (inner.isContinue) {
-    const parent = repetitions > 1
-      ? writeRepetitionWrapper(instructionNode, repetitions).ele("instruction")
-      : instructionNode;
+    const parent =
+      repetitions > 1
+        ? writeRepetitionWrapper(instructionNode, repetitions).ele(
+            "instruction",
+          )
+        : instructionNode;
 
-      writeContinueBlock(parent, inner);
+    writeContinueBlock(parent, inner);
   } else {
-    const parent = writeRepetitionWrapper(instructionNode, repetitions);
-    writeSingleInstruction(parent, inner, strokeModifier ?? StrokeModifiers.STANDARD);
+    const parent = writeRepetitionWrapper(
+      instructionNode,
+      repetitions,
+    );
+
+    writeSingleInstruction(
+      parent,
+      inner,
+      strokeModifier ?? StrokeModifiers.STANDARD,
+    );
   }
 
   for (const modifier of instructionModifiers) {
