@@ -21,7 +21,7 @@ import {
   Statements,
   StrokeModifiers,
   SwimInstruction,
-} from "./astTypes";
+} from "./astTypes.js";
 
 /**
  * Create an AST node for a `Pace` CST node.
